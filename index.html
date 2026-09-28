@@ -113,7 +113,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [];
 let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
@@ -137,6 +137,7 @@ function loadLocal(){
   try{ personas = JSON.parse(localStorage.getItem('vico_personas')||'[]'); }catch(e){ personas = []; }
   try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
   try{ biblioteca = JSON.parse(localStorage.getItem('vico_biblioteca')||'[]'); }catch(e){ biblioteca = []; }
+  try{ campanas = JSON.parse(localStorage.getItem('vico_campanas')||'[]'); }catch(e){ campanas = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
@@ -144,6 +145,7 @@ function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringi
 function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify(eventos)); }catch(e){} }
 function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
 function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.stringify(biblioteca)); }catch(e){} }
+function saveCampanas(){ try{ localStorage.setItem('vico_campanas', JSON.stringify(campanas)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -166,6 +168,8 @@ function render(){
   else if(tab==='equipo') renderEquipo();
   else if(tab==='biblioteca') renderBiblioteca();
   else if(tab==='estadisticas') renderEstadisticas();
+  else if(tab==='campanas') renderCampanas();
+  else if(tab==='campdet') renderCampanaDetail(window.curCamp);
   else renderMas();
 }
 
@@ -244,7 +248,7 @@ function renderAgenda(){
 }
 
 function renderMas(){
-  const items = ["Campañas"];
+  
   const importHecho = localStorage.getItem('vico_import_done');
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
@@ -254,7 +258,7 @@ function renderMas(){
       <div class="row" id="goMet"><span class="dot"></span><div><div class="t">Metas y Mi Visión</div><div class="sub">Corto, mediano y largo plazo</div></div></div>
       <div class="row" id="goBib"><span class="dot"></span><div><div class="t">Biblioteca</div><div class="sub">Recursos y materiales guardados</div></div></div>
       <div class="row" id="goEst"><span class="dot"></span><div><div class="t">Estadísticas</div><div class="sub">Resumen de tu actividad</div></div></div>
-      ${items.map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente</div></div></div>`).join('')}
+      <div class="row" id="goCam"><span class="dot"></span><div><div class="t">Campañas</div><div class="sub">Promos y acciones sobre tu base de contactos</div></div></div>
     </div>
     ${!importHecho ? `<div class="section-title">Importar</div>
     <div class="card">
@@ -266,6 +270,7 @@ function renderMas(){
   document.getElementById('goMet').addEventListener('click', ()=>{ tab='metas'; render(); });
   document.getElementById('goBib').addEventListener('click', ()=>{ tab='biblioteca'; render(); });
   document.getElementById('goEst').addEventListener('click', ()=>{ tab='estadisticas'; render(); });
+  document.getElementById('goCam').addEventListener('click', ()=>{ tab='campanas'; render(); });
   const di = document.getElementById('doImport');
   if(di) di.addEventListener('click', ()=>{
     if(!confirm('Se van a agregar '+IMPORT_DATA.length+' contactos como Potenciales. ¿Continuar?')) return;
@@ -413,6 +418,171 @@ function renderEstadisticas(){
       <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Recursos en biblioteca</div><b>${biblioteca.length}</b></div>
     </div>`;
   document.getElementById('back5').addEventListener('click',()=>{tab='mas';render();});
+}
+
+const CAMP_TIPOS=['Venta','Reposición','Reactivación','Nuevo producto','Captación de clientes','Referidos','Oportunidad de negocio','Equipo','Evento / capacitación','Otro'];
+const CAMP_MOTIVOS=['Reposición','Nuevo producto','Reactivación','Interés previo','Referido','Negocio','Seguimiento','Otro'];
+const CAMP_ESTADOS=['Pendiente','Contactada','Respondió','Seguimiento','Venta','Oportunidad de negocio','No interesada'];
+const QUE_PASO=['No respondió','Respondió','Quiere información','Quiere pensarlo','Seguimiento necesario','Compró','Interesada en negocio','No interesada'];
+const QP_ESTADO={'No respondió':'Contactada','Respondió':'Respondió','Quiere información':'Respondió','Quiere pensarlo':'Seguimiento','Seguimiento necesario':'Seguimiento','Compró':'Venta','Interesada en negocio':'Oportunidad de negocio','No interesada':'No interesada'};
+function campCounts(c){ const o={}; CAMP_ESTADOS.forEach(e=>o[e]=0); (c.personas||[]).forEach(x=>{o[x.estado]=(o[x.estado]||0)+1;}); return o; }
+
+function renderCampanas(){
+  const f=window.camF||'Activas';
+  const list=campanas.filter(c=>(f==='Activas'?c.estado!=='finalizada':c.estado==='finalizada'));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backCM">← Más</div>${['Activas','Finalizadas'].map(x=>`<div class="chip ${f===x?'active':''}" data-camtab="${x}">${x}</div>`).join('')}</div>
+    ${list.length?list.map(c=>{const ct=campCounts(c); return `<div class="card" data-opencamp="${c.id}">
+      <div style="font-weight:600;">${c.nombre}</div>
+      <div class="sub">${c.fechaInicio||''}${c.fechaFin?' → '+c.fechaFin:''} · ${(c.personas||[]).length} personas</div>
+      <div class="sub" style="margin-top:6px;">${ct['Pendiente']} pendientes · ${ct['Contactada']} contactadas · ${ct['Seguimiento']} seguimiento · ${ct['Venta']} ventas</div>
+    </div>`;}).join(''):'<div class="empty">Sin campañas aquí todavía</div>'}
+    ${f==='Activas'?'<button class="cta" id="newCamp">+ Nueva campaña</button>':''}`;
+  document.getElementById('backCM').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-camtab]').forEach(el=>el.addEventListener('click',()=>{window.camF=el.dataset.camtab;renderCampanas();}));
+  $main.querySelectorAll('[data-opencamp]').forEach(el=>el.addEventListener('click',()=>{window.curCamp=el.dataset.opencamp;tab='campdet';render();}));
+  const nb=document.getElementById('newCamp'); if(nb) nb.addEventListener('click', openCampanaForm);
+}
+
+function openCampanaForm(){
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nueva campaña</h3>
+    <input id="c_nom" placeholder="Nombre de la campaña">
+    <select id="c_tipo">${CAMP_TIPOS.map(t=>`<option>${t}</option>`).join('')}</select>
+    <div style="display:flex;gap:8px;"><input id="c_ini" type="date" value="${todayStr()}"><input id="c_fin" type="date" placeholder="Fin (opcional)"></div>
+    <textarea id="c_obj" rows="2" placeholder="Objetivo de la campaña"></textarea>
+    <textarea id="c_notas" rows="2" placeholder="Información importante"></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveCamp">Guardar</button></div>`);
+  document.getElementById('saveCamp').addEventListener('click',()=>{
+    const nombre=document.getElementById('c_nom').value.trim(); if(!nombre) return;
+    const camp={id:uid(),nombre,tipo:document.getElementById('c_tipo').value,fechaInicio:document.getElementById('c_ini').value,fechaFin:document.getElementById('c_fin').value,objetivo:document.getElementById('c_obj').value.trim(),notas:document.getElementById('c_notas').value.trim(),estado:'activa',personas:[]};
+    campanas.push(camp); saveCampanas(); closeModal(); window.curCamp=camp.id; tab='campdet'; render();
+  });
+}
+
+function renderCampanaDetail(id){
+  const c=campanas.find(x=>x.id===id);
+  if(!c){ tab='campanas'; render(); return; }
+  const ct=campCounts(c);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backCD">← Campañas</div></div>
+    <div class="card">
+      <div style="font-weight:600;font-size:16px;">${c.nombre}</div>
+      <div class="sub">${c.tipo} · ${c.fechaInicio||''}${c.fechaFin?' → '+c.fechaFin:''}</div>
+      ${c.objetivo?`<div style="font-size:13px;margin-top:8px;">${c.objetivo}</div>`:''}
+    </div>
+    <div class="stat3">${['Pendiente','Contactada','Seguimiento'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
+    <div class="stat3">${['Venta','Oportunidad de negocio','No interesada'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="moverCamp">🔥 MOVER ESTA CAMPAÑA</button>':''}
+    <div class="section-title" style="margin-top:14px;">Personas (${(c.personas||[]).length})</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.personas||[]).length?c.personas.map(x=>{const p=personas.find(pp=>pp.id===x.personaId); if(!p) return ''; return `<div class="persona" data-openp="${x.personaId}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${x.motivo}</div></div><span class="tag">${x.estado}</span></div>`;}).join(''):'<div class="empty">Sin personas todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addPCamp">+ Agregar personas</button><button class="cta" id="finCamp" style="background:var(--accent);color:var(--brand);">Finalizar campaña</button>':''}
+  `;
+  document.getElementById('backCD').addEventListener('click',()=>{tab='campanas';render();});
+  $main.querySelectorAll('[data-openp]').forEach(el=>el.addEventListener('click',()=>openFichaCampana(c.id, el.dataset.openp)));
+  const ap=document.getElementById('addPCamp'); if(ap) ap.addEventListener('click',()=>openAgregarPersonasCampana(c.id));
+  const mv=document.getElementById('moverCamp'); if(mv) mv.addEventListener('click',()=>openMoverCampana(c.id));
+  const fc=document.getElementById('finCamp'); if(fc) fc.addEventListener('click',()=>{
+    const t=ct['Contactada']+ct['Respondió']+ct['Seguimiento']+ct['Venta']+ct['Oportunidad de negocio']+ct['No interesada'];
+    if(!confirm('Resumen: '+(c.personas||[]).length+' personas, '+t+' contactadas, '+ct['Venta']+' ventas, '+ct['Oportunidad de negocio']+' oportunidades. ¿Finalizar y archivar?')) return;
+    c.estado='finalizada'; saveCampanas(); tab='campanas'; window.camF='Finalizadas'; render();
+  });
+}
+
+function openAgregarPersonasCampana(campId){
+  const c=campanas.find(x=>x.id===campId);
+  const yaIds=new Set((c.personas||[]).map(x=>x.personaId));
+  const sel=new Set();
+  const draw=(filtro,q)=>{
+    let list=personas.filter(p=>!yaIds.has(p.id));
+    if(filtro&&filtro!=='Todos') list=list.filter(p=>p.tipo===filtro);
+    if(q) list=list.filter(p=>p.nombre.toLowerCase().includes(q.toLowerCase()));
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Agregar personas</h3>
+      <input id="ap_q" placeholder="Buscar por nombre..." value="${q||''}">
+      <div class="chips">${['Todos','Potencial','Cliente','Socia'].map(f=>`<div class="chip ${(filtro||'Todos')===f?'active':''}" data-apf="${f}">${f}</div>`).join('')}</div>
+      <div style="max-height:40vh;overflow-y:auto;">${list.length?list.map(p=>`<div class="persona" data-ap="${p.id}"><div class="av" style="${sel.has(p.id)?'':'opacity:.4'}">${sel.has(p.id)?'✓':initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.tipo||''}</div></div></div>`).join(''):'<div class="empty">Nada por aquí</div>'}</div>
+      <div class="sub" style="margin:8px 0;">${sel.size} persona${sel.size===1?'':'s'} seleccionada${sel.size===1?'':'s'}</div>
+      <button class="cta" id="doAddP">Agregar a la campaña</button>`);
+    document.getElementById('ap_q').addEventListener('input',e=>draw(filtro,e.target.value));
+    document.querySelectorAll('[data-apf]').forEach(el=>el.addEventListener('click',()=>draw(el.dataset.apf,q)));
+    document.querySelectorAll('[data-ap]').forEach(el=>el.addEventListener('click',()=>{ const i=el.dataset.ap; if(sel.has(i)) sel.delete(i); else sel.add(i); draw(filtro,q); }));
+    document.getElementById('doAddP').addEventListener('click',()=>{
+      if(!sel.size) return;
+      sel.forEach(pid=>c.personas.push({personaId:pid, motivo:'Otro', estado:'Pendiente', nota:'', proximaFecha:''}));
+      saveCampanas(); closeModal(); render();
+    });
+  };
+  draw('Todos','');
+}
+
+function registrarAccionCampana(campId, personaId, onDone){
+  const c=campanas.find(x=>x.id===campId); const entry=c.personas.find(x=>x.personaId===personaId); const p=personas.find(x=>x.id===personaId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">¿Qué pasó?</h3>
+    <select id="qp_res">${QUE_PASO.map(o=>`<option>${o}</option>`).join('')}</select>
+    <textarea id="qp_nota" rows="2" placeholder="Nota (opcional)"></textarea>
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0;"><input type="checkbox" id="qp_seg"> ¿Necesita seguimiento?</label>
+    <div id="qp_segbox" style="display:none;">
+      <div style="display:flex;gap:8px;"><input id="qp_fecha" type="date"><input id="qp_hora" type="time"></div>
+      <input id="qp_motseg" placeholder="Motivo del seguimiento">
+    </div>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="qp_save">Registrar</button></div>`);
+  document.getElementById('qp_seg').addEventListener('change',e=>{ document.getElementById('qp_segbox').style.display=e.target.checked?'block':'none'; });
+  document.getElementById('qp_save').addEventListener('click',()=>{
+    const resultado=document.getElementById('qp_res').value, nota=document.getElementById('qp_nota').value.trim();
+    entry.estado=QP_ESTADO[resultado]||entry.estado; entry.nota=nota;
+    const texto='Campaña "'+c.nombre+'" — '+resultado+(nota?': '+nota:'');
+    p.historial=(p.historial||[]).concat({fecha:todayStr(),texto});
+    p.ultimaNota=texto;
+    if(document.getElementById('qp_seg').checked){
+      const fecha=document.getElementById('qp_fecha').value, hora=document.getElementById('qp_hora').value, mot=document.getElementById('qp_motseg').value.trim();
+      if(fecha){ eventos.push({id:uid(),titulo:'Seguimiento con '+p.nombre+' ('+c.nombre+')',tipo:'Seguimiento',fecha,hora,personaId:p.id}); saveEventos(); p.proximaFecha=fecha; p.proximaAccion=mot||('Seguimiento — '+c.nombre); entry.proximaFecha=fecha; }
+    }
+    savePersonas(); saveCampanas(); closeModal();
+    if(onDone) onDone(); else render();
+  });
+}
+
+function openFichaCampana(campId, personaId){
+  const c=campanas.find(x=>x.id===campId); const entry=c.personas.find(x=>x.personaId===personaId); const p=personas.find(x=>x.id===personaId);
+  if(!p||!entry) return;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${p.nombre}</h3>
+    <div class="sub">${p.tipo||''}${p.producto?' · '+p.producto:''}</div>
+    <div class="section-title">Motivo en esta campaña</div>
+    <select id="fc_mot">${CAMP_MOTIVOS.map(m=>`<option ${entry.motivo===m?'selected':''}>${m}</option>`).join('')}</select>
+    <div class="section-title">Estado</div>
+    <select id="fc_est">${CAMP_ESTADOS.map(e=>`<option ${entry.estado===e?'selected':''}>${e}</option>`).join('')}</select>
+    <div class="actions" style="margin:10px 0;">
+      ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;" target="_blank" href="https://wa.me/${p.telefono.replace(/\D/g,'')}">WhatsApp</a>`:''}
+      ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;background:var(--accent);color:var(--brand);" href="tel:${p.telefono}">Llamar</a>`:''}
+    </div>
+    <button class="cta" id="fc_reg">Registrar acción</button>
+    <button class="cta" id="fc_ver" style="background:var(--accent);color:var(--brand);margin-top:8px;">Ver ficha completa</button>`);
+  document.getElementById('fc_mot').addEventListener('change',e=>{ entry.motivo=e.target.value; saveCampanas(); });
+  document.getElementById('fc_est').addEventListener('change',e=>{ entry.estado=e.target.value; saveCampanas(); render(); });
+  document.getElementById('fc_reg').addEventListener('click',()=>registrarAccionCampana(campId,personaId));
+  document.getElementById('fc_ver').addEventListener('click',()=>openPersonaDetail(personaId));
+}
+
+function openMoverCampana(campId){
+  const c=campanas.find(x=>x.id===campId);
+  const cola=()=>(c.personas||[]).filter(x=>x.estado==='Pendiente'||x.estado==='Seguimiento');
+  const step=()=>{
+    const q=cola();
+    if(!q.length){ closeModal(); alert('No quedan personas pendientes en esta campaña por ahora 🎉'); render(); return; }
+    const entry=q[0]; const p=personas.find(x=>x.id===entry.personaId);
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${p.nombre}</h3>
+      <div class="sub">${p.producto||p.tipo||''}</div>
+      <div class="section-title">Motivo</div><div style="font-size:14px;margin-bottom:8px;">${entry.motivo}</div>
+      ${p.ultimaNota?`<div class="section-title">Última interacción</div><div style="font-size:13px;color:var(--sub);margin-bottom:8px;">${p.ultimaNota}</div>`:''}
+      <div class="actions">
+        ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;" target="_blank" href="https://wa.me/${p.telefono.replace(/\D/g,'')}">WhatsApp</a>`:''}
+        ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;background:var(--accent);color:var(--brand);" href="tel:${p.telefono}">Llamar</a>`:''}
+      </div>
+      <button class="cta" id="mc_reg">Registrar resultado</button>
+      <button class="cta" id="mc_skip" style="background:none;color:var(--sub);">Omitir por ahora</button>`);
+    document.getElementById('mc_reg').addEventListener('click',()=>{ registrarAccionCampana(campId, entry.personaId, step); });
+    document.getElementById('mc_skip').addEventListener('click',()=>{ const rest=q.slice(1).concat(q[0]); c.personas=c.personas.filter(x=>!q.includes(x)).concat(rest); saveCampanas(); step(); });
+  };
+  step();
 }
 
 function openModal(html){
@@ -581,12 +751,13 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
 window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stringify(biblioteca));}catch(e){} push('biblioteca',{items:clone(biblioteca)}); };
+window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringify(campanas));}catch(e){} push('campanas',{items:clone(campanas)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||''}); };
 
@@ -607,7 +778,7 @@ function addOut(){
 }
 function listen(){
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas','biblioteca'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca','campanas'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -615,7 +786,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===5) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===6) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
