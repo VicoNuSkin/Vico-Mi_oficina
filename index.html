@@ -122,6 +122,15 @@ const fmtFecha = (s) => { if(!s) return ""; const d=new Date(s+"T00:00:00"); ret
 const initials = (n) => (n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
+function repoInfo(p){
+  if(!p.ultimaCompra||!p.ciclo) return null;
+  const d=new Date(p.ultimaCompra+"T00:00:00"); d.setDate(d.getDate()+Number(p.ciclo));
+  const hoy=new Date(todayStr()+"T00:00:00");
+  return {fecha:d.toISOString().slice(0,10), dias:Math.round((d-hoy)/86400000)};
+}
+function repoTxt(p){ const r=repoInfo(p); if(!r) return 'Sin ciclo definido'; return r.dias<0?`Reposición vencida hace ${-r.dias} días`:r.dias===0?'Reposición hoy':`Reposición en ${r.dias} días`; }
+let bloques=[]; try{ bloques=JSON.parse(localStorage.getItem('vico_bloques')||'[]'); }catch(e){}
+function saveBloques(){ try{ localStorage.setItem('vico_bloques', JSON.stringify(bloques)); }catch(e){} }
 // Almacenamiento local (queda guardado en este teléfono/navegador)
 function loadLocal(){
   try{ personas = JSON.parse(localStorage.getItem('vico_personas')||'[]'); }catch(e){ personas = []; }
@@ -142,11 +151,12 @@ async function boot(){
 }
 
 function render(){
-  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(tab==='clientes'?'mas':tab)));
   document.getElementById('fab').style.display = tab==='personas' ? 'flex' : 'none';
   if(tab==='inicio') renderInicio();
   else if(tab==='personas') renderPersonas();
   else if(tab==='agenda') renderAgenda();
+  else if(tab==='clientes') renderClientes();
   else renderMas();
 }
 
@@ -169,7 +179,7 @@ function renderInicio(){
     <div class="stat3">
       <div class="box"><b>${seguimientos.length}</b><small>Seguimientos</small></div>
       <div class="box"><b>${eventosHoy.length}</b><small>Hoy en agenda</small></div>
-      <div class="box"><b>${personas.length}</b><small>Personas</small></div>
+      <div class="box"><b>${personas.filter(p=>{const r=repoInfo(p);return r&&r.dias<=7;}).length}</b><small>Reposiciones</small></div>
     </div>
     <div class="section-title">Hoy en tu agenda</div>
     <div class="card">
@@ -179,8 +189,9 @@ function renderInicio(){
     <div class="card">
       ${seguimientos.length ? seguimientos.map(p=>`<div class="row" data-open="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||'Retomar contacto'}</div></div></div>`).join('') : '<div class="empty">Sin pendientes vencidos 🎉</div>'}
     </div>
-    <button class="cta">🔥 MOVER MI OFICINA</button>
+    <button class="cta" id="moverBtn">🔥 MOVER MI OFICINA</button>
   `;
+  document.getElementById('moverBtn').addEventListener('click', openMover);
   const pq = document.getElementById('paraQueInput');
   pq.addEventListener('change', ()=>{ config.paraQue = pq.value; saveConfig(); });
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
@@ -228,9 +239,56 @@ function renderMas(){
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
     <div class="card">
-      ${items.map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente en V1</div></div></div>`).join('')}
+      <div class="row" id="goCli"><span class="dot"></span><div><div class="t">Clientes</div><div class="sub">Reposiciones y recompras</div></div></div>
+      ${items.filter(i=>i!=="Clientes").map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente</div></div></div>`).join('')}
     </div>
   `;
+  document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
+}
+
+function renderClientes(){
+  const f=window.cf||'Todos';
+  let list=personas.filter(p=>p.tipo==='Cliente').map(p=>({p,r:repoInfo(p)}));
+  if(f==='Para reponer') list=list.filter(x=>x.r&&x.r.dias<=7);
+  if(f==='Consumiendo') list=list.filter(x=>x.r&&x.r.dias>7);
+  list.sort((a,b)=>(a.r?a.r.dias:9999)-(b.r?b.r.dias:9999));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div>${['Todos','Para reponer','Consumiendo'].map(c=>`<div class="chip ${f===c?'active':''}" data-cf="${c}">${c}</div>`).join('')}</div>
+  <div class="card" style="padding:6px 4px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div></div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
+  document.getElementById('back').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-cf]').forEach(el=>el.addEventListener('click',()=>{window.cf=el.dataset.cf;renderClientes();}));
+  $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
+}
+
+function openMover(){
+  const m={paso:0,intencion:'',foco:'',elegidas:[],pid:'',motivo:'',cierre:'',proximo:''};
+  const focos=['Clientes','Seguimientos','Negocio','Equipo','Campaña'], motivos=['Reposición','Nuevo producto','Reactivación','Referido','Negocio','Seguimiento'];
+  const titulos=['Intención','Elijo mi foco','Personas sugeridas','Acción','Cierre'];
+  const sug=()=>{ const hoy=todayStr(); const a=personas.filter(p=>(p.proximaFecha&&p.proximaFecha<=hoy)||(repoInfo(p)&&repoInfo(p).dias<=7)); const b=personas.filter(p=>!a.includes(p)&&p.tipo!=='Socia'); return a.concat(b).slice(0,5); };
+  const draw=()=>{
+    let body='';
+    if(m.paso===0) body=`<p class="sub">Abrí tu cuaderno. ¿Qué querés mover hoy?</p><textarea id="m_int" rows="3" placeholder="Hoy quiero...">${m.intencion}</textarea>`;
+    if(m.paso===1) body=`<div class="chips" style="flex-wrap:wrap">${focos.map(x=>`<div class="chip ${m.foco===x?'active':''}" data-foco="${x}">${x}</div>`).join('')}</div>`;
+    if(m.paso===2){ const l=sug(); body=l.length?l.map(p=>`<div class="persona" data-sel="${p.id}"><div class="av" style="${m.elegidas.includes(p.id)?'':'opacity:.4'}">${m.elegidas.includes(p.id)?'✓':initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.proximaAccion||repoTxt(p)}</div></div></div>`).join(''):'<div class="empty">Cargá personas primero en la pestaña Personas.</div>'; }
+    if(m.paso===3){ const l=personas.filter(p=>m.elegidas.includes(p.id)); const pp=l.length?l:personas; const per=personas.find(x=>x.id===m.pid);
+      body=`<select id="m_p"><option value="">Elegí una persona</option>${pp.map(p=>`<option value="${p.id}" ${m.pid===p.id?'selected':''}>${p.nombre}</option>`).join('')}</select><div class="chips" style="flex-wrap:wrap">${motivos.map(x=>`<div class="chip ${m.motivo===x?'active':''}" data-mot="${x}">${x}</div>`).join('')}</div><p class="sub">Una persona, un motivo, una conversación.</p>${per&&per.telefono?`<a class="cta" style="text-align:center;text-decoration:none" target="_blank" href="https://wa.me/${per.telefono.replace(/\D/g,'')}">Abrir WhatsApp</a>`:''}`; }
+    if(m.paso===4) body=`<p class="sub">Revisá lo que hiciste y tu próximo paso.</p><textarea id="m_cie" rows="3" placeholder="Qué hice / cómo salió">${m.cierre}</textarea><textarea id="m_pro" rows="2" placeholder="Próximo paso">${m.proximo}</textarea>`;
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3>0${m.paso+1} · ${titulos[m.paso]}</h3>${body}<div class="actions">${m.paso>0?'<button class="btn-secondary" id="m_prev">Atrás</button>':''}<button class="btn-primary" id="m_next">${m.paso===4?'Terminar':'Siguiente'}</button></div>`);
+    const g=id=>document.getElementById(id);
+    document.querySelectorAll('[data-foco]').forEach(e=>e.addEventListener('click',()=>{m.foco=e.dataset.foco;draw();}));
+    document.querySelectorAll('[data-mot]').forEach(e=>e.addEventListener('click',()=>{m.motivo=e.dataset.mot;if(g('m_p'))m.pid=g('m_p').value;draw();}));
+    document.querySelectorAll('[data-sel]').forEach(e=>e.addEventListener('click',()=>{const i=e.dataset.sel;m.elegidas=m.elegidas.includes(i)?m.elegidas.filter(x=>x!==i):m.elegidas.concat(i);draw();}));
+    if(g('m_prev')) g('m_prev').addEventListener('click',()=>{ m.paso--; draw(); });
+    g('m_next').addEventListener('click',()=>{
+      if(g('m_int')) m.intencion=g('m_int').value; if(g('m_p')) m.pid=g('m_p').value;
+      if(g('m_cie')){ m.cierre=g('m_cie').value; m.proximo=g('m_pro').value; }
+      if(m.paso<4){ m.paso++; draw(); return; }
+      const per=personas.find(x=>x.id===m.pid);
+      if(per){ per.historial=(per.historial||[]).concat({fecha:todayStr(),texto:(m.motivo?m.motivo+': ':'')+(m.cierre||'Bloque de trabajo')}); per.ultimaNota=m.cierre||per.ultimaNota; if(m.proximo) per.proximaAccion=m.proximo; savePersonas(); }
+      bloques.push({fecha:todayStr(),intencion:m.intencion,foco:m.foco,motivo:m.motivo,pid:m.pid,cierre:m.cierre,proximo:m.proximo}); saveBloques();
+      closeModal(); render();
+    });
+  };
+  draw();
 }
 
 function openModal(html){
@@ -287,6 +345,9 @@ function openPersonaDetail(id){
     <div class="section-title">Próxima acción</div>
     <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
     <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
+    <div class="section-title">Compra / reposición</div>
+    <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
+    <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>
     <div class="section-title">Agregar al historial</div>
     <textarea id="d_nueva" placeholder="Qué pasó / qué se dijo" rows="2"></textarea>
     <div class="actions">
@@ -303,6 +364,8 @@ function openPersonaDetail(id){
     p.proximaAccion = document.getElementById('d_accion').value.trim();
     p.proximaFecha = document.getElementById('d_fecha').value;
     p.historial = historial;
+    p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
+    if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
     if(nuevaTexto) p.ultimaNota = nuevaTexto;
     savePersonas();
     closeModal();
