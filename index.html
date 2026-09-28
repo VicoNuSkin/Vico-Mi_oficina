@@ -113,7 +113,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""};
+let personas = [], eventos = [], config = {paraQue:""}, metas = [];
 let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
@@ -135,11 +135,13 @@ function saveBloques(){ try{ localStorage.setItem('vico_bloques', JSON.stringify
 // Almacenamiento local (queda guardado en este teléfono/navegador)
 function loadLocal(){
   try{ personas = JSON.parse(localStorage.getItem('vico_personas')||'[]'); }catch(e){ personas = []; }
+  try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
 function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringify(personas)); }catch(e){} }
 function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify(eventos)); }catch(e){} }
+function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -158,6 +160,8 @@ function render(){
   else if(tab==='personas') renderPersonas();
   else if(tab==='agenda') renderAgenda();
   else if(tab==='clientes') renderClientes();
+  else if(tab==='metas') renderMetas();
+  else if(tab==='equipo') renderEquipo();
   else renderMas();
 }
 
@@ -236,13 +240,15 @@ function renderAgenda(){
 }
 
 function renderMas(){
-  const items = ["Clientes","Equipo / Socias","Metas","Mi Visión / Mapa de sueños","Biblioteca","Campañas","Estadísticas"];
+  const items = ["Biblioteca","Campañas","Estadísticas"];
   const importHecho = localStorage.getItem('vico_import_done');
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
     <div class="card">
       <div class="row" id="goCli"><span class="dot"></span><div><div class="t">Clientes</div><div class="sub">Reposiciones y recompras</div></div></div>
-      ${items.filter(i=>i!=="Clientes").map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente</div></div></div>`).join('')}
+      <div class="row" id="goEq"><span class="dot"></span><div><div class="t">Equipo / Socias</div><div class="sub">Etapa y objetivo de cada socia</div></div></div>
+      <div class="row" id="goMet"><span class="dot"></span><div><div class="t">Metas y Mi Visión</div><div class="sub">Corto, mediano y largo plazo</div></div></div>
+      ${items.map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente</div></div></div>`).join('')}
     </div>
     ${!importHecho ? `<div class="section-title">Importar</div>
     <div class="card">
@@ -250,6 +256,8 @@ function renderMas(){
     </div>` : ''}
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
+  document.getElementById('goEq').addEventListener('click', ()=>{ tab='equipo'; render(); });
+  document.getElementById('goMet').addEventListener('click', ()=>{ tab='metas'; render(); });
   const di = document.getElementById('doImport');
   if(di) di.addEventListener('click', ()=>{
     if(!confirm('Se van a agregar '+IMPORT_DATA.length+' contactos como Potenciales. ¿Continuar?')) return;
@@ -315,6 +323,37 @@ function openMover(){
   draw();
 }
 
+function renderEquipo(){
+  const list = personas.filter(p=>p.tipo==='Socia');
+  $main.innerHTML = `<div class="chips"><div class="chip" id="back2">← Más</div></div>
+  <div class="card" style="padding:6px 4px;">${list.length?list.map(p=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.etapa||'Sin etapa'} · ${p.objetivo||'Sin objetivo'}</div></div></div>`).join(''):'<div class="empty">Aún no hay socias. Marcá a alguien como Socia desde su ficha.</div>'}</div>`;
+  document.getElementById('back2').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
+}
+
+const PLAZOS=[['corto','Corto plazo (3-6 meses)'],['medio','Mediano plazo (1-2 años)'],['largo','Largo plazo (3-5 años)']];
+function renderMetas(){
+  $main.innerHTML = `<div class="chips"><div class="chip" id="back3">← Más</div></div>
+    <div class="paraque"><b>MI VISIÓN</b><textarea id="visionTxt" rows="3" placeholder="Describí cómo se ve tu vida cuando logres tus metas...">${(config.vision||'').replace(/</g,'&lt;')}</textarea></div>
+    ${PLAZOS.map(([k,label])=>{
+      const items=metas.filter(m=>m.plazo===k); const done=items.filter(m=>m.hecha).length;
+      return `<div class="section-title">${label} · ${done}/${items.length||0}</div>
+      <div class="card">
+        ${items.length?items.map(m=>`<div class="row"><input type="checkbox" data-chk="${m.id}" ${m.hecha?'checked':''}><div class="t" style="flex:1;${m.hecha?'text-decoration:line-through;color:var(--sub)':''}">${m.texto}</div><span data-del="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin metas todavía</div>'}
+        <div class="row" style="gap:6px;"><input id="new_${k}" placeholder="Nueva meta..." style="margin:0;"><button data-add="${k}" style="border:none;background:var(--brand);color:#fff;border-radius:8px;padding:8px 12px;">+</button></div>
+      </div>`;
+    }).join('')}
+  `;
+  document.getElementById('back3').addEventListener('click',()=>{tab='mas';render();});
+  document.getElementById('visionTxt').addEventListener('change',e=>{ config.vision=e.target.value; saveConfig(); });
+  $main.querySelectorAll('[data-chk]').forEach(el=>el.addEventListener('change',()=>{ const m=metas.find(x=>x.id===el.dataset.chk); if(m){m.hecha=el.checked; saveMetas(); render();} }));
+  $main.querySelectorAll('[data-del]').forEach(el=>el.addEventListener('click',()=>{ metas=metas.filter(x=>x.id!==el.dataset.del); saveMetas(); render(); }));
+  $main.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>{
+    const k=el.dataset.add; const inp=document.getElementById('new_'+k); const v=inp.value.trim();
+    if(!v) return; metas.push({id:uid(),plazo:k,texto:v,hecha:false}); saveMetas(); render();
+  }));
+}
+
 function openModal(html){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `<div class="backdrop" id="bd"><div class="sheet">${html}</div></div>`;
@@ -375,9 +414,15 @@ function openPersonaDetail(id){
     <div class="section-title">Próxima acción</div>
     <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
     <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
+    ${p.tipo==='Socia' ? `
+    <div class="section-title">Equipo</div>
+    <select id="d_etapa">
+      ${['En inicio','En desarrollo','Activa','Creciendo','En formación'].map(o=>`<option ${p.etapa===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+    <input id="d_obj" placeholder="Objetivo (ej: su primer rango)" value="${(p.objetivo||'').replace(/"/g,'&quot;')}">` : `
     <div class="section-title">Compra / reposición</div>
     <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
-    <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>
+    <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>`}
     <div class="section-title">Agregar al historial</div>
     <textarea id="d_nueva" placeholder="Qué pasó / qué se dijo" rows="2"></textarea>
     <div class="actions">
@@ -398,8 +443,12 @@ function openPersonaDetail(id){
     p.proximaAccion = document.getElementById('d_accion').value.trim();
     p.proximaFecha = document.getElementById('d_fecha').value;
     p.historial = historial;
-    p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
-    if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
+    if(p.tipo==='Socia'){
+      p.etapa=document.getElementById('d_etapa').value; p.objetivo=document.getElementById('d_obj').value.trim();
+    } else {
+      p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
+      if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
+    }
     if(nuevaTexto) p.ultimaNota = nuevaTexto;
     savePersonas();
     closeModal();
@@ -462,10 +511,11 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
+window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||''}); };
 
@@ -486,7 +536,7 @@ function addOut(){
 }
 function listen(){
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques'].forEach(n=>{
+  ['personas','eventos','bloques','metas'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -494,7 +544,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===3) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===4) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
