@@ -85,7 +85,7 @@
   nav.bottom .ic{font-size:18px;}
   .empty{text-align:center; color:var(--sub); font-size:13px; padding:24px 0;}
   .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:flex-end; z-index:50;}
-  .sheet{background:var(--card); width:100%; max-width:480px; margin:0 auto; border-radius:20px 20px 0 0; padding:18px; max-height:85vh; overflow-y:auto; padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));}
+  .sheet{position:relative; background:var(--card); width:100%; max-width:480px; margin:0 auto; border-radius:20px 20px 0 0; padding:18px; max-height:85vh; overflow-y:auto; padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));}
   .sheet h3{margin:0 0 12px; color:var(--brand);}
   .sheet .actions{display:flex; gap:10px; margin-top:6px;}
   .sheet .actions button{flex:1; padding:12px; border-radius:10px; border:none; font-size:14px;}
@@ -93,7 +93,7 @@
   .btn-secondary{background:var(--accent); color:var(--brand);}
   .detail-hist{font-size:13px; padding:8px 0; border-bottom:1px solid var(--line);}
   .detail-hist .d{color:var(--sub); font-size:11px;}
-  .close-x{position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; color:var(--sub);}
+  .close-x{position:absolute; top:10px; right:10px; background:var(--accent); border:none; font-size:18px; color:var(--brand); width:30px; height:30px; border-radius:50%; z-index:5;}
 </style>
 </head>
 <body>
@@ -113,7 +113,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [];
 let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
@@ -136,12 +136,14 @@ function saveBloques(){ try{ localStorage.setItem('vico_bloques', JSON.stringify
 function loadLocal(){
   try{ personas = JSON.parse(localStorage.getItem('vico_personas')||'[]'); }catch(e){ personas = []; }
   try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
+  try{ biblioteca = JSON.parse(localStorage.getItem('vico_biblioteca')||'[]'); }catch(e){ biblioteca = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
 function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringify(personas)); }catch(e){} }
 function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify(eventos)); }catch(e){} }
 function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
+function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.stringify(biblioteca)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -162,6 +164,8 @@ function render(){
   else if(tab==='clientes') renderClientes();
   else if(tab==='metas') renderMetas();
   else if(tab==='equipo') renderEquipo();
+  else if(tab==='biblioteca') renderBiblioteca();
+  else if(tab==='estadisticas') renderEstadisticas();
   else renderMas();
 }
 
@@ -240,7 +244,7 @@ function renderAgenda(){
 }
 
 function renderMas(){
-  const items = ["Biblioteca","Campañas","Estadísticas"];
+  const items = ["Campañas"];
   const importHecho = localStorage.getItem('vico_import_done');
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
@@ -248,6 +252,8 @@ function renderMas(){
       <div class="row" id="goCli"><span class="dot"></span><div><div class="t">Clientes</div><div class="sub">Reposiciones y recompras</div></div></div>
       <div class="row" id="goEq"><span class="dot"></span><div><div class="t">Equipo / Socias</div><div class="sub">Etapa y objetivo de cada socia</div></div></div>
       <div class="row" id="goMet"><span class="dot"></span><div><div class="t">Metas y Mi Visión</div><div class="sub">Corto, mediano y largo plazo</div></div></div>
+      <div class="row" id="goBib"><span class="dot"></span><div><div class="t">Biblioteca</div><div class="sub">Recursos y materiales guardados</div></div></div>
+      <div class="row" id="goEst"><span class="dot"></span><div><div class="t">Estadísticas</div><div class="sub">Resumen de tu actividad</div></div></div>
       ${items.map(i=>`<div class="row"><span class="dot" style="background:var(--sub)"></span><div><div class="t">${i}</div><div class="sub">Próximamente</div></div></div>`).join('')}
     </div>
     ${!importHecho ? `<div class="section-title">Importar</div>
@@ -258,6 +264,8 @@ function renderMas(){
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
   document.getElementById('goEq').addEventListener('click', ()=>{ tab='equipo'; render(); });
   document.getElementById('goMet').addEventListener('click', ()=>{ tab='metas'; render(); });
+  document.getElementById('goBib').addEventListener('click', ()=>{ tab='biblioteca'; render(); });
+  document.getElementById('goEst').addEventListener('click', ()=>{ tab='estadisticas'; render(); });
   const di = document.getElementById('doImport');
   if(di) di.addEventListener('click', ()=>{
     if(!confirm('Se van a agregar '+IMPORT_DATA.length+' contactos como Potenciales. ¿Continuar?')) return;
@@ -331,7 +339,7 @@ function renderEquipo(){
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
 }
 
-const PLAZOS=[['corto','Corto plazo (3-6 meses)'],['medio','Mediano plazo (1-2 años)'],['largo','Largo plazo (3-5 años)']];
+const PLAZOS=[['corto','Corto plazo (0-3 meses)'],['medio','Mediano plazo (3-6 meses)'],['largo','Largo plazo (+6 meses)']];
 function renderMetas(){
   $main.innerHTML = `<div class="chips"><div class="chip" id="back3">← Más</div></div>
     <div class="paraque"><b>MI VISIÓN</b><textarea id="visionTxt" rows="3" placeholder="Describí cómo se ve tu vida cuando logres tus metas...">${(config.vision||'').replace(/</g,'&lt;')}</textarea></div>
@@ -340,7 +348,7 @@ function renderMetas(){
       return `<div class="section-title">${label} · ${done}/${items.length||0}</div>
       <div class="card">
         ${items.length?items.map(m=>`<div class="row"><input type="checkbox" data-chk="${m.id}" ${m.hecha?'checked':''}><div class="t" style="flex:1;${m.hecha?'text-decoration:line-through;color:var(--sub)':''}">${m.texto}</div><span data-del="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin metas todavía</div>'}
-        <div class="row" style="gap:6px;"><input id="new_${k}" placeholder="Nueva meta..." style="margin:0;"><button data-add="${k}" style="border:none;background:var(--brand);color:#fff;border-radius:8px;padding:8px 12px;">+</button></div>
+        <div class="row" style="gap:6px;"><input id="new_${k}" placeholder="Nueva meta..." style="margin:0;flex:1;min-width:0;"><button data-add="${k}" style="flex:none;border:none;background:var(--brand);color:#fff;border-radius:8px;padding:8px 12px;">+</button></div>
       </div>`;
     }).join('')}
   `;
@@ -352,6 +360,59 @@ function renderMetas(){
     const k=el.dataset.add; const inp=document.getElementById('new_'+k); const v=inp.value.trim();
     if(!v) return; metas.push({id:uid(),plazo:k,texto:v,hecha:false}); saveMetas(); render();
   }));
+}
+
+const BIB_CATS=['Producto','Negocio','Formación'];
+function renderBiblioteca(){
+  const f=window.bf||'Todo';
+  const list=biblioteca.filter(b=>f==='Todo'||b.categoria===f);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back4">← Más</div>${['Todo',...BIB_CATS].map(c=>`<div class="chip ${f===c?'active':''}" data-bf="${c}">${c}</div>`).join('')}</div>
+  <div class="card" style="padding:6px 4px;">${list.length?list.map(b=>`<div class="row" data-bopen="${b.id}"><span class="dot"></span><div style="flex:1;"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
+  <button class="cta" id="addBib">+ Agregar recurso</button>`;
+  document.getElementById('back4').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-bf]').forEach(el=>el.addEventListener('click',()=>{window.bf=el.dataset.bf;renderBiblioteca();}));
+  $main.querySelectorAll('[data-bopen]').forEach(el=>el.addEventListener('click',()=>{
+    const b=biblioteca.find(x=>x.id===el.dataset.bopen);
+    if(b&&b.url){ window.open(b.url,'_blank'); }
+  }));
+  document.getElementById('addBib').addEventListener('click',()=>{
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nuevo recurso</h3>
+      <input id="b_tit" placeholder="Título">
+      <select id="b_cat">${BIB_CATS.map(c=>`<option>${c}</option>`).join('')}</select>
+      <input id="b_url" placeholder="Link (opcional)">
+      <textarea id="b_nota" rows="2" placeholder="Nota (opcional)"></textarea>
+      <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveBib">Guardar</button></div>`);
+    document.getElementById('saveBib').addEventListener('click',()=>{
+      const titulo=document.getElementById('b_tit').value.trim();
+      if(!titulo) return;
+      biblioteca.push({id:uid(),titulo,categoria:document.getElementById('b_cat').value,url:document.getElementById('b_url').value.trim(),nota:document.getElementById('b_nota').value.trim()});
+      saveBiblioteca(); closeModal(); renderBiblioteca();
+    });
+  });
+}
+
+function renderEstadisticas(){
+  const mes=todayStr().slice(0,7);
+  const clientes=personas.filter(p=>p.tipo==='Cliente').length;
+  const socias=personas.filter(p=>p.tipo==='Socia').length;
+  const potenciales=personas.filter(p=>p.tipo==='Potencial').length;
+  const seguimientos=personas.filter(p=>p.proximaFecha&&p.proximaFecha<=todayStr()).length;
+  const nuevos=personas.filter(p=>p.creado&&p.creado.slice(0,7)===mes).length;
+  const bloquesMes=bloques.filter(b=>b.fecha&&b.fecha.slice(0,7)===mes).length;
+  const metasDone=metas.filter(m=>m.hecha).length;
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back5">← Más</div></div>
+    <div class="section-title">Este mes</div>
+    <div class="stat3"><div class="box"><b>${nuevos}</b><small>Contactos nuevos</small></div><div class="box"><b>${bloquesMes}</b><small>Bloques de trabajo</small></div><div class="box"><b>${seguimientos}</b><small>Seguimientos</small></div></div>
+    <div class="section-title">General</div>
+    <div class="card">
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Personas totales</div><b>${personas.length}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Clientes</div><b>${clientes}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Potenciales</div><b>${potenciales}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Socias</div><b>${socias}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Metas logradas</div><b>${metasDone}/${metas.length}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Recursos en biblioteca</div><b>${biblioteca.length}</b></div>
+    </div>`;
+  document.getElementById('back5').addEventListener('click',()=>{tab='mas';render();});
 }
 
 function openModal(html){
@@ -388,7 +449,7 @@ function openPersonaForm(){
       tipo: document.getElementById('f_tipo').value,
       ultimaNota: nota,
       historial: nota ? [{fecha: todayStr(), texto: nota}] : [],
-      proximaAccion:"", proximaFecha:""
+      proximaAccion:"", proximaFecha:"", creado: todayStr()
     };
     personas.push(data);
     savePersonas();
@@ -403,7 +464,7 @@ function openPersonaDetail(id){
   const hist = (p.historial||[]).slice().reverse();
   openModal(`
     <button class="close-x" onclick="closeModal()">✕</button>
-    <h3>Editar datos</h3>
+    <h3 style="padding-right:34px;">Editar datos</h3>
     <input id="d_nombre" placeholder="Nombre" value="${(p.nombre||'').replace(/"/g,'&quot;')}">
     <input id="d_tel" placeholder="Teléfono" value="${(p.telefono||'').replace(/"/g,'&quot;')}">
     <select id="d_tipo">
@@ -414,15 +475,18 @@ function openPersonaDetail(id){
     <div class="section-title">Próxima acción</div>
     <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
     <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
-    ${p.tipo==='Socia' ? `
-    <div class="section-title">Equipo</div>
-    <select id="d_etapa">
-      ${['En inicio','En desarrollo','Activa','Creciendo','En formación'].map(o=>`<option ${p.etapa===o?'selected':''}>${o}</option>`).join('')}
-    </select>
-    <input id="d_obj" placeholder="Objetivo (ej: su primer rango)" value="${(p.objetivo||'').replace(/"/g,'&quot;')}">` : `
-    <div class="section-title">Compra / reposición</div>
-    <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
-    <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>`}
+    <div id="blockSocia" style="display:${p.tipo==='Socia'?'block':'none'}">
+      <div class="section-title">Equipo</div>
+      <select id="d_etapa">
+        ${['En inicio','En desarrollo','Activa','Creciendo','En formación'].map(o=>`<option ${p.etapa===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <input id="d_obj" placeholder="Objetivo (ej: su primer rango)" value="${(p.objetivo||'').replace(/"/g,'&quot;')}">
+    </div>
+    <div id="blockOtro" style="display:${p.tipo==='Socia'?'none':'block'}">
+      <div class="section-title">Compra / reposición</div>
+      <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
+      <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>
+    </div>
     <div class="section-title">Agregar al historial</div>
     <textarea id="d_nueva" placeholder="Qué pasó / qué se dijo" rows="2"></textarea>
     <div class="actions">
@@ -432,6 +496,11 @@ function openPersonaDetail(id){
     <div class="section-title" style="margin-top:14px;">Historial</div>
     ${hist.length ? hist.map(h=>`<div class="detail-hist"><div class="d">${fmtFecha(h.fecha)}</div>${h.texto}</div>`).join('') : '<div class="empty">Sin historial aún</div>'}
   `);
+  document.getElementById('d_tipo').addEventListener('change', e=>{
+    const soc = e.target.value==='Socia';
+    document.getElementById('blockSocia').style.display = soc?'block':'none';
+    document.getElementById('blockOtro').style.display = soc?'none':'block';
+  });
   document.getElementById('saveD').addEventListener('click', ()=>{
     const nuevaTexto = document.getElementById('d_nueva').value.trim();
     const historial = (p.historial||[]).slice();
@@ -449,6 +518,7 @@ function openPersonaDetail(id){
       p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
       if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
     }
+    if(!confirmed_ok){}
     if(nuevaTexto) p.ultimaNota = nuevaTexto;
     savePersonas();
     closeModal();
@@ -511,11 +581,12 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
+window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stringify(biblioteca));}catch(e){} push('biblioteca',{items:clone(biblioteca)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||''}); };
 
@@ -536,7 +607,7 @@ function addOut(){
 }
 function listen(){
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -544,7 +615,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===4) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===5) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
