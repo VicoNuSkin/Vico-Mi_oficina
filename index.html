@@ -261,7 +261,7 @@ function renderClientes(){
 
 function openMover(){
   const m={paso:0,intencion:'',foco:'',elegidas:[],pid:'',motivo:'',cierre:'',proximo:''};
-  const focos=['Clientes','Seguimientos','Negocio','Equipo','Campaña'], motivos=['Reposición','Nuevo producto','Reactivación','Referido','Negocio','Seguimiento'];
+  const focos=['Clientes','Seguimientos','Negocio','Equipo','Formación','Campaña'], motivos=['Reposición','Nuevo producto','Reactivación','Referido','Negocio','Seguimiento'];
   const titulos=['Intención','Elijo mi foco','Personas sugeridas','Acción','Cierre'];
   const sug=()=>{ const hoy=todayStr(); const a=personas.filter(p=>(p.proximaFecha&&p.proximaFecha<=hoy)||(repoInfo(p)&&repoInfo(p).dias<=7)); const b=personas.filter(p=>!a.includes(p)&&p.tipo!=='Socia'); return a.concat(b).slice(0,5); };
   const draw=()=>{
@@ -414,6 +414,70 @@ function openEventoForm(){
 }
 
 boot();
+</script>
+<div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyCZvCtnddspzVPtCC-FSCLgRwCRhqwrI3I",authDomain:"vico-mi-nuskin.firebaseapp.com",projectId:"vico-mi-nuskin",storageBucket:"vico-mi-nuskin.firebasestorage.app",messagingSenderId:"118400723901",appId:"1:118400723901:web:573520df4370d9a4e2c0d4"});
+const auth=getAuth(app);
+const fs=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
+let uid=null, unsubs=[], first={}, done=0;
+const ref=n=>doc(fs,'usuarios',uid,'datos',n);
+const lr=document.getElementById('loginRoot');
+const clone=x=>JSON.parse(JSON.stringify(x));
+const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
+window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
+window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
+window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||''}); };
+
+function showLogin(msg){
+  lr.style.display='flex';
+  lr.innerHTML=`<div style="width:100%;max-width:340px;text-align:center;"><h1 style="color:var(--brand);margin:0;letter-spacing:1px;">VICO</h1><div style="font-size:11px;color:var(--sub);letter-spacing:1px;margin-bottom:22px;">MI OFICINA</div><input id="lg_mail" type="email" placeholder="Correo" autocomplete="username"><input id="lg_pass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="cta" id="lg_go">Entrar</button><div id="lg_msg" style="color:#b3423a;font-size:13px;margin-top:10px;min-height:18px;">${msg||''}</div></div>`;
+  const go=()=>{ const m=document.getElementById('lg_mail').value.trim(), p=document.getElementById('lg_pass').value; if(!m||!p) return;
+    signInWithEmailAndPassword(auth,m,p).catch(()=>{ document.getElementById('lg_msg').textContent='Correo o contraseña incorrectos.'; }); };
+  document.getElementById('lg_go').addEventListener('click',go);
+  document.getElementById('lg_pass').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+}
+function addOut(){
+  if(document.getElementById('outBtn')) return;
+  const b=document.createElement('button'); b.id='outBtn'; b.textContent='Salir';
+  b.style.cssText='background:none;border:none;color:var(--sub);font-size:12px;';
+  b.addEventListener('click',async()=>{ if(!confirm('¿Cerrar sesión en este dispositivo?')) return; await signOut(auth); ['personas','eventos','bloques','config'].forEach(k=>{try{localStorage.removeItem('vico_'+k);}catch(e){}}); location.reload(); });
+  document.querySelector('header.top').appendChild(b);
+}
+function listen(){
+  const merged=localStorage.getItem('vico_merged_'+uid);
+  ['personas','eventos','bloques'].forEach(n=>{
+    unsubs.push(onSnapshot(ref(n),snap=>{
+      if(snap.metadata.hasPendingWrites) return;
+      if(!first[n]){
+        if(snap.metadata.fromCache && !snap.exists()) return;
+        first[n]=true; done++;
+        let cloud=snap.exists()?(snap.data().items||[]):[];
+        if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
+        if(done===3) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        setCur(n,cloud); render(); return;
+      }
+      setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
+    },()=>{}));
+  });
+  unsubs.push(onSnapshot(ref('config'),snap=>{
+    if(snap.metadata.hasPendingWrites) return;
+    if(snap.exists()){ config=snap.data(); try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} }
+    else if(config.paraQue) push('config',{paraQue:config.paraQue});
+    render();
+  },()=>{}));
+}
+onAuthStateChanged(auth,u=>{
+  unsubs.forEach(f=>f()); unsubs=[]; first={}; done=0;
+  if(u){ uid=u.uid; lr.style.display='none'; addOut(); listen(); }
+  else { uid=null; showLogin(); }
+});
 </script>
 </body>
 </html>
