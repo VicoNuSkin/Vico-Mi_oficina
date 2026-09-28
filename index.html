@@ -364,8 +364,14 @@ function openPersonaDetail(id){
   const hist = (p.historial||[]).slice().reverse();
   openModal(`
     <button class="close-x" onclick="closeModal()">✕</button>
-    <h3>${p.nombre}</h3>
-    <div class="sub" style="margin-bottom:10px;">${p.tipo||''} ${p.telefono?(' · '+p.telefono):''}</div>
+    <h3>Editar datos</h3>
+    <input id="d_nombre" placeholder="Nombre" value="${(p.nombre||'').replace(/"/g,'&quot;')}">
+    <input id="d_tel" placeholder="Teléfono" value="${(p.telefono||'').replace(/"/g,'&quot;')}">
+    <select id="d_tipo">
+      <option value="Potencial" ${p.tipo==='Potencial'?'selected':''}>Potencial</option>
+      <option value="Cliente" ${p.tipo==='Cliente'?'selected':''}>Cliente</option>
+      <option value="Socia" ${p.tipo==='Socia'?'selected':''}>Socia</option>
+    </select>
     <div class="section-title">Próxima acción</div>
     <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
     <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
@@ -385,6 +391,10 @@ function openPersonaDetail(id){
     const nuevaTexto = document.getElementById('d_nueva').value.trim();
     const historial = (p.historial||[]).slice();
     if(nuevaTexto) historial.push({fecha: todayStr(), texto: nuevaTexto});
+    const nombreNuevo = document.getElementById('d_nombre').value.trim();
+    if(nombreNuevo) p.nombre = nombreNuevo;
+    p.telefono = document.getElementById('d_tel').value.trim();
+    p.tipo = document.getElementById('d_tipo').value;
     p.proximaAccion = document.getElementById('d_accion').value.trim();
     p.proximaFecha = document.getElementById('d_fecha').value;
     p.historial = historial;
