@@ -471,6 +471,16 @@ function renderCampanaDetail(id){
     <div class="stat3">${['Pendiente','Contactada','Seguimiento'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
     <div class="stat3">${['Venta','Oportunidad de negocio','No interesada'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
     ${c.estado!=='finalizada'?'<button class="cta" id="moverCamp">🔥 MOVER ESTA CAMPAÑA</button>':''}
+    <div class="section-title" style="margin-top:14px;">Materiales</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.materiales||[]).length?c.materiales.map(m=>`<div class="row" data-openmat="${m.url||''}"><span class="dot"></span><div class="t" style="flex:1;">${m.titulo}</div><span data-delmat="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin materiales todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addMat" style="background:var(--accent);color:var(--brand);">+ Agregar material</button>':''}
+    <div class="section-title" style="margin-top:14px;">Mensajes preparados</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.mensajes||[]).length?c.mensajes.map(m=>`<div class="row"><div class="t" style="flex:1;">${m.titulo}</div><span data-copymsg="${m.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 8px;">COPIAR</span><span data-delmsg="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin mensajes todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addMsg" style="background:var(--accent);color:var(--brand);">+ Agregar mensaje</button>':''}
     <div class="section-title" style="margin-top:14px;">Personas (${(c.personas||[]).length})</div>
     <div class="card" style="padding:6px 4px;">
       ${(c.personas||[]).length?c.personas.map(x=>{const p=personas.find(pp=>pp.id===x.personaId); if(!p) return ''; return `<div class="persona" data-openp="${x.personaId}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${x.motivo}</div></div><span class="tag">${x.estado}</span></div>`;}).join(''):'<div class="empty">Sin personas todavía</div>'}
@@ -481,6 +491,15 @@ function renderCampanaDetail(id){
   $main.querySelectorAll('[data-openp]').forEach(el=>el.addEventListener('click',()=>openFichaCampana(c.id, el.dataset.openp)));
   const ap=document.getElementById('addPCamp'); if(ap) ap.addEventListener('click',()=>openAgregarPersonasCampana(c.id));
   const mv=document.getElementById('moverCamp'); if(mv) mv.addEventListener('click',()=>openMoverCampana(c.id));
+  $main.querySelectorAll('[data-openmat]').forEach(el=>el.addEventListener('click',()=>{ if(el.dataset.openmat) window.open(el.dataset.openmat,'_blank'); }));
+  $main.querySelectorAll('[data-delmat]').forEach(el=>el.addEventListener('click',()=>{ c.materiales=(c.materiales||[]).filter(m=>m.id!==el.dataset.delmat); saveCampanas(); render(); }));
+  $main.querySelectorAll('[data-copymsg]').forEach(el=>el.addEventListener('click',()=>{
+    const m=(c.mensajes||[]).find(x=>x.id===el.dataset.copymsg); if(!m) return;
+    (navigator.clipboard&&navigator.clipboard.writeText ? navigator.clipboard.writeText(m.texto) : Promise.reject()).then(()=>alert('Mensaje copiado')).catch(()=>{ prompt('Copiá el mensaje:', m.texto); });
+  }));
+  $main.querySelectorAll('[data-delmsg]').forEach(el=>el.addEventListener('click',()=>{ c.mensajes=(c.mensajes||[]).filter(m=>m.id!==el.dataset.delmsg); saveCampanas(); render(); }));
+  const am=document.getElementById('addMat'); if(am) am.addEventListener('click',()=>openAgregarMaterial(c.id));
+  const amsg=document.getElementById('addMsg'); if(amsg) amsg.addEventListener('click',()=>openAgregarMensaje(c.id));
   const fc=document.getElementById('finCamp'); if(fc) fc.addEventListener('click',()=>{
     const t=ct['Contactada']+ct['Respondió']+ct['Seguimiento']+ct['Venta']+ct['Oportunidad de negocio']+ct['No interesada'];
     if(!confirm('Resumen: '+(c.personas||[]).length+' personas, '+t+' contactadas, '+ct['Venta']+' ventas, '+ct['Oportunidad de negocio']+' oportunidades. ¿Finalizar y archivar?')) return;
@@ -550,6 +569,8 @@ function openFichaCampana(campId, personaId){
     <select id="fc_mot">${CAMP_MOTIVOS.map(m=>`<option ${entry.motivo===m?'selected':''}>${m}</option>`).join('')}</select>
     <div class="section-title">Estado</div>
     <select id="fc_est">${CAMP_ESTADOS.map(e=>`<option ${entry.estado===e?'selected':''}>${e}</option>`).join('')}</select>
+    ${(c.mensajes||[]).length?`<div class="section-title">Mensajes preparados</div>
+    <div class="card" style="padding:6px 4px;margin-bottom:10px;">${c.mensajes.map(m=>`<div class="row"><div class="t" style="flex:1;">${m.titulo}</div><span data-fcmsg="${m.id}" style="color:var(--brand);font-size:12px;font-weight:600;">COPIAR</span></div>`).join('')}</div>`:''}
     <div class="actions" style="margin:10px 0;">
       ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;" target="_blank" href="https://wa.me/${p.telefono.replace(/\D/g,'')}">WhatsApp</a>`:''}
       ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;background:var(--accent);color:var(--brand);" href="tel:${p.telefono}">Llamar</a>`:''}
@@ -558,8 +579,46 @@ function openFichaCampana(campId, personaId){
     <button class="cta" id="fc_ver" style="background:var(--accent);color:var(--brand);margin-top:8px;">Ver ficha completa</button>`);
   document.getElementById('fc_mot').addEventListener('change',e=>{ entry.motivo=e.target.value; saveCampanas(); });
   document.getElementById('fc_est').addEventListener('change',e=>{ entry.estado=e.target.value; saveCampanas(); render(); });
+  document.querySelectorAll('[data-fcmsg]').forEach(el=>el.addEventListener('click',()=>{
+    const m=(c.mensajes||[]).find(x=>x.id===el.dataset.fcmsg); if(!m) return;
+    (navigator.clipboard&&navigator.clipboard.writeText ? navigator.clipboard.writeText(m.texto) : Promise.reject()).then(()=>alert('Mensaje copiado')).catch(()=>{ prompt('Copiá el mensaje:', m.texto); });
+  }));
   document.getElementById('fc_reg').addEventListener('click',()=>registrarAccionCampana(campId,personaId));
   document.getElementById('fc_ver').addEventListener('click',()=>openPersonaDetail(personaId));
+}
+
+function openAgregarMaterial(campId){
+  const c=campanas.find(x=>x.id===campId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Agregar material</h3>
+    <input id="m_tit" placeholder="Título (ej: Flyer 3 cuotas)">
+    <input id="m_url" placeholder="Pegar link (imagen, PDF, catálogo...)">
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="m_save">Agregar</button></div>
+    ${biblioteca.length?`<div class="section-title" style="margin-top:14px;">O elegir de Biblioteca</div>
+    <div class="card" style="padding:6px 4px;">${biblioteca.map(b=>`<div class="row" data-frombib="${b.id}"><span class="dot"></span><div class="t" style="flex:1;">${b.titulo}</div></div>`).join('')}</div>`:''}`);
+  document.getElementById('m_save').addEventListener('click',()=>{
+    const titulo=document.getElementById('m_tit').value.trim(); if(!titulo) return;
+    c.materiales=(c.materiales||[]).concat({id:uid(),titulo,url:document.getElementById('m_url').value.trim()});
+    saveCampanas(); closeModal(); render();
+  });
+  document.querySelectorAll('[data-frombib]').forEach(el=>el.addEventListener('click',()=>{
+    const b=biblioteca.find(x=>x.id===el.dataset.frombib); if(!b) return;
+    c.materiales=(c.materiales||[]).concat({id:uid(),titulo:b.titulo,url:b.url||''});
+    saveCampanas(); closeModal(); render();
+  }));
+}
+
+function openAgregarMensaje(campId){
+  const c=campanas.find(x=>x.id===campId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Mensaje preparado</h3>
+    <input id="ms_tit" placeholder="Título (ej: Reactivación)">
+    <textarea id="ms_txt" rows="4" placeholder="Escribí el mensaje de referencia..."></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="ms_save">Guardar</button></div>`);
+  document.getElementById('ms_save').addEventListener('click',()=>{
+    const titulo=document.getElementById('ms_tit').value.trim(), texto=document.getElementById('ms_txt').value.trim();
+    if(!titulo||!texto) return;
+    c.mensajes=(c.mensajes||[]).concat({id:uid(),titulo,texto});
+    saveCampanas(); closeModal(); render();
+  });
 }
 
 function openMoverCampana(campId){
