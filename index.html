@@ -196,7 +196,7 @@ function renderInicio(){
     </div>
     <div class="section-title">Hoy en tu agenda</div>
     <div class="card">
-      ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div><div class="t">${e.hora||''} · ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div></div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
+      ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${e.hora||''} · ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
     </div>
     <div class="section-title">Seguimientos pendientes</div>
     <div class="card">
@@ -240,7 +240,7 @@ function renderAgenda(){
   $main.innerHTML = `
     <div class="section-title">Próximos eventos</div>
     <div class="card">
-      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div></div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
+      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
     </div>
     <button class="cta" id="addEvt">+ Agendar evento</button>
   `;
@@ -249,7 +249,6 @@ function renderAgenda(){
 
 function renderMas(){
   
-  const importHecho = localStorage.getItem('vico_import_done');
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
     <div class="card">
@@ -260,10 +259,6 @@ function renderMas(){
       <div class="row" id="goEst"><span class="dot"></span><div><div class="t">Estadísticas</div><div class="sub">Resumen de tu actividad</div></div></div>
       <div class="row" id="goCam"><span class="dot"></span><div><div class="t">Campañas</div><div class="sub">Promos y acciones sobre tu base de contactos</div></div></div>
     </div>
-    ${!importHecho ? `<div class="section-title">Importar</div>
-    <div class="card">
-      <div class="row" id="doImport"><span class="dot" style="background:var(--ok)"></span><div><div class="t">Importar lista de contactos (${IMPORT_DATA.length})</div><div class="sub">Los agrega como Potenciales, con su historial</div></div></div>
-    </div>` : ''}
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
   document.getElementById('goEq').addEventListener('click', ()=>{ tab='equipo'; render(); });
@@ -271,24 +266,7 @@ function renderMas(){
   document.getElementById('goBib').addEventListener('click', ()=>{ tab='biblioteca'; render(); });
   document.getElementById('goEst').addEventListener('click', ()=>{ tab='estadisticas'; render(); });
   document.getElementById('goCam').addEventListener('click', ()=>{ tab='campanas'; render(); });
-  const di = document.getElementById('doImport');
-  if(di) di.addEventListener('click', ()=>{
-    if(!confirm('Se van a agregar '+IMPORT_DATA.length+' contactos como Potenciales. ¿Continuar?')) return;
-    const existentes = new Set(personas.map(p=>(p.nombre||'').trim().toLowerCase()));
-    let agregados=0;
-    IMPORT_DATA.forEach(d=>{
-      const key=d.nombre.trim().toLowerCase();
-      if(existentes.has(key)) return;
-      existentes.add(key);
-      personas.push(Object.assign({id:uid()}, d));
-      agregados++;
-    });
-    savePersonas();
-    try{ localStorage.setItem('vico_import_done','1'); }catch(e){}
-    closeModal();
-    alert('Se agregaron '+agregados+' contactos nuevos.');
-    tab='personas'; filtro='Potencial'; render();
-  });
+
 }
 
 function renderClientes(){
@@ -372,7 +350,7 @@ function renderBiblioteca(){
   const f=window.bf||'Todo';
   const list=biblioteca.filter(b=>f==='Todo'||b.categoria===f);
   $main.innerHTML=`<div class="chips"><div class="chip" id="back4">← Más</div>${['Todo',...BIB_CATS].map(c=>`<div class="chip ${f===c?'active':''}" data-bf="${c}">${c}</div>`).join('')}</div>
-  <div class="card" style="padding:6px 4px;">${list.length?list.map(b=>`<div class="row" data-bopen="${b.id}"><span class="dot"></span><div style="flex:1;"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
+  <div class="card" style="padding:6px 4px;">${list.length?list.map(b=>`<div class="row"><span class="dot"></span><div style="flex:1;" data-bopen="${b.id}"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div><span data-bedit="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-bdel="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
   <button class="cta" id="addBib">+ Agregar recurso</button>`;
   document.getElementById('back4').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-bf]').forEach(el=>el.addEventListener('click',()=>{window.bf=el.dataset.bf;renderBiblioteca();}));
@@ -380,19 +358,28 @@ function renderBiblioteca(){
     const b=biblioteca.find(x=>x.id===el.dataset.bopen);
     if(b&&b.url){ window.open(b.url,'_blank'); }
   }));
-  document.getElementById('addBib').addEventListener('click',()=>{
-    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nuevo recurso</h3>
-      <input id="b_tit" placeholder="Título">
-      <select id="b_cat">${BIB_CATS.map(c=>`<option>${c}</option>`).join('')}</select>
-      <input id="b_url" placeholder="Link (opcional)">
-      <textarea id="b_nota" rows="2" placeholder="Nota (opcional)"></textarea>
-      <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveBib">Guardar</button></div>`);
-    document.getElementById('saveBib').addEventListener('click',()=>{
-      const titulo=document.getElementById('b_tit').value.trim();
-      if(!titulo) return;
-      biblioteca.push({id:uid(),titulo,categoria:document.getElementById('b_cat').value,url:document.getElementById('b_url').value.trim(),nota:document.getElementById('b_nota').value.trim()});
-      saveBiblioteca(); closeModal(); renderBiblioteca();
-    });
+  $main.querySelectorAll('[data-bdel]').forEach(el=>el.addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este recurso?')) return;
+    biblioteca=biblioteca.filter(x=>x.id!==el.dataset.bdel); saveBiblioteca(); renderBiblioteca();
+  }));
+  $main.querySelectorAll('[data-bedit]').forEach(el=>el.addEventListener('click',()=>openBibForm(el.dataset.bedit)));
+  document.getElementById('addBib').addEventListener('click',()=>openBibForm(null));
+}
+
+function openBibForm(editId){
+  const b = editId ? biblioteca.find(x=>x.id===editId) : null;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${b?'Editar recurso':'Nuevo recurso'}</h3>
+    <input id="b_tit" placeholder="Título" value="${b?(b.titulo||'').replace(/"/g,'&quot;'):''}">
+    <select id="b_cat">${BIB_CATS.map(c=>`<option ${b&&b.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
+    <input id="b_url" placeholder="Link (opcional)" value="${b?(b.url||'').replace(/"/g,'&quot;'):''}">
+    <textarea id="b_nota" rows="2" placeholder="Nota (opcional)">${b?(b.nota||''):''}</textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveBib">Guardar</button></div>`);
+  document.getElementById('saveBib').addEventListener('click',()=>{
+    const titulo=document.getElementById('b_tit').value.trim();
+    if(!titulo) return;
+    const data={titulo,categoria:document.getElementById('b_cat').value,url:document.getElementById('b_url').value.trim(),nota:document.getElementById('b_nota').value.trim()};
+    if(b){ Object.assign(b,data); } else { biblioteca.push(Object.assign({id:uid()},data)); }
+    saveBiblioteca(); closeModal(); renderBiblioteca();
   });
 }
 
@@ -774,6 +761,7 @@ function openEventoForm(){
     <input id="e_fecha" type="date" value="${todayStr()}">
     <input id="e_hora" type="time">
     <select id="e_persona"><option value="">— Sin vincular —</option>${opciones}</select>
+    <input id="e_link" placeholder="Link de Zoom / Meet (opcional)">
     <div class="actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" id="saveE">Guardar</button>
@@ -786,7 +774,8 @@ function openEventoForm(){
       id: uid(), titulo, tipo: document.getElementById('e_tipo').value,
       fecha: document.getElementById('e_fecha').value,
       hora: document.getElementById('e_hora').value,
-      personaId: document.getElementById('e_persona').value
+      personaId: document.getElementById('e_persona').value,
+      link: document.getElementById('e_link').value.trim()
     };
     eventos.push(data);
     saveEventos();
