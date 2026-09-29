@@ -1,6 +1,6 @@
 {
   "name": "VICO · Mi Oficina",
-  "short_name": "VICO",
+  "short_name": "",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
