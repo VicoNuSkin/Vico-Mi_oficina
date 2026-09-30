@@ -70,7 +70,7 @@
   .persona .info .n{font-size:14px; font-weight:600;}
   .persona .info .m{font-size:12px; color:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .tag{font-size:10px; padding:2px 8px; border-radius:10px; background:var(--accent); color:var(--brand); display:inline-block; margin-top:2px;}
-  .fab{position:fixed; right:calc((100vw - 480px)/2 + 20px); bottom:calc(90px + env(safe-area-inset-bottom,0px)); width:52px; height:52px; border-radius:50%; background:var(--brand); color:#fff; border:none; font-size:24px;}
+  .fab{position:fixed; right:calc((100vw - 480px)/2 + 20px); bottom:calc(90px + env(safe-area-inset-bottom,0px)); width:52px; height:52px; border-radius:50%; background:var(--brand); color:#fff; border:none; font-size:26px; line-height:1; padding:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(54,40,89,.3);}
   @media (max-width:520px){.fab{right:20px;}}
   nav.bottom{
     position:sticky; bottom:0; background:var(--card); border-top:1px solid var(--line);
@@ -285,7 +285,7 @@ function renderClientes(){
   if(f==='Consumiendo') list=list.filter(x=>x.r&&x.r.dias>7);
   list.sort((a,b)=>(a.r?a.r.dias:9999)-(b.r?b.r.dias:9999));
   $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div>${['Todos','Para reponer','Consumiendo'].map(c=>`<div class="chip ${f===c?'active':''}" data-cf="${c}">${c}</div>`).join('')}</div>
-  <div class="card" style="padding:6px 4px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div></div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
+  <div class="card" style="padding:6px 4px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${p.categoria?`<span class="tag">${p.categoria}</span>`:''}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
   document.getElementById('back').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-cf]').forEach(el=>el.addEventListener('click',()=>{window.cf=el.dataset.cf;renderClientes();}));
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
@@ -764,6 +764,11 @@ function openPersonaDetail(id){
     </div>
     <div id="blockOtro" style="display:${p.tipo==='Socia'?'none':'block'}">
       <div class="section-title">Compra / reposición</div>
+      <select id="d_categ">
+        <option value="">Categoría (Miembro / Minorista)</option>
+        <option value="Miembro" ${p.categoria==='Miembro'?'selected':''}>Miembro</option>
+        <option value="Minorista" ${p.categoria==='Minorista'?'selected':''}>Minorista</option>
+      </select>
       <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
       <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>
     </div>
@@ -806,7 +811,7 @@ function openPersonaDetail(id){
     if(p.tipo==='Socia'){
       p.etapa=document.getElementById('d_etapa').value; p.objetivo=document.getElementById('d_obj').value.trim();
     } else {
-      p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
+      p.categoria=document.getElementById('d_categ').value; p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
       if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
     }
     if(!confirmed_ok){}
