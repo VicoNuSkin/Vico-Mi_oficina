@@ -225,7 +225,7 @@ function renderPersonas(){
           <div class="av">${initials(p.nombre)}</div>
           <div class="info">
             <div class="n">${p.nombre}</div>
-            <div class="m">${p.ultimaNota || p.telefono || ''}</div>
+            <div class="m">${p.ultimaNota || p.telefono || p.pais || ''}</div>
             ${p.tipo?`<span class="tag">${p.tipo}</span>`:''}
           </div>
         </div>`).join('') : '<div class="empty">Todavía no hay personas. Tocá + para agregar.</div>'}
@@ -654,6 +654,20 @@ function openMoverCampana(campId){
   step();
 }
 
+function renderQR(){
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backQR">← Más</div></div>
+    <div class="card" style="text-align:center;padding:26px 16px;">
+      <div style="font-weight:600;margin-bottom:4px;">Compartir VICO · Mi Oficina</div>
+      <div class="sub" style="margin-bottom:16px;">Escaneá para abrir la app</div>
+      <div id="qrbox" style="display:flex;justify-content:center;"></div>
+      <div class="sub" style="margin-top:12px;word-break:break-all;">${location.href.split('#')[0]}</div>
+    </div>`;
+  document.getElementById('backQR').addEventListener('click',()=>{tab='mas';render();});
+  const box=document.getElementById('qrbox');
+  if(window.QRCode&&box){ new QRCode(box,{text:location.href.split('#')[0],width:190,height:190,colorDark:'#362859',colorLight:'#ffffff'}); }
+  else if(box){ box.innerHTML='<div class="empty">No se pudo cargar el generador de QR (revisá tu conexión).</div>'; }
+}
+
 function openModal(html){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `<div class="backdrop" id="bd"><div class="sheet">${html}</div></div>`;
@@ -667,6 +681,12 @@ function openPersonaForm(){
     <h3>Nueva persona</h3>
     <input id="f_nombre" placeholder="Nombre">
     <input id="f_telefono" placeholder="Teléfono (opcional)">
+    <input id="f_pais" placeholder="País (opcional)">
+    <div style="display:flex;gap:8px;">
+      <input id="f_fb" placeholder="Facebook" style="flex:1;min-width:0;">
+      <input id="f_ig" placeholder="Instagram" style="flex:1;min-width:0;">
+      <input id="f_tt" placeholder="TikTok" style="flex:1;min-width:0;">
+    </div>
     <select id="f_tipo">
       <option value="Potencial">Potencial</option>
       <option value="Cliente">Cliente</option>
@@ -685,6 +705,10 @@ function openPersonaForm(){
     const data = {
       id: uid(), nombre,
       telefono: document.getElementById('f_telefono').value.trim(),
+      pais: document.getElementById('f_pais').value.trim(),
+      facebook: document.getElementById('f_fb').value.trim(),
+      instagram: document.getElementById('f_ig').value.trim(),
+      tiktok: document.getElementById('f_tt').value.trim(),
       tipo: document.getElementById('f_tipo').value,
       ultimaNota: nota,
       historial: nota ? [{fecha: todayStr(), texto: nota}] : [],
@@ -706,6 +730,12 @@ function openPersonaDetail(id){
     <h3 style="padding-right:34px;">Editar datos</h3>
     <input id="d_nombre" placeholder="Nombre" value="${(p.nombre||'').replace(/"/g,'&quot;')}">
     <input id="d_tel" placeholder="Teléfono" value="${(p.telefono||'').replace(/"/g,'&quot;')}">
+    <input id="d_pais" placeholder="País" value="${(p.pais||'').replace(/"/g,'&quot;')}">
+    <div style="display:flex;gap:8px;">
+      <input id="d_fb" placeholder="Facebook" style="flex:1;min-width:0;" value="${(p.facebook||'').replace(/"/g,'&quot;')}">
+      <input id="d_ig" placeholder="Instagram" style="flex:1;min-width:0;" value="${(p.instagram||'').replace(/"/g,'&quot;')}">
+      <input id="d_tt" placeholder="TikTok" style="flex:1;min-width:0;" value="${(p.tiktok||'').replace(/"/g,'&quot;')}">
+    </div>
     <select id="d_tipo">
       <option value="Potencial" ${p.tipo==='Potencial'?'selected':''}>Potencial</option>
       <option value="Cliente" ${p.tipo==='Cliente'?'selected':''}>Cliente</option>
@@ -714,6 +744,7 @@ function openPersonaDetail(id){
     <div class="section-title">Próxima acción</div>
     <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
     <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
+    <button type="button" class="cta" id="d_wa" style="background:var(--accent);color:var(--brand);margin-bottom:10px;">Enviar WhatsApp</button>
     <div id="blockSocia" style="display:${p.tipo==='Socia'?'block':'none'}">
       <div class="section-title">Equipo</div>
       <select id="d_etapa">
@@ -735,6 +766,13 @@ function openPersonaDetail(id){
     <div class="section-title" style="margin-top:14px;">Historial</div>
     ${hist.length ? hist.map(h=>`<div class="detail-hist"><div class="d">${fmtFecha(h.fecha)}</div>${h.texto}</div>`).join('') : '<div class="empty">Sin historial aún</div>'}
   `);
+  document.getElementById('d_wa').addEventListener('click', ()=>{
+    const tel=document.getElementById('d_tel').value.trim();
+    const accion=document.getElementById('d_accion').value.trim();
+    const nom=(document.getElementById('d_nombre').value.trim()||'').split(' ')[0];
+    const link=waLink(tel, accion || ('Hola '+nom+'!'));
+    if(link) window.open(link,'_blank'); else alert('Esta persona no tiene teléfono cargado.');
+  });
   document.getElementById('d_tipo').addEventListener('change', e=>{
     const soc = e.target.value==='Socia';
     document.getElementById('blockSocia').style.display = soc?'block':'none';
@@ -747,6 +785,10 @@ function openPersonaDetail(id){
     const nombreNuevo = document.getElementById('d_nombre').value.trim();
     if(nombreNuevo) p.nombre = nombreNuevo;
     p.telefono = document.getElementById('d_tel').value.trim();
+    p.pais = document.getElementById('d_pais').value.trim();
+    p.facebook = document.getElementById('d_fb').value.trim();
+    p.instagram = document.getElementById('d_ig').value.trim();
+    p.tiktok = document.getElementById('d_tt').value.trim();
     p.tipo = document.getElementById('d_tipo').value;
     p.proximaAccion = document.getElementById('d_accion').value.trim();
     p.proximaFecha = document.getElementById('d_fecha').value;
