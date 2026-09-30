@@ -187,8 +187,14 @@ function renderInicio(){
       <div style="font-size:13px; color:var(--sub); text-transform:capitalize;">${fechaLarga}</div>
     </div>
     <div class="paraque">
-      <b>MI PARA QUÉ</b><br>${config.paraQue ? config.paraQue : 'Tocá para escribir tu para qué (en Más → Mi Visión, próximamente). Por ahora podés escribirlo aquí abajo.'}
-      <div style="margin-top:8px;"><input id="paraQueInput" placeholder="Escribe tu para qué..." value="${(config.paraQue||'').replace(/"/g,'&quot;')}"/></div>
+      <b>MI PARA QUÉ</b>
+      ${window.editPQ || !config.paraQue ? `
+        <div style="margin-top:8px;"><textarea id="paraQueInput" rows="3" placeholder="Escribe tu para qué...">${(config.paraQue||'').replace(/</g,'&lt;')}</textarea></div>
+        <button class="cta" id="savePQ" style="margin-top:4px;">Guardar</button>
+      ` : `
+        <div style="margin-top:6px; white-space:pre-wrap;">${config.paraQue}</div>
+        <span id="editPQ" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--brand2);">EDITAR</span>
+      `}
     </div>
     <div class="stat3">
       <div class="box"><b>${seguimientos.length}</b><small>Seguimientos</small></div>
@@ -207,7 +213,11 @@ function renderInicio(){
   `;
   document.getElementById('moverBtn').addEventListener('click', openMover);
   const pq = document.getElementById('paraQueInput');
-  pq.addEventListener('change', ()=>{ config.paraQue = pq.value; saveConfig(); });
+  if(pq) pq.focus();
+  const savePQ = document.getElementById('savePQ');
+  if(savePQ) savePQ.addEventListener('click', ()=>{ config.paraQue = pq.value.trim(); window.editPQ=false; saveConfig(); renderInicio(); });
+  const editPQ = document.getElementById('editPQ');
+  if(editPQ) editPQ.addEventListener('click', ()=>{ window.editPQ=true; renderInicio(); });
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
 
@@ -334,7 +344,16 @@ function renderEquipo(){
 const PLAZOS=[['corto','Corto plazo (0-3 meses)'],['medio','Mediano plazo (3-6 meses)'],['largo','Largo plazo (+6 meses)']];
 function renderMetas(){
   $main.innerHTML = `<div class="chips"><div class="chip" id="back3">← Más</div></div>
-    <div class="paraque"><b>MI VISIÓN</b><textarea id="visionTxt" rows="3" placeholder="Describí cómo se ve tu vida cuando logres tus metas...">${(config.vision||'').replace(/</g,'&lt;')}</textarea></div>
+    <div class="paraque">
+      <b>MI VISIÓN</b>
+      ${window.editVision || !config.vision ? `
+        <div style="margin-top:8px;"><textarea id="visionTxt" rows="4" placeholder="Describí cómo se ve tu vida cuando logres tus metas...">${(config.vision||'').replace(/</g,'&lt;')}</textarea></div>
+        <button class="cta" id="saveVision" style="margin-top:4px;">Guardar</button>
+      ` : `
+        <div style="margin-top:6px; white-space:pre-wrap;">${config.vision}</div>
+        <span id="editVision" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--brand2);">EDITAR</span>
+      `}
+    </div>
     ${PLAZOS.map(([k,label])=>{
       const items=metas.filter(m=>m.plazo===k); const done=items.filter(m=>m.hecha).length;
       return `<div class="section-title">${label} · ${done}/${items.length||0}</div>
@@ -345,7 +364,11 @@ function renderMetas(){
     }).join('')}
   `;
   document.getElementById('back3').addEventListener('click',()=>{tab='mas';render();});
-  document.getElementById('visionTxt').addEventListener('change',e=>{ config.vision=e.target.value; saveConfig(); });
+  const vt=document.getElementById('visionTxt'); if(vt) vt.focus();
+  const saveVision=document.getElementById('saveVision');
+  if(saveVision) saveVision.addEventListener('click',()=>{ config.vision=vt.value.trim(); window.editVision=false; saveConfig(); renderMetas(); });
+  const editVision=document.getElementById('editVision');
+  if(editVision) editVision.addEventListener('click',()=>{ window.editVision=true; renderMetas(); });
   $main.querySelectorAll('[data-chk]').forEach(el=>el.addEventListener('change',()=>{ const m=metas.find(x=>x.id===el.dataset.chk); if(m){m.hecha=el.checked; saveMetas(); render();} }));
   $main.querySelectorAll('[data-del]').forEach(el=>el.addEventListener('click',()=>{ metas=metas.filter(x=>x.id!==el.dataset.del); saveMetas(); render(); }));
   $main.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>{
