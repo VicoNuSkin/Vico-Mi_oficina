@@ -814,7 +814,6 @@ function openPersonaDetail(id){
       p.categoria=document.getElementById('d_categ').value; p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
       if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
     }
-    if(!confirmed_ok){}
     if(nuevaTexto) p.ultimaNota = nuevaTexto;
     savePersonas();
     closeModal();
