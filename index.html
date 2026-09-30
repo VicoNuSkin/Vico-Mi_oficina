@@ -211,13 +211,16 @@ function renderInicio(){
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
 
+const TIPO_LABEL={'Todos':'Todos','Potencial':'Potenciales','P. Cliente':'P. Clientes','P. Socia':'P. Socias','Cliente':'Clientes','Socia':'Socias'};
 function renderPersonas(){
-  const cats = ["Todos","Cliente","Potencial","Socia"];
-  const list = personas.filter(p => filtro==="Todos" || p.tipo===filtro)
+  const cats = ["Todos","Potencial","P. Cliente","P. Socia","Cliente","Socia"];
+  const q=(window.pq||'').toLowerCase();
+  const list = personas.filter(p => (filtro==="Todos" || p.tipo===filtro) && (!q || (p.nombre||'').toLowerCase().includes(q)))
     .sort((a,b)=>(a.nombre||"").localeCompare(b.nombre||""));
   $main.innerHTML = `
     <div class="searchbar">
-      <div class="chips">${cats.map(c=>`<div class="chip ${filtro===c?'active':''}" data-f="${c}">${c==="Todos"?"Todos":c+"s"}</div>`).join('')}</div>
+      <input id="p_search" placeholder="Buscar por nombre..." value="${(window.pq||'').replace(/"/g,'&quot;')}">
+      <div class="chips">${cats.map(c=>`<div class="chip ${filtro===c?'active':''}" data-f="${c}">${TIPO_LABEL[c]}</div>`).join('')}</div>
     </div>
     <div class="card" style="padding:6px 4px;">
       ${list.length ? list.map(p=>`
@@ -231,6 +234,9 @@ function renderPersonas(){
         </div>`).join('') : '<div class="empty">Todavía no hay personas. Tocá + para agregar.</div>'}
     </div>
   `;
+  const psEl=document.getElementById('p_search');
+  psEl.addEventListener('input', e=>{ window.pq=e.target.value; renderPersonas(); });
+  if(window.pq){ psEl.focus(); psEl.selectionStart=psEl.selectionEnd=psEl.value.length; }
   $main.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('click', ()=>{ filtro=el.dataset.f; renderPersonas(); }));
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
@@ -689,6 +695,8 @@ function openPersonaForm(){
     </div>
     <select id="f_tipo">
       <option value="Potencial">Potencial</option>
+      <option value="P. Cliente">Potencial Cliente</option>
+      <option value="P. Socia">Potencial Socia</option>
       <option value="Cliente">Cliente</option>
       <option value="Socia">Socia</option>
     </select>
@@ -738,6 +746,8 @@ function openPersonaDetail(id){
     </div>
     <select id="d_tipo">
       <option value="Potencial" ${p.tipo==='Potencial'?'selected':''}>Potencial</option>
+      <option value="P. Cliente" ${p.tipo==='P. Cliente'?'selected':''}>Potencial Cliente</option>
+      <option value="P. Socia" ${p.tipo==='P. Socia'?'selected':''}>Potencial Socia</option>
       <option value="Cliente" ${p.tipo==='Cliente'?'selected':''}>Cliente</option>
       <option value="Socia" ${p.tipo==='Socia'?'selected':''}>Socia</option>
     </select>
@@ -876,7 +886,7 @@ window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(co
 
 function showLogin(msg){
   lr.style.display='flex';
-  lr.innerHTML=`<div style="width:100%;max-width:340px;text-align:center;"><svg class="vico-mark-lg" viewBox="0 0 1080 569.95" xmlns="http://www.w3.org/2000/svg"><path d="M181.09,250.79c.24,40.41,9.58,82.79,31.62,117.21,19.04,29.74,55.91,36.68,74.05,2.07,15.54-29.64,16.32-62.52,26.63-93.71,15.11-45.72,48.17-69.51,96.5-65.8,22.76,1.74,22.65-33.73,0-35.46-67.23-5.15-114.66,35.15-132.71,98.42-3.99,13.99-5.92,28.42-9.01,42.61-1.75,8.02-6.42,36.21-13.41,38.85-15.73,5.94-27.46-38.08-30.07-46.74-5.67-18.8-8.03-37.84-8.15-57.44-.13-22.81-35.6-22.86-35.46,0h0Z"/><path d="M866.61,374.25c-28.42,20.88-74.34,28.06-106.84,13.17-17.07-7.8-29.61-22.56-36.66-39.72-15.96,17.25-35.6,30.85-58.16,39.06-34.53,12.5-83.03,11.62-111.67-14.45-12.28-11.17-20.7-26.55-24.83-43.13-16,23.67-34.44,47.79-60.16,59.54-30.99,14.19-61.09-.93-72.84-31.56-12.41-32.32-7.54-68.71-3.28-102.14,2.84-22.39,38.3-22.56,35.46,0-3.46,27.09-13.21,70.8,3.5,95.58,21.99,32.5,66.72-39.5,76.96-54.7,9.75-14.5,22.65-32.36,37.73-46.95,7.85-7.62,16.31-14.36,25.22-19.28.09-.04.13-.09.22-.09,18.97-10.46,40.03-12.59,61.89,2.53,18.53,12.86,1.86,42.65-17.87,30.63-30.68-18.62-56.12,19.2-54.13,46.73,1.82,25.76,16.58,41.94,41.05,47.57,53.29,12.28,99.57-27,120.36-72.57,9.53-20.88,39.59-2.7,30.63,17.91-10.2,23.45,10.86,52.98,34.14,56.26,18.97,2.66,41.85-.93,57.72-12.32,20.48-14.76,23.19-41.23,12.37-63.22-14.45-29.52-46.95-31.25-75.1-22.56-21.9,6.78-31.16-27.44-9.44-34.18,46.24-14.32,97.13-2.53,117.88,44.73,16,36.57,8.64,79.04-24.16,103.2Z"/><path d="M571.05,229.64c-8.91,4.92-17.38,11.66-25.22,19.28,7.09-8.16,15.74-14.76,25.22-19.28Z"/></svg><div style="font-size:11px;color:var(--sub);letter-spacing:1px;margin-bottom:22px;">MI OFICINA · CONCIENCIA EN ACCIÓN</div><input id="lg_mail" type="email" placeholder="Correo" autocomplete="username"><input id="lg_pass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="cta" id="lg_go">Entrar</button><div id="lg_msg" style="color:#b3423a;font-size:13px;margin-top:10px;min-height:18px;">${msg||''}</div></div>`;
+  lr.innerHTML=`<div style="width:100%;max-width:340px;text-align:center;"><svg class="vico-mark-lg" viewBox="0 0 1080 569.95" xmlns="http://www.w3.org/2000/svg"><path d="M181.09,250.79c.24,40.41,9.58,82.79,31.62,117.21,19.04,29.74,55.91,36.68,74.05,2.07,15.54-29.64,16.32-62.52,26.63-93.71,15.11-45.72,48.17-69.51,96.5-65.8,22.76,1.74,22.65-33.73,0-35.46-67.23-5.15-114.66,35.15-132.71,98.42-3.99,13.99-5.92,28.42-9.01,42.61-1.75,8.02-6.42,36.21-13.41,38.85-15.73,5.94-27.46-38.08-30.07-46.74-5.67-18.8-8.03-37.84-8.15-57.44-.13-22.81-35.6-22.86-35.46,0h0Z"/><path d="M866.61,374.25c-28.42,20.88-74.34,28.06-106.84,13.17-17.07-7.8-29.61-22.56-36.66-39.72-15.96,17.25-35.6,30.85-58.16,39.06-34.53,12.5-83.03,11.62-111.67-14.45-12.28-11.17-20.7-26.55-24.83-43.13-16,23.67-34.44,47.79-60.16,59.54-30.99,14.19-61.09-.93-72.84-31.56-12.41-32.32-7.54-68.71-3.28-102.14,2.84-22.39,38.3-22.56,35.46,0-3.46,27.09-13.21,70.8,3.5,95.58,21.99,32.5,66.72-39.5,76.96-54.7,9.75-14.5,22.65-32.36,37.73-46.95,7.85-7.62,16.31-14.36,25.22-19.28.09-.04.13-.09.22-.09,18.97-10.46,40.03-12.59,61.89,2.53,18.53,12.86,1.86,42.65-17.87,30.63-30.68-18.62-56.12,19.2-54.13,46.73,1.82,25.76,16.58,41.94,41.05,47.57,53.29,12.28,99.57-27,120.36-72.57,9.53-20.88,39.59-2.7,30.63,17.91-10.2,23.45,10.86,52.98,34.14,56.26,18.97,2.66,41.85-.93,57.72-12.32,20.48-14.76,23.19-41.23,12.37-63.22-14.45-29.52-46.95-31.25-75.1-22.56-21.9,6.78-31.16-27.44-9.44-34.18,46.24-14.32,97.13-2.53,117.88,44.73,16,36.57,8.64,79.04-24.16,103.2Z"/><path d="M571.05,229.64c-8.91,4.92-17.38,11.66-25.22,19.28,7.09-8.16,15.74-14.76,25.22-19.28Z"/></svg><div style="font-size:11px;color:var(--sub);letter-spacing:1px;margin-bottom:22px;">MI OFICINA · CONCIENCIA EN ACCIÓN</div><input id="lg_mail" type="email" placeholder="Correo" autocomplete="username"><input id="lg_pass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="cta" id="lg_go">Entrar</button><a href="mailto:ezequiel135@hotmail.com?subject=Solicito%20acceso%20a%20VICO%20%C2%B7%20Mi%20Oficina&body=Hola!%20Me%20gustar%C3%ADa%20solicitar%20acceso%20a%20la%20app%20VICO%20%C2%B7%20Mi%20Oficina.%20Mi%20correo%20es%3A%20" class="cta" style="display:block;box-sizing:border-box;text-decoration:none;background:var(--accent);color:var(--brand);margin-top:10px;">Solicitar acceso</a><div id="lg_msg" style="color:#b3423a;font-size:13px;margin-top:10px;min-height:18px;">${msg||''}</div></div>`;
   const go=()=>{ const m=document.getElementById('lg_mail').value.trim(), p=document.getElementById('lg_pass').value; if(!m||!p) return;
     signInWithEmailAndPassword(auth,m,p).catch(()=>{ document.getElementById('lg_msg').textContent='Correo o contraseña incorrectos.'; }); };
   document.getElementById('lg_go').addEventListener('click',go);
