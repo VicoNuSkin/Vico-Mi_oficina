@@ -965,7 +965,7 @@ window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(meta
 window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stringify(biblioteca));}catch(e){} push('biblioteca',{items:clone(biblioteca)}); };
 window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringify(campanas));}catch(e){} push('campanas',{items:clone(campanas)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
-window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||''}); };
+window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||''}); };
 
 function showLogin(msg){
   lr.style.display='flex';
@@ -1020,7 +1020,7 @@ function listen(){
   unsubs.push(onSnapshot(ref('config'),snap=>{
     if(snap.metadata.hasPendingWrites) return;
     if(snap.exists()){ config=snap.data(); try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} }
-    else if(config.paraQue) push('config',{paraQue:config.paraQue});
+    else if(config.paraQue||config.vision) push('config',{paraQue:config.paraQue||'', vision:config.vision||''});
     render();
   },()=>{}));
 }
