@@ -171,6 +171,7 @@ function render(){
   else if(tab==='campanas') renderCampanas();
   else if(tab==='campdet') renderCampanaDetail(window.curCamp);
   else if(tab==='qr') renderQR();
+  else if(tab==='mensajes') renderMensajes();
   else renderMas();
 }
 
@@ -276,6 +277,7 @@ function renderMas(){
       <div class="row" id="goEst"><span class="dot"></span><div><div class="t">Estadísticas</div><div class="sub">Resumen de tu actividad</div></div></div>
       <div class="row" id="goCam"><span class="dot"></span><div><div class="t">Campañas</div><div class="sub">Promos y acciones sobre tu base de contactos</div></div></div>
       <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
+      <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
     </div>
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
@@ -285,6 +287,7 @@ function renderMas(){
   document.getElementById('goEst').addEventListener('click', ()=>{ tab='estadisticas'; render(); });
   document.getElementById('goCam').addEventListener('click', ()=>{ tab='campanas'; render(); });
   document.getElementById('goQR').addEventListener('click', ()=>{ tab='qr'; render(); });
+  document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
 
 }
 
@@ -697,6 +700,54 @@ function renderQR(){
   else if(box){ box.innerHTML='<div class="empty">No se pudo cargar el generador de QR (revisá tu conexión).</div>'; }
 }
 
+function esParaMi(m){ return m.de===window.miUid || m.destinatarios==='todos' || (Array.isArray(m.destinatarios)&&m.destinatarios.includes(window.miUid)); }
+function nombreDe(uidX){ if(uidX===window.miUid) return 'Vos'; const d=(window.directorio||[]).find(x=>x.uid===uidX); return d?d.nombre:'Alguien'; }
+function renderMensajes(){
+  const list=(window.mensajes||[]).filter(esParaMi);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMsg">← Más</div></div>
+    <div class="card" style="padding:6px 4px;max-height:60vh;overflow-y:auto;">
+      ${list.length?list.map(m=>`<div class="row" style="align-items:flex-start;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;width:100%;"><b style="font-size:13px;">${nombreDe(m.de)}${m.destinatarios==='todos'?' → Todos':''}</b><span class="sub">${(m.fecha||'').slice(0,16).replace('T',' ')}</span></div>
+        ${m.campanaNombre?`<span class="tag" style="margin-top:4px;">${m.campanaNombre}</span>`:''}
+        ${m.texto?`<div style="font-size:14px;margin-top:4px;">${m.texto}</div>`:''}
+      </div>`).join(''):'<div class="empty">Sin mensajes todavía</div>'}
+    </div>
+    <button class="cta" id="newMsg">+ Nuevo mensaje</button>`;
+  document.getElementById('backMsg').addEventListener('click',()=>{tab='mas';render();});
+  document.getElementById('newMsg').addEventListener('click',openNuevoMensaje);
+}
+
+function openNuevoMensaje(){
+  const otros=(window.directorio||[]).filter(d=>d.uid!==window.miUid);
+  const activas=campanas.filter(c=>c.estado!=='finalizada');
+  let todos=otros.length===0;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nuevo mensaje</h3>
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" id="nm_todos" style="width:auto;flex:none;" ${todos?'checked':''}> Enviar a todos</label>
+    <div id="nm_dest" style="${todos?'display:none;':''}max-height:22vh;overflow-y:auto;">
+      ${otros.length?otros.map(d=>`<label class="sub" style="display:flex;align-items:center;gap:8px;padding:4px 0;"><input type="checkbox" class="nm_u" value="${d.uid}" style="width:auto;flex:none;"> ${d.nombre}</label>`).join(''):'<div class="empty">Todavía no hay otros usuarios dados de alta</div>'}
+    </div>
+    ${activas.length?`<select id="nm_camp"><option value="">Sin campaña vinculada</option>${activas.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('')}</select>`:''}
+    <textarea id="nm_txt" rows="3" placeholder="Escribí tu mensaje..."></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="nm_send">Enviar</button></div>
+    <div id="nm_msg" class="sub" style="margin-top:6px;"></div>`);
+  document.getElementById('nm_todos').addEventListener('change',e=>{ todos=e.target.checked; document.getElementById('nm_dest').style.display=todos?'none':'block'; });
+  document.getElementById('nm_send').addEventListener('click',async()=>{
+    const texto=document.getElementById('nm_txt').value.trim();
+    const sel=Array.from(document.querySelectorAll('.nm_u:checked')).map(x=>x.value);
+    if(!todos && !sel.length){ alert('Elegí al menos una persona o "Enviar a todos".'); return; }
+    if(!texto){ alert('Escribí un mensaje.'); return; }
+    const btn=document.getElementById('nm_send'); btn.disabled=true;
+    document.getElementById('nm_msg').textContent='Enviando...';
+    try{
+      const campSel=document.getElementById('nm_camp');
+      const campId=campSel?campSel.value:'';
+      const camp=campId?campanas.find(c=>c.id===campId):null;
+      await window.enviarMensaje({destinatarios: todos?'todos':sel, texto, campanaId:campId, campanaNombre:camp?camp.nombre:''});
+      closeModal(); tab='mensajes'; render();
+    }catch(err){ document.getElementById('nm_msg').textContent='No se pudo enviar. Probá de nuevo.'; btn.disabled=false; }
+  });
+}
+
 function openModal(html){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `<div class="backdrop" id="bd"><div class="sheet">${html}</div></div>`;
@@ -892,10 +943,15 @@ boot();
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc,collection,addDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCZvCtnddspzVPtCC-FSCLgRwCRhqwrI3I",authDomain:"vico-mi-nuskin.firebaseapp.com",projectId:"vico-mi-nuskin",storageBucket:"vico-mi-nuskin.firebasestorage.app",messagingSenderId:"118400723901",appId:"1:118400723901:web:573520df4370d9a4e2c0d4"});
 const auth=getAuth(app);
 const fs=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
+window.directorio=[]; window.mensajes=[];
+window.enviarMensaje=async({destinatarios,texto,campanaId,campanaNombre})=>{
+  if(!uid) return;
+  await addDoc(collection(fs,'mensajes'),{de:uid,deNombre:window.miNombre||'',destinatarios,texto:texto||'',campanaId:campanaId||'',campanaNombre:campanaNombre||'',fecha:new Date().toISOString()});
+};
 let uid=null, unsubs=[], first={}, done=0;
 const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
@@ -927,6 +983,25 @@ function addOut(){
   document.querySelector('header.top').appendChild(b);
 }
 function listen(){
+  const dirKey='vico_dirname_set_'+uid;
+  if(!localStorage.getItem(dirKey)){
+    let nombre=prompt('¿Cómo querés que te vean los demás en los mensajes?', (auth.currentUser&&auth.currentUser.email||'').split('@')[0]);
+    nombre=(nombre||'Usuario').trim()||'Usuario';
+    window.miNombre=nombre;
+    setDoc(doc(fs,'directorio',uid),{nombre,email:(auth.currentUser&&auth.currentUser.email)||''}).catch(()=>{});
+    try{localStorage.setItem(dirKey,nombre);}catch(e){}
+  } else {
+    window.miNombre=localStorage.getItem(dirKey);
+  }
+  window.miUid=uid;
+  unsubs.push(onSnapshot(collection(fs,'directorio'),snap=>{
+    window.directorio=snap.docs.map(d=>({uid:d.id,...d.data()}));
+    if(tab==='mensajes'||tab==='nuevomsg') render();
+  },()=>{}));
+  unsubs.push(onSnapshot(query(collection(fs,'mensajes'),orderBy('fecha','desc'),limit(200)),snap=>{
+    window.mensajes=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(tab==='mensajes') render();
+  },()=>{}));
   const merged=localStorage.getItem('vico_merged_'+uid);
   ['personas','eventos','bloques','metas','biblioteca','campanas'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
