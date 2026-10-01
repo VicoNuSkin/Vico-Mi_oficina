@@ -260,11 +260,12 @@ function renderAgenda(){
   $main.innerHTML = `
     <div class="section-title">Próximos eventos</div>
     <div class="card">
-      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}${e.recurrenciaId?' · se repite':''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;margin-right:6px;">UNIRME</a>`:''}<span data-delevt="${e.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
+      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}${e.recurrenciaId?' · se repite':''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;margin-right:6px;">UNIRME</a>`:''}<span data-editevt="${e.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-delevt="${e.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
     </div>
     <button class="cta" id="addEvt">+ Agendar evento</button>
   `;
-  document.getElementById('addEvt').addEventListener('click', openEventoForm);
+  document.getElementById('addEvt').addEventListener('click', ()=>openEventoForm(null));
+  $main.querySelectorAll('[data-editevt]').forEach(el=>el.addEventListener('click',()=>openEventoForm(el.dataset.editevt)));
   $main.querySelectorAll('[data-delevt]').forEach(el=>el.addEventListener('click',()=>{
     const ev=eventos.find(x=>x.id===el.dataset.delevt); if(!ev) return;
     if(ev.recurrenciaId){
@@ -917,36 +918,40 @@ function openPersonaDetail(id){
   });
 }
 
-function openEventoForm(){
-  const opciones = personas.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+function openEventoForm(editId){
+  const ev = editId ? eventos.find(x=>x.id===editId) : null;
+  const opciones = personas.map(p=>`<option value="${p.id}" ${ev&&ev.personaId===p.id?'selected':''}>${p.nombre}</option>`).join('');
   openModal(`
     <button class="close-x" onclick="closeModal()">✕</button>
-    <h3>Agendar evento</h3>
-    <input id="e_titulo" placeholder="Título (ej: Llamada con...)">
+    <h3 style="padding-right:34px;">${ev?'Editar evento':'Agendar evento'}</h3>
+    <input id="e_titulo" placeholder="Título (ej: Llamada con...)" value="${ev?(ev.titulo||'').replace(/"/g,'&quot;'):''}">
     <select id="e_tipo">
-      <option>Llamada</option><option>Reunión</option><option>Seguimiento</option>
-      <option>Capacitación</option><option>Evento</option><option>1:1</option><option>Tarea</option>
+      ${['Llamada','Reunión','Seguimiento','Capacitación','Evento','1:1','Tarea'].map(t=>`<option ${ev&&ev.tipo===t?'selected':''}>${t}</option>`).join('')}
     </select>
-    <input id="e_fecha" type="date" value="${todayStr()}">
-    <input id="e_hora" type="time">
+    <input id="e_fecha" type="date" value="${ev?ev.fecha:todayStr()}">
+    <input id="e_hora" type="time" value="${ev?(ev.hora||''):''}">
     <select id="e_persona"><option value="">— Sin vincular —</option>${opciones}</select>
-    <input id="e_link" placeholder="Link de Zoom / Meet (opcional)">
-    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;"> Se repite cada semana (mismo día y hora)</label>
+    <input id="e_link" placeholder="Link de Zoom / Meet (opcional)" value="${ev?(ev.link||'').replace(/"/g,'&quot;'):''}">
+    ${!ev?`<label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;"> Se repite cada semana (mismo día y hora)</label>
     <div id="e_repbox" style="display:none;">
       <input id="e_hasta" type="date" placeholder="Repetir hasta (opcional)">
       <div class="sub" style="margin:-6px 0 8px;">Si no ponés fecha, se agenda por 3 meses.</div>
-    </div>
+    </div>`:''}
     <div class="actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" id="saveE">Guardar</button>
     </div>
   `);
-  document.getElementById('e_rep').addEventListener('change',e=>{ document.getElementById('e_repbox').style.display=e.target.checked?'block':'none'; });
+  const erep=document.getElementById('e_rep'); if(erep) erep.addEventListener('change',e=>{ document.getElementById('e_repbox').style.display=e.target.checked?'block':'none'; });
   document.getElementById('saveE').addEventListener('click', ()=>{
     const titulo = document.getElementById('e_titulo').value.trim();
     if(!titulo) return;
     const tipo=document.getElementById('e_tipo').value, hora=document.getElementById('e_hora').value, personaId=document.getElementById('e_persona').value, link=document.getElementById('e_link').value.trim();
     const fechaInicial=document.getElementById('e_fecha').value;
+    if(ev){
+      ev.titulo=titulo; ev.tipo=tipo; ev.hora=hora; ev.personaId=personaId; ev.link=link; ev.fecha=fechaInicial;
+      saveEventos(); closeModal(); render(); return;
+    }
     const repite=document.getElementById('e_rep').checked;
     const recId = repite ? uid() : null;
     let hasta = repite ? document.getElementById('e_hasta').value : '';
