@@ -109,6 +109,12 @@
     nav.bottom button.active{ background:var(--accent); }
     .fab{ right:calc((100vw - 1100px)/2 + 40px); bottom:40px; }
     @media (max-width:1140px){ .fab{ right:40px; } }
+    main{ padding:0 40px 60px; max-width:1000px; }
+    .cta{ width:auto; min-width:220px; display:inline-block; }
+    .list-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+    .list-grid .persona{ border:1px solid var(--line); border-radius:12px; padding:12px; margin:0; flex-direction:column; align-items:flex-start; gap:4px; }
+    .list-grid .row{ border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0; }
+    .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
   }
 </style>
 </head>
@@ -221,13 +227,19 @@ function renderInicio(){
       <div class="box"><b>${eventosHoy.length}</b><small>Hoy en agenda</small></div>
       <div class="box"><b>${personas.filter(p=>{const r=repoInfo(p);return r&&r.dias<=7;}).length}</b><small>Reposiciones</small></div>
     </div>
-    <div class="section-title">Hoy en tu agenda</div>
-    <div class="card">
-      ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${e.hora||''} · ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
-    </div>
-    <div class="section-title">Seguimientos pendientes</div>
-    <div class="card">
-      ${seguimientos.length ? seguimientos.map(p=>`<div class="row" data-open="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||'Retomar contacto'}</div></div></div>`).join('') : '<div class="empty">Sin pendientes vencidos 🎉</div>'}
+    <div class="two-col">
+      <div>
+        <div class="section-title">Hoy en tu agenda</div>
+        <div class="card">
+          ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${e.hora||''} · ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Seguimientos pendientes</div>
+        <div class="card">
+          ${seguimientos.length ? seguimientos.map(p=>`<div class="row" data-open="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||'Retomar contacto'}</div></div></div>`).join('') : '<div class="empty">Sin pendientes vencidos 🎉</div>'}
+        </div>
+      </div>
     </div>
     <button class="cta" id="moverBtn">🔥 MOVER MI OFICINA</button>
   `;
@@ -252,7 +264,7 @@ function renderPersonas(){
       <input id="p_search" placeholder="Buscar por nombre..." value="${(window.pq||'').replace(/"/g,'&quot;')}">
       <div class="chips">${cats.map(c=>`<div class="chip ${filtro===c?'active':''}" data-f="${c}">${TIPO_LABEL[c]}</div>`).join('')}</div>
     </div>
-    <div class="card" style="padding:6px 4px;">
+    <div class="card list-grid" style="padding:10px;">
       ${list.length ? list.map(p=>`
         <div class="persona" data-open="${p.id}">
           <div class="av">${initials(p.nombre)}</div>
@@ -332,7 +344,7 @@ function renderClientes(){
   if(f==='Consumiendo') list=list.filter(x=>x.r&&x.r.dias>7);
   list.sort((a,b)=>(a.r?a.r.dias:9999)-(b.r?b.r.dias:9999));
   $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div>${['Todos','Para reponer','Consumiendo'].map(c=>`<div class="chip ${f===c?'active':''}" data-cf="${c}">${c}</div>`).join('')}</div>
-  <div class="card" style="padding:6px 4px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${p.categoria?`<span class="tag">${p.categoria}</span>`:''}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${p.categoria?`<span class="tag">${p.categoria}</span>`:''}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
   document.getElementById('back').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-cf]').forEach(el=>el.addEventListener('click',()=>{window.cf=el.dataset.cf;renderClientes();}));
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
@@ -373,7 +385,7 @@ function openMover(){
 function renderEquipo(){
   const list = personas.filter(p=>p.tipo==='Socia');
   $main.innerHTML = `<div class="chips"><div class="chip" id="back2">← Más</div></div>
-  <div class="card" style="padding:6px 4px;">${list.length?list.map(p=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.etapa||'Sin etapa'} · ${p.objetivo||'Sin objetivo'}</div></div></div>`).join(''):'<div class="empty">Aún no hay socias. Marcá a alguien como Socia desde su ficha.</div>'}</div>`;
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(p=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.etapa||'Sin etapa'} · ${p.objetivo||'Sin objetivo'}</div></div></div>`).join(''):'<div class="empty">Aún no hay socias. Marcá a alguien como Socia desde su ficha.</div>'}</div>`;
   document.getElementById('back2').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
 }
@@ -419,7 +431,7 @@ function renderBiblioteca(){
   const f=window.bf||'Todo';
   const list=biblioteca.filter(b=>f==='Todo'||b.categoria===f);
   $main.innerHTML=`<div class="chips"><div class="chip" id="back4">← Más</div>${['Todo',...BIB_CATS].map(c=>`<div class="chip ${f===c?'active':''}" data-bf="${c}">${c}</div>`).join('')}</div>
-  <div class="card" style="padding:6px 4px;">${list.length?list.map(b=>`<div class="row"><span class="dot"></span><div style="flex:1;" data-bopen="${b.id}"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div><span data-bshare="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">COMPARTIR</span><span data-bedit="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-bdel="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(b=>`<div class="row"><span class="dot"></span><div style="flex:1;" data-bopen="${b.id}"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div><span data-bshare="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">COMPARTIR</span><span data-bedit="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-bdel="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
   <button class="cta" id="addBib">+ Agregar recurso</button>`;
   document.getElementById('back4').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-bf]').forEach(el=>el.addEventListener('click',()=>{window.bf=el.dataset.bf;renderBiblioteca();}));
@@ -949,11 +961,11 @@ function openEventoForm(editId){
     <input id="e_hora" type="time" value="${ev?(ev.hora||''):''}">
     <select id="e_persona"><option value="">— Sin vincular —</option>${opciones}</select>
     <input id="e_link" placeholder="Link de Zoom / Meet (opcional)" value="${ev?(ev.link||'').replace(/"/g,'&quot;'):''}">
-    ${!ev?`<label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;"> Se repite cada semana (mismo día y hora)</label>
-    <div id="e_repbox" style="display:none;">
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;" ${ev&&ev.recurrenciaId?'checked':''}> Se repite cada semana (mismo día y hora)</label>
+    <div id="e_repbox" style="display:${ev&&ev.recurrenciaId?'block':'none'};">
       <input id="e_hasta" type="date" placeholder="Repetir hasta (opcional)">
       <div class="sub" style="margin:-6px 0 8px;">Si no ponés fecha, se agenda por 3 meses.</div>
-    </div>`:''}
+    </div>
     <div class="actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" id="saveE">Guardar</button>
@@ -965,11 +977,22 @@ function openEventoForm(editId){
     if(!titulo) return;
     const tipo=document.getElementById('e_tipo').value, hora=document.getElementById('e_hora').value, personaId=document.getElementById('e_persona').value, link=document.getElementById('e_link').value.trim();
     const fechaInicial=document.getElementById('e_fecha').value;
+    const repite=document.getElementById('e_rep').checked;
     if(ev){
       ev.titulo=titulo; ev.tipo=tipo; ev.hora=hora; ev.personaId=personaId; ev.link=link; ev.fecha=fechaInicial;
+      if(repite && !ev.recurrenciaId){
+        const recId=uid(); ev.recurrenciaId=recId;
+        let hasta=document.getElementById('e_hasta').value;
+        if(!hasta){ const d=new Date(fechaInicial+'T00:00:00'); d.setMonth(d.getMonth()+3); hasta=d.toISOString().slice(0,10); }
+        let fecha=fechaInicial;
+        while(true){
+          const d=new Date(fecha+'T00:00:00'); d.setDate(d.getDate()+7); fecha=d.toISOString().slice(0,10);
+          if(fecha>hasta) break;
+          eventos.push({id:uid(), titulo, tipo, fecha, hora, personaId, link, recurrenciaId:recId});
+        }
+      }
       saveEventos(); closeModal(); render(); return;
     }
-    const repite=document.getElementById('e_rep').checked;
     const recId = repite ? uid() : null;
     let hasta = repite ? document.getElementById('e_hasta').value : '';
     if(repite && !hasta){ const d=new Date(fechaInicial+'T00:00:00'); d.setMonth(d.getMonth()+3); hasta=d.toISOString().slice(0,10); }
