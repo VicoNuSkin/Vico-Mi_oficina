@@ -112,7 +112,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], recurrentes = [];
 let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
@@ -138,6 +138,7 @@ function loadLocal(){
   try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
   try{ biblioteca = JSON.parse(localStorage.getItem('vico_biblioteca')||'[]'); }catch(e){ biblioteca = []; }
   try{ campanas = JSON.parse(localStorage.getItem('vico_campanas')||'[]'); }catch(e){ campanas = []; }
+  try{ recurrentes = JSON.parse(localStorage.getItem('vico_recurrentes')||'[]'); }catch(e){ recurrentes = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
@@ -146,6 +147,7 @@ function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify
 function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
 function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.stringify(biblioteca)); }catch(e){} }
 function saveCampanas(){ try{ localStorage.setItem('vico_campanas', JSON.stringify(campanas)); }catch(e){} }
+function saveRecurrentes(){ try{ localStorage.setItem('vico_recurrentes', JSON.stringify(recurrentes)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -258,11 +260,25 @@ function renderAgenda(){
   $main.innerHTML = `
     <div class="section-title">Próximos eventos</div>
     <div class="card">
-      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
+      ${prox.length ? prox.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}${e.recurrenciaId?' · se repite':''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;margin-right:6px;">UNIRME</a>`:''}<span data-delevt="${e.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join('') : '<div class="empty">Sin eventos próximos</div>'}
     </div>
     <button class="cta" id="addEvt">+ Agendar evento</button>
   `;
   document.getElementById('addEvt').addEventListener('click', openEventoForm);
+  $main.querySelectorAll('[data-delevt]').forEach(el=>el.addEventListener('click',()=>{
+    const ev=eventos.find(x=>x.id===el.dataset.delevt); if(!ev) return;
+    if(ev.recurrenciaId){
+      if(!confirm('Este evento se repite. Aceptar para borrar ESTE Y LOS SIGUIENTES de la serie, o Cancelar para borrar solo este.')){
+        eventos=eventos.filter(x=>x.id!==ev.id);
+      } else {
+        eventos=eventos.filter(x=>!(x.recurrenciaId===ev.recurrenciaId && x.fecha>=ev.fecha));
+      }
+    } else {
+      if(!confirm('¿Eliminar este evento?')) return;
+      eventos=eventos.filter(x=>x.id!==ev.id);
+    }
+    saveEventos(); renderAgenda();
+  }));
 }
 
 function renderMas(){
@@ -915,22 +931,33 @@ function openEventoForm(){
     <input id="e_hora" type="time">
     <select id="e_persona"><option value="">— Sin vincular —</option>${opciones}</select>
     <input id="e_link" placeholder="Link de Zoom / Meet (opcional)">
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;"> Se repite cada semana (mismo día y hora)</label>
+    <div id="e_repbox" style="display:none;">
+      <input id="e_hasta" type="date" placeholder="Repetir hasta (opcional)">
+      <div class="sub" style="margin:-6px 0 8px;">Si no ponés fecha, se agenda por 3 meses.</div>
+    </div>
     <div class="actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" id="saveE">Guardar</button>
     </div>
   `);
+  document.getElementById('e_rep').addEventListener('change',e=>{ document.getElementById('e_repbox').style.display=e.target.checked?'block':'none'; });
   document.getElementById('saveE').addEventListener('click', ()=>{
     const titulo = document.getElementById('e_titulo').value.trim();
     if(!titulo) return;
-    const data = {
-      id: uid(), titulo, tipo: document.getElementById('e_tipo').value,
-      fecha: document.getElementById('e_fecha').value,
-      hora: document.getElementById('e_hora').value,
-      personaId: document.getElementById('e_persona').value,
-      link: document.getElementById('e_link').value.trim()
-    };
-    eventos.push(data);
+    const tipo=document.getElementById('e_tipo').value, hora=document.getElementById('e_hora').value, personaId=document.getElementById('e_persona').value, link=document.getElementById('e_link').value.trim();
+    const fechaInicial=document.getElementById('e_fecha').value;
+    const repite=document.getElementById('e_rep').checked;
+    const recId = repite ? uid() : null;
+    let hasta = repite ? document.getElementById('e_hasta').value : '';
+    if(repite && !hasta){ const d=new Date(fechaInicial+'T00:00:00'); d.setMonth(d.getMonth()+3); hasta=d.toISOString().slice(0,10); }
+    let fecha = fechaInicial;
+    while(true){
+      eventos.push({id:uid(), titulo, tipo, fecha, hora, personaId, link, recurrenciaId:recId});
+      if(!repite) break;
+      const d=new Date(fecha+'T00:00:00'); d.setDate(d.getDate()+7); fecha=d.toISOString().slice(0,10);
+      if(fecha>hasta) break;
+    }
     saveEventos();
     closeModal();
     render();
@@ -957,13 +984,14 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='recurrentes'?recurrentes:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='recurrentes'){recurrentes=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
 window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stringify(biblioteca));}catch(e){} push('biblioteca',{items:clone(biblioteca)}); };
 window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringify(campanas));}catch(e){} push('campanas',{items:clone(campanas)}); };
+window.saveRecurrentes=()=>{ try{localStorage.setItem('vico_recurrentes',JSON.stringify(recurrentes));}catch(e){} push('recurrentes',{items:clone(recurrentes)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||''}); };
 
@@ -1003,7 +1031,7 @@ function listen(){
     if(tab==='mensajes') render();
   },()=>{}));
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas','biblioteca','campanas'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca','campanas','recurrentes'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -1011,7 +1039,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===6) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===7) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
