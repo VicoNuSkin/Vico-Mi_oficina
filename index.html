@@ -140,7 +140,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], recurrentes = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [];
 let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
@@ -171,7 +171,7 @@ function loadLocal(){
   try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
   try{ biblioteca = JSON.parse(localStorage.getItem('vico_biblioteca')||'[]'); }catch(e){ biblioteca = []; }
   try{ campanas = JSON.parse(localStorage.getItem('vico_campanas')||'[]'); }catch(e){ campanas = []; }
-  try{ recurrentes = JSON.parse(localStorage.getItem('vico_recurrentes')||'[]'); }catch(e){ recurrentes = []; }
+  try{ rutinas = JSON.parse(localStorage.getItem('vico_rutinas')||'[]'); }catch(e){ rutinas = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
@@ -180,7 +180,7 @@ function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify
 function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
 function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.stringify(biblioteca)); }catch(e){} }
 function saveCampanas(){ try{ localStorage.setItem('vico_campanas', JSON.stringify(campanas)); }catch(e){} }
-function saveRecurrentes(){ try{ localStorage.setItem('vico_recurrentes', JSON.stringify(recurrentes)); }catch(e){} }
+function saveRutinas(){ try{ localStorage.setItem('vico_rutinas', JSON.stringify(rutinas)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -208,9 +208,11 @@ function render(){
   else if(tab==='qr') renderQR();
   else if(tab==='mensajes') renderMensajes();
   else if(tab==='mfoco') renderMFoco();
+  else if(tab==='mrutinas') renderMRutinas();
   else if(tab==='macciones') renderMAcciones();
   else if(tab==='mtrabajo') renderMTrabajo();
   else if(tab==='mresumen') renderMResumen();
+  else if(tab==='historial') renderHistorial();
   else renderMas();
 }
 
@@ -219,6 +221,9 @@ function renderInicio(){
   const hoyM = madridNow().fecha;
   const eventosHoy = eventos.filter(e=>e.fecha===hoyM).sort((a,b)=>(a.hora||"").localeCompare(b.hora||""));
   const seguimientos = personas.filter(p=>p.proximaFecha && p.proximaFecha<=hoy);
+  const bloquesHoy = bloques.filter(b=>b.fecha===hoyM && b.horaInicio);
+  const minHoy = bloquesHoy.reduce((s,b)=>s+(b.tiempoRealMin||0),0);
+  const accHoy = bloquesHoy.reduce((s,b)=>s+(b.acciones||[]).filter(a=>a.hecho>0).length,0);
   const d = new Date();
   const fechaLarga = d.toLocaleDateString('es-ES',{weekday:'long', day:'numeric', month:'long'});
 
@@ -256,6 +261,7 @@ function renderInicio(){
         </div>
       </div>
     </div>
+    ${bloquesHoy.length?`<div class="paraque" style="text-align:center;">✨ HOY YA MOVISTE<br><b>${minHoy>=60?Math.floor(minHoy/60)+'h '+(minHoy%60)+'min':minHoy+' min'} · ${accHoy} acciones</b></div>`:''}
     <button class="cta" id="moverBtn">🔥 MOVER MI OFICINA</button>
   `;
   document.getElementById('moverBtn').addEventListener('click', openMover);
@@ -346,6 +352,7 @@ function renderMas(){
       <div class="row" id="goCam"><span class="dot"></span><div><div class="t">Campañas</div><div class="sub">Promos y acciones sobre tu base de contactos</div></div></div>
       <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
       <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
+      <div class="row" id="goHist"><span class="dot"></span><div><div class="t">Historial de Mover mi Oficina</div><div class="sub">Tus días guardados</div></div></div>
     </div>
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
@@ -356,6 +363,7 @@ function renderMas(){
   document.getElementById('goCam').addEventListener('click', ()=>{ tab='campanas'; render(); });
   document.getElementById('goQR').addEventListener('click', ()=>{ tab='qr'; render(); });
   document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
+  document.getElementById('goHist').addEventListener('click', ()=>{ tab='historial'; render(); });
 
 }
 
@@ -426,7 +434,27 @@ function openMover(){
   const activo = cargarBloqueActivo();
   if(activo){ window.bloqueActivo=activo; tab='mtrabajo'; render(); return; }
   window.cfgMover = {focos:[], tiempoMin:60, acciones:[]};
+  if(rutinas.length){ tab='mrutinas'; render(); return; }
   tab='mfoco'; render();
+}
+
+function renderMRutinas(){
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMR">✕</div></div>
+    <h3 style="margin-top:4px;">⚡ ¿Cómo querés empezar?</h3>
+    <div class="card" style="padding:6px 4px;">
+      ${rutinas.map(r=>`<div class="row"><div style="flex:1;" data-userut="${r.id}"><div class="t">${r.nombre}</div><div class="sub">${(r.focos||[]).join(' + ')} · ${r.tiempoMin} min</div></div><span data-delrut="${r.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join('')}
+    </div>
+    <button class="cta" id="mr_foco" style="background:var(--accent);color:var(--brand);">🎯 Elegir mi foco</button>`;
+  document.getElementById('backMR').addEventListener('click',()=>{tab='inicio';render();});
+  document.getElementById('mr_foco').addEventListener('click',()=>{ tab='mfoco'; render(); });
+  document.querySelectorAll('[data-delrut]').forEach(el=>el.addEventListener('click',()=>{ if(!confirm('¿Eliminar esta rutina?')) return; rutinas=rutinas.filter(x=>x.id!==el.dataset.delrut); saveRutinas(); renderMRutinas(); }));
+  document.querySelectorAll('[data-userut]').forEach(el=>el.addEventListener('click',()=>{
+    const r=rutinas.find(x=>x.id===el.dataset.userut); if(!r) return;
+    const bloque={id:uid(), fecha:todayStr(), horaInicio:new Date().toISOString(), focos:r.focos, tiempoPlanMin:r.tiempoMin,
+      acciones:r.acciones.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo,hecho:0})),
+      pausado:false, pausaInicio:null, pausaTotalMs:0, resultados:[], personasAsoc:[]};
+    guardarBloqueActivo(bloque); tab='mtrabajo'; render();
+  }));
 }
 
 function renderMFoco(){
@@ -477,8 +505,18 @@ function renderMAcciones(){
         <span data-plus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">+</span>
       </div>`).join('')}
     </div>`).join('')}
-    <button class="cta" id="mfEmpezar">🔥 Empezar mi oficina</button>`;
+    <button class="cta" id="mfEmpezar">🔥 Empezar mi oficina</button>
+    <button class="cta" id="mfGuardarRut" style="background:none;color:var(--brand2);">⭐ Guardar como rutina</button>`;
   document.getElementById('backMA').addEventListener('click',()=>{tab='mfoco';render();});
+  document.getElementById('mfGuardarRut').addEventListener('click',()=>{
+    const elegidas=c.acciones.filter(a=>a.activa);
+    if(!elegidas.length){ alert('Elegí al menos una acción primero.'); return; }
+    const nombre=prompt('¿Cómo querés llamar a esta rutina? (ej: "30 minutos de foco")');
+    if(!nombre) return;
+    rutinas.push({id:uid(), nombre:nombre.trim(), focos:c.focos, tiempoMin:c.tiempoMin, acciones:elegidas.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo}))});
+    saveRutinas();
+    alert('Rutina guardada.');
+  });
   document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('change',e=>{ const a=c.acciones.find(x=>x.id===el.dataset.act); a.activa=e.target.checked; }));
   document.querySelectorAll('[data-plus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.plus); a.objetivo+=(a.min?5:1); renderMAcciones(); }));
   document.querySelectorAll('[data-minus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.minus); a.objetivo=Math.max(a.min?5:1,a.objetivo-(a.min?5:1)); renderMAcciones(); }));
@@ -553,7 +591,12 @@ function openAsociarPersona(accionId){
   const b=window.bloqueActivo; const acc=b.acciones.find(x=>x.id===accionId);
   openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${acc.nombre}</h3>
     <div class="section-title">¿Con quién fue?</div>
-    <select id="as_p"><option value="">Elegí una persona</option>${personas.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('')}</select>
+    <select id="as_p"><option value="">Elegí una persona</option><option value="__nueva__">+ Nueva persona</option>${personas.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('')}</select>
+    <div id="as_nueva" style="display:none;">
+      <input id="as_nnombre" placeholder="Nombre">
+      <input id="as_ntel" placeholder="Teléfono / Instagram (opcional)">
+      <select id="as_ntipo"><option value="Potencial">Potencial</option><option value="P. Cliente">Potencial Cliente</option><option value="P. Socia">Potencial Socia</option></select>
+    </div>
     <div class="section-title">¿Resultado de la conversación?</div>
     <div class="chips" style="flex-wrap:wrap;">${RESULTADOS_OPC.map(r=>`<div class="chip" data-res="${r}">${r}</div>`).join('')}</div>
     <div class="section-title">¿Próximo seguimiento?</div>
@@ -561,11 +604,18 @@ function openAsociarPersona(accionId){
     <textarea id="as_nota" rows="2" placeholder="Nota (opcional)"></textarea>
     <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="as_save">Guardar</button></div>`);
   let resSel='';
+  document.getElementById('as_p').addEventListener('change',e=>{ document.getElementById('as_nueva').style.display=e.target.value==='__nueva__'?'block':'none'; });
   document.querySelectorAll('[data-res]').forEach(el=>el.addEventListener('click',()=>{ resSel=el.dataset.res; document.querySelectorAll('[data-res]').forEach(x=>x.classList.remove('active')); el.classList.add('active'); }));
   document.getElementById('as_save').addEventListener('click',()=>{
-    const pid=document.getElementById('as_p').value;
+    let pid=document.getElementById('as_p').value;
     const nota=document.getElementById('as_nota').value.trim();
     const fecha=document.getElementById('as_fecha').value;
+    if(pid==='__nueva__'){
+      const nombreN=document.getElementById('as_nnombre').value.trim();
+      if(!nombreN){ alert('Escribí el nombre de la persona.'); return; }
+      const nueva={id:uid(), nombre:nombreN, telefono:document.getElementById('as_ntel').value.trim(), tipo:document.getElementById('as_ntipo').value, ultimaNota:'', historial:[], proximaAccion:'', proximaFecha:'', creado:todayStr()};
+      personas.push(nueva); pid=nueva.id;
+    }
     if(pid){
       const p=personas.find(x=>x.id===pid);
       p.historial=(p.historial||[]).concat({fecha:todayStr(),texto:acc.nombre+(resSel?' — '+resSel:'')+(nota?': '+nota:'')});
@@ -1017,6 +1067,33 @@ function openNuevoMensaje(){
   });
 }
 
+function renderHistorial(){
+  const list=bloques.slice().filter(b=>b.horaInicio).sort((a,b)=>(b.horaInicio||'').localeCompare(a.horaInicio||''));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backHist">← Más</div></div>
+    <div class="card list-grid" style="padding:10px;">
+      ${list.length?list.map(b=>{
+        const hechos=(b.acciones||[]).filter(a=>a.hecho>0).length;
+        const min=b.tiempoRealMin||0; const htxt=min>=60?`${Math.floor(min/60)} h ${min%60} min`:`${min} min`;
+        return `<div class="row" data-vb="${b.id}"><span class="dot"></span><div><div class="t">${fmtFecha(b.fecha)} · ${htxt}</div><div class="sub">${(b.focos||[]).join(' + ')} · ${hechos} acciones</div></div></div>`;
+      }).join(''):'<div class="empty">Todavía no guardaste ningún día</div>'}
+    </div>`;
+  document.getElementById('backHist').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-vb]').forEach(el=>el.addEventListener('click',()=>openDetalleBloque(el.dataset.vb)));
+}
+
+function openDetalleBloque(id){
+  const b=bloques.find(x=>x.id===id); if(!b) return;
+  const hechos=(b.acciones||[]).filter(a=>a.hecho>0);
+  const resCount={}; (b.resultados||[]).forEach(r=>{ resCount[r]=(resCount[r]||0)+1; });
+  const min=b.tiempoRealMin||0; const htxt=min>=60?`${Math.floor(min/60)} h ${min%60} min`:`${min} min`;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${fmtFecha(b.fecha)}</h3>
+    <div class="sub" style="margin-bottom:10px;">${htxt} · ${(b.focos||[]).join(' + ')}</div>
+    <div class="section-title">Acciones</div>
+    <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho}/${a.objetivo}${a.min?' min':''} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
+    ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
+  `);
+}
+
 function openModal(html){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `<div class="backdrop" id="bd"><div class="sheet">${html}</div></div>`;
@@ -1252,14 +1329,14 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='recurrentes'?recurrentes:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='recurrentes'){recurrentes=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='rutinas'?rutinas:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='rutinas'){rutinas=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
 window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stringify(biblioteca));}catch(e){} push('biblioteca',{items:clone(biblioteca)}); };
 window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringify(campanas));}catch(e){} push('campanas',{items:clone(campanas)}); };
-window.saveRecurrentes=()=>{ try{localStorage.setItem('vico_recurrentes',JSON.stringify(recurrentes));}catch(e){} push('recurrentes',{items:clone(recurrentes)}); };
+window.saveRutinas=()=>{ try{localStorage.setItem('vico_rutinas',JSON.stringify(rutinas));}catch(e){} push('rutinas',{items:clone(rutinas)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||''}); };
 
@@ -1299,7 +1376,7 @@ function listen(){
     if(tab==='mensajes') render();
   },()=>{}));
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas','biblioteca','campanas','recurrentes'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca','campanas','rutinas'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
