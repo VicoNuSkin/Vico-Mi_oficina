@@ -112,8 +112,13 @@
     main{ padding:0 40px 60px; max-width:1000px; }
     .cta{ width:auto; min-width:220px; display:inline-block; }
     .list-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
-    .list-grid .persona{ border:1px solid var(--line); border-radius:12px; padding:12px; margin:0; flex-direction:column; align-items:flex-start; gap:4px; }
-    .list-grid .row{ border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0; }
+    .list-grid .persona{ border:1px solid var(--line); border-radius:12px; padding:12px; margin:0; flex-direction:column; align-items:flex-start; gap:4px; min-width:0; }
+    .list-grid .row{ border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0; min-width:0; }
+    .list-grid .persona .info{ min-width:0; width:100%; }
+    .list-grid .persona .n, .list-grid .persona .m, .list-grid .row .t, .list-grid .row .sub, .list-grid .row .m{
+      overflow-wrap:anywhere; word-break:break-word; white-space:normal; text-overflow:clip; overflow:visible;
+    }
+    .list-grid .row > div{ min-width:0; }
     .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
   }
 </style>
@@ -202,6 +207,10 @@ function render(){
   else if(tab==='campdet') renderCampanaDetail(window.curCamp);
   else if(tab==='qr') renderQR();
   else if(tab==='mensajes') renderMensajes();
+  else if(tab==='mfoco') renderMFoco();
+  else if(tab==='macciones') renderMAcciones();
+  else if(tab==='mtrabajo') renderMTrabajo();
+  else if(tab==='mresumen') renderMResumen();
   else renderMas();
 }
 
@@ -363,36 +372,237 @@ function renderClientes(){
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
 }
 
+const FOCOS_CFG = {
+  'Visibilidad': {icon:'📱', acciones:[
+    {id:'vis_historia', nombre:'Publicar historia en Instagram'},
+    {id:'vis_estado', nombre:'Publicar estado en WhatsApp'},
+    {id:'vis_compprod', nombre:'Compartir producto en uso'},
+    {id:'vis_compexp', nombre:'Compartir experiencia personal'},
+    {id:'vis_compneg', nombre:'Compartir oportunidad de negocio'},
+    {id:'vis_content', nombre:'Publicar contenido / reel / post'},
+    {id:'vis_resp', nombre:'Responder interacciones recibidas'},
+    {id:'vis_iniciar', nombre:'Iniciar conversaciones desde story/interacción'}
+  ]},
+  'Clientes': {icon:'🤍', acciones:[
+    {id:'cli_nuevo', nombre:'Contactar personas nuevas'},
+    {id:'cli_retomar', nombre:'Retomar conversaciones'},
+    {id:'cli_seg', nombre:'Hacer seguimiento de producto'},
+    {id:'cli_recom', nombre:'Recomendar producto'},
+    {id:'cli_info', nombre:'Enviar información/precio'},
+    {id:'cli_cerrar', nombre:'Cerrar pedido'},
+    {id:'cli_anterior', nombre:'Contactar cliente anterior'},
+    {id:'cli_react', nombre:'Reactivar cliente'},
+    {id:'cli_repo', nombre:'Consultar por reposición'},
+    {id:'cli_ref', nombre:'Pedir referido/recomendación'}
+  ]},
+  'Equipo': {icon:'🤝', acciones:[
+    {id:'eq_contactar', nombre:'Contactar posible socio/a'},
+    {id:'eq_compneg', nombre:'Compartir oportunidad de negocio'},
+    {id:'eq_seg', nombre:'Hacer seguimiento de oportunidad'},
+    {id:'eq_invitar', nombre:'Invitar a llamada/presentación'},
+    {id:'eq_llamar', nombre:'Realizar llamada/presentación'},
+    {id:'eq_info', nombre:'Enviar información del negocio'},
+    {id:'eq_incorp', nombre:'Incorporar nuevo socio/a'}
+  ]},
+  'Crecimiento': {icon:'🧠', acciones:[
+    {id:'cre_nuskin', nombre:'Formación Nu Skin', min:true},
+    {id:'cre_prod', nombre:'Formación de producto', min:true},
+    {id:'cre_ventas', nombre:'Formación en ventas', min:true},
+    {id:'cre_prosp', nombre:'Formación en prospección', min:true},
+    {id:'cre_lider', nombre:'Formación en liderazgo', min:true},
+    {id:'cre_pract1', nombre:'Practicar presentación del negocio'},
+    {id:'cre_pract2', nombre:'Practicar explicación de producto'},
+    {id:'cre_audio', nombre:'Escuchar audio / podcast / formación', min:true},
+    {id:'cre_mindset', nombre:'Trabajar mindset / creencia / miedo'},
+    {id:'cre_aprend', nombre:'Registrar aprendizaje'}
+  ]}
+};
+const FRASES_VICO = ['Lo que hacés hoy construye lo que querés mañana.','Tomar acción puede dar vuelta todo.','Resultados diferentes requieren acciones diferentes.','Hacer menos, durante más tiempo.'];
+
+function cargarBloqueActivo(){ try{ return JSON.parse(localStorage.getItem('vico_bloque_activo')||'null'); }catch(e){ return null; } }
+function guardarBloqueActivo(b){ window.bloqueActivo=b; try{ b?localStorage.setItem('vico_bloque_activo',JSON.stringify(b)):localStorage.removeItem('vico_bloque_activo'); }catch(e){} }
+
 function openMover(){
-  const m={paso:0,intencion:'',foco:'',elegidas:[],pid:'',motivo:'',cierre:'',proximo:''};
-  const focos=['Clientes','Seguimientos','Negocio','Equipo','Formación','Campaña'], motivos=['Reposición','Nuevo producto','Reactivación','Referido','Negocio','Seguimiento'];
-  const titulos=['Intención','Elijo mi foco','Personas sugeridas','Acción','Cierre'];
-  const sug=()=>{ const hoy=todayStr(); const a=personas.filter(p=>(p.proximaFecha&&p.proximaFecha<=hoy)||(repoInfo(p)&&repoInfo(p).dias<=7)); const b=personas.filter(p=>!a.includes(p)&&p.tipo!=='Socia'); return a.concat(b).slice(0,5); };
-  const draw=()=>{
-    let body='';
-    if(m.paso===0) body=`<p class="sub">Abrí tu cuaderno. ¿Qué querés mover hoy?</p><textarea id="m_int" rows="3" placeholder="Hoy quiero...">${m.intencion}</textarea>`;
-    if(m.paso===1) body=`<div class="chips" style="flex-wrap:wrap">${focos.map(x=>`<div class="chip ${m.foco===x?'active':''}" data-foco="${x}">${x}</div>`).join('')}</div>`;
-    if(m.paso===2){ const l=sug(); body=l.length?l.map(p=>`<div class="persona" data-sel="${p.id}"><div class="av" style="${m.elegidas.includes(p.id)?'':'opacity:.4'}">${m.elegidas.includes(p.id)?'✓':initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.proximaAccion||repoTxt(p)}</div></div></div>`).join(''):'<div class="empty">Cargá personas primero en la pestaña Personas.</div>'; }
-    if(m.paso===3){ const l=personas.filter(p=>m.elegidas.includes(p.id)); const pp=l.length?l:personas; const per=personas.find(x=>x.id===m.pid);
-      body=`<select id="m_p"><option value="">Elegí una persona</option>${pp.map(p=>`<option value="${p.id}" ${m.pid===p.id?'selected':''}>${p.nombre}</option>`).join('')}</select><div class="chips" style="flex-wrap:wrap">${motivos.map(x=>`<div class="chip ${m.motivo===x?'active':''}" data-mot="${x}">${x}</div>`).join('')}</div><p class="sub">Una persona, un motivo, una conversación.</p>${per&&per.telefono?`<a class="cta" style="text-align:center;text-decoration:none" target="_blank" href="${waLink(per.telefono, per.proximaAccion || ('Hola '+per.nombre.split(' ')[0]+'!'))}">Abrir WhatsApp</a>`:''}`; }
-    if(m.paso===4) body=`<p class="sub">Revisá lo que hiciste y tu próximo paso.</p><textarea id="m_cie" rows="3" placeholder="Qué hice / cómo salió">${m.cierre}</textarea><textarea id="m_pro" rows="2" placeholder="Próximo paso">${m.proximo}</textarea>`;
-    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3>0${m.paso+1} · ${titulos[m.paso]}</h3>${body}<div class="actions">${m.paso>0?'<button class="btn-secondary" id="m_prev">Atrás</button>':''}<button class="btn-primary" id="m_next">${m.paso===4?'Terminar':'Siguiente'}</button></div>`);
-    const g=id=>document.getElementById(id);
-    document.querySelectorAll('[data-foco]').forEach(e=>e.addEventListener('click',()=>{m.foco=e.dataset.foco;draw();}));
-    document.querySelectorAll('[data-mot]').forEach(e=>e.addEventListener('click',()=>{m.motivo=e.dataset.mot;if(g('m_p'))m.pid=g('m_p').value;draw();}));
-    document.querySelectorAll('[data-sel]').forEach(e=>e.addEventListener('click',()=>{const i=e.dataset.sel;m.elegidas=m.elegidas.includes(i)?m.elegidas.filter(x=>x!==i):m.elegidas.concat(i);draw();}));
-    if(g('m_prev')) g('m_prev').addEventListener('click',()=>{ m.paso--; draw(); });
-    g('m_next').addEventListener('click',()=>{
-      if(g('m_int')) m.intencion=g('m_int').value; if(g('m_p')) m.pid=g('m_p').value;
-      if(g('m_cie')){ m.cierre=g('m_cie').value; m.proximo=g('m_pro').value; }
-      if(m.paso<4){ m.paso++; draw(); return; }
-      const per=personas.find(x=>x.id===m.pid);
-      if(per){ per.historial=(per.historial||[]).concat({fecha:todayStr(),texto:(m.motivo?m.motivo+': ':'')+(m.cierre||'Bloque de trabajo')}); per.ultimaNota=m.cierre||per.ultimaNota; if(m.proximo) per.proximaAccion=m.proximo; savePersonas(); }
-      bloques.push({fecha:todayStr(),intencion:m.intencion,foco:m.foco,motivo:m.motivo,pid:m.pid,cierre:m.cierre,proximo:m.proximo}); saveBloques();
-      closeModal(); render();
-    });
-  };
-  draw();
+  const activo = cargarBloqueActivo();
+  if(activo){ window.bloqueActivo=activo; tab='mtrabajo'; render(); return; }
+  window.cfgMover = {focos:[], tiempoMin:60, acciones:[]};
+  tab='mfoco'; render();
+}
+
+function renderMFoco(){
+  const c=window.cfgMover;
+  const nombres=Object.keys(FOCOS_CFG);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMF">✕</div></div>
+    <h3 style="margin-top:4px;">🔥 ¿Qué querés mover hoy?</h3>
+    <p class="sub">Elegí 1 foco principal y, si querés, 1 secundario.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      ${nombres.map(f=>`<div class="card" data-f="${f}" style="cursor:pointer;text-align:center;padding:16px 8px;${c.focos.includes(f)?'border-color:var(--brand);background:var(--accent);':''}">
+        <div style="font-size:22px;">${FOCOS_CFG[f].icon}</div><div style="font-weight:600;font-size:13px;margin-top:4px;">${f.toUpperCase()}</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-title">¿Cuánto tiempo tenés hoy?</div>
+    <div class="chips" style="flex-wrap:wrap;">
+      ${[['30','30 min'],['60','1 h'],['120','2 h']].map(([v,l])=>`<div class="chip ${String(c.tiempoMin)===v?'active':''}" data-t="${v}">${l}</div>`).join('')}
+      <div class="chip ${c.custom?'active':''}" id="tCustom">Personalizado</div>
+    </div>
+    ${c.custom?`<input id="tMin" type="number" min="5" placeholder="Minutos" value="${c.tiempoMin}">`:''}
+    <button class="cta" id="mfContinuar" ${!c.focos.length?'disabled style="opacity:.5;"':''}>Continuar →</button>`;
+  document.getElementById('backMF').addEventListener('click',()=>{tab='inicio';render();});
+  document.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('click',()=>{
+    const f=el.dataset.f;
+    if(c.focos.includes(f)) c.focos=c.focos.filter(x=>x!==f);
+    else if(c.focos.length<2) c.focos.push(f);
+    renderMFoco();
+  }));
+  document.querySelectorAll('[data-t]').forEach(el=>el.addEventListener('click',()=>{ c.tiempoMin=Number(el.dataset.t); c.custom=false; renderMFoco(); }));
+  document.getElementById('tCustom').addEventListener('click',()=>{ c.custom=true; renderMFoco(); });
+  const tMin=document.getElementById('tMin'); if(tMin) tMin.addEventListener('change',e=>{ c.tiempoMin=Number(e.target.value)||30; });
+  const cont=document.getElementById('mfContinuar');
+  if(c.focos.length) cont.addEventListener('click',()=>{ tab='macciones'; render(); });
+}
+
+function renderMAcciones(){
+  const c=window.cfgMover;
+  if(!c.acciones.length){ c.focos.forEach(f=>{ FOCOS_CFG[f].acciones.forEach(a=>{ c.acciones.push({id:a.id,nombre:a.nombre,foco:f,min:!!a.min,activa:false,objetivo:a.min?20:3}); }); }); }
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMA">← Atrás</div></div>
+    <h3 style="margin-top:4px;">🎯 Armá tu foco de hoy</h3>
+    <p class="sub">Elegí qué acciones querés realizar. No necesitás hacerlas todas.</p>
+    ${c.focos.map(f=>`<div class="section-title">${FOCOS_CFG[f].icon} ${f.toUpperCase()}</div>
+    <div class="card">
+      ${c.acciones.filter(a=>a.foco===f).map(a=>`<div class="row">
+        <input type="checkbox" data-act="${a.id}" ${a.activa?'checked':''} style="width:auto;flex:none;margin-right:10px;">
+        <div class="t" style="flex:1;">${a.nombre}</div>
+        <span data-minus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">−</span>
+        <b style="min-width:34px;text-align:center;">${a.objetivo}${a.min?'m':''}</b>
+        <span data-plus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">+</span>
+      </div>`).join('')}
+    </div>`).join('')}
+    <button class="cta" id="mfEmpezar">🔥 Empezar mi oficina</button>`;
+  document.getElementById('backMA').addEventListener('click',()=>{tab='mfoco';render();});
+  document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('change',e=>{ const a=c.acciones.find(x=>x.id===el.dataset.act); a.activa=e.target.checked; }));
+  document.querySelectorAll('[data-plus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.plus); a.objetivo+=(a.min?5:1); renderMAcciones(); }));
+  document.querySelectorAll('[data-minus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.minus); a.objetivo=Math.max(a.min?5:1,a.objetivo-(a.min?5:1)); renderMAcciones(); }));
+  document.getElementById('mfEmpezar').addEventListener('click',()=>{
+    const elegidas=c.acciones.filter(a=>a.activa);
+    if(!elegidas.length){ alert('Elegí al menos una acción.'); return; }
+    const bloque={id:uid(), fecha:todayStr(), horaInicio:new Date().toISOString(), focos:c.focos, tiempoPlanMin:c.tiempoMin,
+      acciones:elegidas.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo,hecho:0})),
+      pausado:false, pausaInicio:null, pausaTotalMs:0, resultados:[], personasAsoc:[]};
+    guardarBloqueActivo(bloque);
+    window.cfgMover=null;
+    tab='mtrabajo'; render();
+  });
+}
+
+function sugeridasParaBloque(){
+  const hoy=todayStr();
+  const a=personas.filter(p=>p.proximaFecha&&p.proximaFecha<=hoy);
+  const b=personas.filter(p=>!a.includes(p)&&(repoInfo(p)&&repoInfo(p).dias<=7));
+  const c=personas.filter(p=>!a.includes(p)&&!b.includes(p)&&p.tipo!=='Socia');
+  return a.concat(b).concat(c).slice(0,3);
+}
+
+function renderMTrabajo(){
+  const b=window.bloqueActivo;
+  if(!b){ tab='inicio'; render(); return; }
+  if(window.timerInt) clearInterval(window.timerInt);
+  const elapsedMs=()=>{ const ini=new Date(b.horaInicio).getTime(); let pausa=b.pausaTotalMs||0; if(b.pausado&&b.pausaInicio) pausa+=(Date.now()-new Date(b.pausaInicio).getTime()); return Date.now()-ini-pausa; };
+  const fmt=ms=>{ const s=Math.max(0,Math.floor(ms/1000)); const h=String(Math.floor(s/3600)).padStart(2,'0'); const m=String(Math.floor((s%3600)/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return h+':'+m+':'+ss; };
+  const sug=sugeridasParaBloque();
+  $main.innerHTML=`<div class="chips"><div class="chip" id="mt_salir">Minimizar</div></div>
+    <h3 style="margin-top:4px;">🔥 Mi foco de hoy</h3>
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+      <div><div class="sub">Tiempo: ${b.tiempoPlanMin} min · ${b.pausado?'⏸ Pausado':'⏱'} <b id="mt_crono">${fmt(elapsedMs())}</b></div><div class="sub">Focos: ${b.focos.join(' + ')}</div></div>
+      <button id="mt_pausa" style="border:none;background:var(--accent);color:var(--brand);border-radius:10px;padding:8px 12px;font-weight:600;">${b.pausado?'Reanudar':'Pausar'}</button>
+    </div>
+    ${b.focos.map(f=>`<div class="section-title">${FOCOS_CFG[f].icon} ${f.toUpperCase()}</div>
+    <div class="card">
+      ${b.acciones.filter(a=>a.foco===f).map(a=>`<div class="row">
+        <div class="t" style="flex:1;">${a.nombre}<div class="sub">${a.hecho}/${a.objetivo}${a.min?' min':''}</div></div>
+        <span data-mminus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">−</span>
+        <span data-mplus="${a.id}" style="padding:4px 10px;background:var(--brand);color:#fff;border-radius:8px;font-weight:700;">+1</span>
+        <span data-asoc="${a.id}" style="padding:4px 6px;color:var(--brand2);">👤</span>
+      </div>`).join('')}
+    </div>`).join('')}
+    ${sug.length?`<div class="section-title">⚡ Personas que podrías contactar</div>
+    <div class="card">${sug.map(p=>`<div class="row" data-verp="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||repoTxt(p)}</div></div></div>`).join('')}</div>`:''}
+    <button class="cta" id="mt_terminar" style="background:var(--accent);color:var(--brand);">Terminar mi oficina</button>`;
+  document.getElementById('mt_salir').addEventListener('click',()=>{tab='inicio';render();});
+  document.getElementById('mt_pausa').addEventListener('click',()=>{
+    if(b.pausado){ b.pausaTotalMs=(b.pausaTotalMs||0)+(Date.now()-new Date(b.pausaInicio).getTime()); b.pausado=false; b.pausaInicio=null; }
+    else { b.pausado=true; b.pausaInicio=new Date().toISOString(); }
+    guardarBloqueActivo(b); renderMTrabajo();
+  });
+  document.querySelectorAll('[data-mplus]').forEach(el=>el.addEventListener('click',()=>{ const a=b.acciones.find(x=>x.id===el.dataset.mplus); a.hecho++; guardarBloqueActivo(b); renderMTrabajo(); }));
+  document.querySelectorAll('[data-mminus]').forEach(el=>el.addEventListener('click',()=>{ const a=b.acciones.find(x=>x.id===el.dataset.mminus); a.hecho=Math.max(0,a.hecho-1); guardarBloqueActivo(b); renderMTrabajo(); }));
+  document.querySelectorAll('[data-asoc]').forEach(el=>el.addEventListener('click',()=>openAsociarPersona(el.dataset.asoc)));
+  document.querySelectorAll('[data-verp]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.verp)));
+  document.getElementById('mt_terminar').addEventListener('click',()=>{
+    if(!confirm('¿Terminar y guardar el bloque de hoy?')) return;
+    tab='mresumen'; render();
+  });
+  window.timerInt=setInterval(()=>{
+    if(tab!=='mtrabajo'){ clearInterval(window.timerInt); return; }
+    const el=document.getElementById('mt_crono'); if(!el){ clearInterval(window.timerInt); return; }
+    if(!b.pausado) el.textContent=fmt(elapsedMs());
+  },1000);
+}
+
+const RESULTADOS_OPC=['Información','Interés producto','Interés negocio','Seguimiento','Pedido','Cliente nuevo','Posible socia','Otro'];
+function openAsociarPersona(accionId){
+  const b=window.bloqueActivo; const acc=b.acciones.find(x=>x.id===accionId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${acc.nombre}</h3>
+    <div class="section-title">¿Con quién fue?</div>
+    <select id="as_p"><option value="">Elegí una persona</option>${personas.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('')}</select>
+    <div class="section-title">¿Resultado de la conversación?</div>
+    <div class="chips" style="flex-wrap:wrap;">${RESULTADOS_OPC.map(r=>`<div class="chip" data-res="${r}">${r}</div>`).join('')}</div>
+    <div class="section-title">¿Próximo seguimiento?</div>
+    <input id="as_fecha" type="date">
+    <textarea id="as_nota" rows="2" placeholder="Nota (opcional)"></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="as_save">Guardar</button></div>`);
+  let resSel='';
+  document.querySelectorAll('[data-res]').forEach(el=>el.addEventListener('click',()=>{ resSel=el.dataset.res; document.querySelectorAll('[data-res]').forEach(x=>x.classList.remove('active')); el.classList.add('active'); }));
+  document.getElementById('as_save').addEventListener('click',()=>{
+    const pid=document.getElementById('as_p').value;
+    const nota=document.getElementById('as_nota').value.trim();
+    const fecha=document.getElementById('as_fecha').value;
+    if(pid){
+      const p=personas.find(x=>x.id===pid);
+      p.historial=(p.historial||[]).concat({fecha:todayStr(),texto:acc.nombre+(resSel?' — '+resSel:'')+(nota?': '+nota:'')});
+      if(nota) p.ultimaNota=nota;
+      if(fecha){ p.proximaFecha=fecha; eventos.push({id:uid(),titulo:'Seguimiento con '+p.nombre,tipo:'Seguimiento',fecha,hora:'',personaId:p.id}); saveEventos(); }
+      savePersonas();
+      b.personasAsoc.push({accionId,personaId:pid,resultado:resSel,fecha:todayStr()});
+    }
+    if(resSel) b.resultados.push(resSel);
+    guardarBloqueActivo(b); closeModal(); renderMTrabajo();
+  });
+}
+
+function renderMResumen(){
+  const b=window.bloqueActivo;
+  if(!b){ tab='inicio'; render(); return; }
+  const ini=new Date(b.horaInicio).getTime();
+  const pausa=(b.pausaTotalMs||0)+(b.pausado&&b.pausaInicio?(Date.now()-new Date(b.pausaInicio).getTime()):0);
+  const ms=Date.now()-ini-pausa; const mins=Math.round(ms/60000);
+  const horasTxt = mins>=60?`${Math.floor(mins/60)} h ${mins%60} min`:`${mins} min`;
+  const hechos=b.acciones.filter(a=>a.hecho>0);
+  const resCount={}; (b.resultados||[]).forEach(r=>{ resCount[r]=(resCount[r]||0)+1; });
+  const frase=FRASES_VICO[Math.floor(Math.random()*FRASES_VICO.length)];
+  $main.innerHTML=`<h3 style="margin-top:4px;">✨ Hoy moviste tu negocio</h3>
+    <div class="stat3"><div class="box"><b>${horasTxt}</b><small>Tiempo real</small></div><div class="box"><b>${b.focos.length}</b><small>Focos</small></div></div>
+    <div class="section-title">Lo que hiciste hoy</div>
+    <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
+    ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
+    <div class="paraque" style="text-align:center;margin-top:10px;">${frase}</div>
+    <button class="cta" id="mr_guardar">Guardar día 🤍</button>`;
+  document.getElementById('mr_guardar').addEventListener('click',()=>{
+    bloques.push({id:b.id, fecha:b.fecha, horaInicio:b.horaInicio, horaFin:new Date().toISOString(), tiempoPlanMin:b.tiempoPlanMin, tiempoRealMin:mins,
+      focos:b.focos, acciones:b.acciones, resultados:b.resultados, personasAsoc:b.personasAsoc});
+    saveBloques();
+    guardarBloqueActivo(null);
+    tab='inicio'; render();
+  });
 }
 
 function renderEquipo(){
