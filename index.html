@@ -213,6 +213,7 @@ function render(){
   else if(tab==='mtrabajo') renderMTrabajo();
   else if(tab==='mresumen') renderMResumen();
   else if(tab==='historial') renderHistorial();
+  else if(tab==='progreso') renderProgreso();
   else renderMas();
 }
 
@@ -353,6 +354,7 @@ function renderMas(){
       <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
       <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
       <div class="row" id="goHist"><span class="dot"></span><div><div class="t">Historial de Mover mi Oficina</div><div class="sub">Tus días guardados</div></div></div>
+      <div class="row" id="goProg"><span class="dot"></span><div><div class="t">Mi Progreso</div><div class="sub">Estadísticas y calendario de constancia</div></div></div>
     </div>
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
@@ -364,6 +366,7 @@ function renderMas(){
   document.getElementById('goQR').addEventListener('click', ()=>{ tab='qr'; render(); });
   document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
   document.getElementById('goHist').addEventListener('click', ()=>{ tab='historial'; render(); });
+  document.getElementById('goProg').addEventListener('click', ()=>{ tab='progreso'; render(); });
 
 }
 
@@ -603,9 +606,13 @@ function openAsociarPersona(accionId){
     <input id="as_fecha" type="date">
     <textarea id="as_nota" rows="2" placeholder="Nota (opcional)"></textarea>
     <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="as_save">Guardar</button></div>`);
-  let resSel='';
+  let resSel=[];
   document.getElementById('as_p').addEventListener('change',e=>{ document.getElementById('as_nueva').style.display=e.target.value==='__nueva__'?'block':'none'; });
-  document.querySelectorAll('[data-res]').forEach(el=>el.addEventListener('click',()=>{ resSel=el.dataset.res; document.querySelectorAll('[data-res]').forEach(x=>x.classList.remove('active')); el.classList.add('active'); }));
+  document.querySelectorAll('[data-res]').forEach(el=>el.addEventListener('click',()=>{
+    const r=el.dataset.res;
+    if(resSel.includes(r)){ resSel=resSel.filter(x=>x!==r); el.classList.remove('active'); }
+    else { resSel.push(r); el.classList.add('active'); }
+  }));
   document.getElementById('as_save').addEventListener('click',()=>{
     let pid=document.getElementById('as_p').value;
     const nota=document.getElementById('as_nota').value.trim();
@@ -618,13 +625,13 @@ function openAsociarPersona(accionId){
     }
     if(pid){
       const p=personas.find(x=>x.id===pid);
-      p.historial=(p.historial||[]).concat({fecha:todayStr(),texto:acc.nombre+(resSel?' — '+resSel:'')+(nota?': '+nota:'')});
+      p.historial=(p.historial||[]).concat({fecha:todayStr(),texto:acc.nombre+(resSel.length?' — '+resSel.join(', '):'')+(nota?': '+nota:'')});
       if(nota) p.ultimaNota=nota;
       if(fecha){ p.proximaFecha=fecha; eventos.push({id:uid(),titulo:'Seguimiento con '+p.nombre,tipo:'Seguimiento',fecha,hora:'',personaId:p.id}); saveEventos(); }
       savePersonas();
-      b.personasAsoc.push({accionId,personaId:pid,resultado:resSel,fecha:todayStr()});
+      b.personasAsoc.push({accionId,personaId:pid,resultado:resSel.join(', '),fecha:todayStr()});
     }
-    if(resSel) b.resultados.push(resSel);
+    resSel.forEach(r=>b.resultados.push(r));
     guardarBloqueActivo(b); closeModal(); renderMTrabajo();
   });
 }
@@ -1092,6 +1099,65 @@ function openDetalleBloque(id){
     <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho}/${a.objetivo}${a.min?' min':''} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
     ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
   `);
+}
+
+function sumarDias(fechaStr, n){ const d=new Date(fechaStr+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function renderProgreso(){
+  const f=window.progFiltro||'Semana';
+  const hoy=madridNow().fecha;
+  const dias={'Semana':6,'Mes':29,'90 días':89,'Año':364}[f];
+  const desde=sumarDias(hoy,-dias);
+  const list=bloques.filter(b=>b.horaInicio && b.fecha>=desde && b.fecha<=hoy);
+  const diasActivos=new Set(list.map(b=>b.fecha)).size;
+  const horasTot=Math.round(list.reduce((s,b)=>s+(b.tiempoRealMin||0),0)/6)/10;
+  const contactosNuevos=personas.filter(p=>p.creado&&p.creado>=desde&&p.creado<=hoy).length;
+  const seguimientos=list.reduce((s,b)=>s+(b.personasAsoc||[]).length,0);
+  const resAll={}; list.forEach(b=>(b.resultados||[]).forEach(r=>resAll[r]=(resAll[r]||0)+1));
+  const focoMin={}; let totalFocoMin=0;
+  list.forEach(b=>{ (b.focos||[]).forEach(fo=>{ focoMin[fo]=(focoMin[fo]||0)+(b.tiempoRealMin||0); totalFocoMin+=(b.tiempoRealMin||0); }); });
+
+  if(!window.calMes){ const hm=madridNow().fecha.split('-'); window.calMes={y:Number(hm[0]),m:Number(hm[1])}; }
+  const {y,m}=window.calMes;
+  const primerDia=new Date(y,m-1,1); const diasMes=new Date(y,m,0).getDate();
+  let offset=primerDia.getDay(); offset=offset===0?6:offset-1;
+  const fechasConBloque=new Set(bloques.filter(b=>b.horaInicio).map(b=>b.fecha));
+  const mesNombre=primerDia.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+  let celdas='';
+  for(let i=0;i<offset;i++) celdas+='<div></div>';
+  for(let d=1;d<=diasMes;d++){
+    const fstr=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const activo=fechasConBloque.has(fstr);
+    celdas+=`<div data-dia="${fstr}" style="text-align:center;padding:6px 0;border-radius:8px;cursor:pointer;${activo?'background:var(--brand);color:#fff;font-weight:600;':''}">${d}</div>`;
+  }
+
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backProg">← Más</div></div>
+    <div class="chips">${['Semana','Mes','90 días','Año'].map(x=>`<div class="chip ${f===x?'active':''}" data-pf="${x}">${x}</div>`).join('')}</div>
+    <div class="stat3"><div class="box"><b>${diasActivos}</b><small>Días activos</small></div><div class="box"><b>${list.length}</b><small>Bloques</small></div><div class="box"><b>${horasTot}</b><small>Horas</small></div></div>
+    <div class="stat3"><div class="box"><b>${contactosNuevos}</b><small>Contactos nuevos</small></div><div class="box"><b>${seguimientos}</b><small>Seguimientos</small></div><div class="box"><b>${resAll['Pedido']||0}</b><small>Pedidos</small></div></div>
+    <div class="section-title">¿Dónde pusiste tu energía?</div>
+    <div class="card">${Object.keys(focoMin).length?Object.entries(focoMin).map(([fo,mins])=>`<div class="row"><div class="t" style="flex:1;">${fo}</div><div class="sub">${Math.round(mins/6)/10} h · ${totalFocoMin?Math.round(mins/totalFocoMin*100):0}%</div></div>`).join(''):'<div class="empty">Sin datos en este período</div>'}</div>
+    <div class="section-title">📅 Mi constancia</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span id="cal_prev" style="padding:4px 10px;color:var(--brand);font-weight:700;">←</span>
+        <b style="text-transform:capitalize;">${mesNombre}</b>
+        <span id="cal_next" style="padding:4px 10px;color:var(--brand);font-weight:700;">→</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px;">${celdas}</div>
+      <div class="sub" style="margin-top:10px;">Este mes moviste tu oficina ${new Set(bloques.filter(b=>b.horaInicio&&b.fecha.slice(0,7)===`${y}-${String(m).padStart(2,'0')}`).map(b=>b.fecha)).size} días. 🤍</div>
+    </div>`;
+  document.getElementById('backProg').addEventListener('click',()=>{tab='mas';render();});
+  document.querySelectorAll('[data-pf]').forEach(el=>el.addEventListener('click',()=>{ window.progFiltro=el.dataset.pf; renderProgreso(); }));
+  document.getElementById('cal_prev').addEventListener('click',()=>{ let {y,m}=window.calMes; m--; if(m<1){m=12;y--;} window.calMes={y,m}; renderProgreso(); });
+  document.getElementById('cal_next').addEventListener('click',()=>{ let {y,m}=window.calMes; m++; if(m>12){m=1;y++;} window.calMes={y,m}; renderProgreso(); });
+  document.querySelectorAll('[data-dia]').forEach(el=>el.addEventListener('click',()=>{
+    const fstr=el.dataset.dia; const delDia=bloques.filter(b=>b.horaInicio&&b.fecha===fstr);
+    if(!delDia.length) return;
+    if(delDia.length===1){ openDetalleBloque(delDia[0].id); return; }
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${fmtFecha(fstr)}</h3>
+      <div class="card">${delDia.map(b=>`<div class="row" data-vb2="${b.id}"><span class="dot"></span><div class="t">${(b.focos||[]).join(' + ')} · ${b.tiempoRealMin||0} min</div></div>`).join('')}</div>`);
+    document.querySelectorAll('[data-vb2]').forEach(x=>x.addEventListener('click',()=>openDetalleBloque(x.dataset.vb2)));
+  }));
 }
 
 function openModal(html){
