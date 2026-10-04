@@ -567,7 +567,8 @@ function renderMTrabajo(){
     </div>`).join('')}
     ${sug.length?`<div class="section-title">⚡ Personas que podrías contactar</div>
     <div class="card">${sug.map(p=>`<div class="row" data-verp="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||repoTxt(p)}</div></div></div>`).join('')}</div>`:''}
-    <button class="cta" id="mt_terminar" style="background:var(--accent);color:var(--brand);">Terminar mi oficina</button>`;
+    <button class="cta" id="mt_terminar" style="background:var(--accent);color:var(--brand);">Terminar mi oficina</button>
+    <button class="cta" id="mt_descartar" style="background:none;color:var(--sub);">Descartar este bloque (lo empecé por error)</button>`;
   document.getElementById('mt_salir').addEventListener('click',()=>{tab='inicio';render();});
   document.getElementById('mt_pausa').addEventListener('click',()=>{
     if(b.pausado){ b.pausaTotalMs=(b.pausaTotalMs||0)+(Date.now()-new Date(b.pausaInicio).getTime()); b.pausado=false; b.pausaInicio=null; }
@@ -581,6 +582,10 @@ function renderMTrabajo(){
   document.getElementById('mt_terminar').addEventListener('click',()=>{
     if(!confirm('¿Terminar y guardar el bloque de hoy?')) return;
     tab='mresumen'; render();
+  });
+  document.getElementById('mt_descartar').addEventListener('click',()=>{
+    if(!confirm('¿Descartar este bloque? No se va a guardar nada de lo hecho acá.')) return;
+    guardarBloqueActivo(null); clearInterval(window.timerInt); tab='inicio'; render();
   });
   window.timerInt=setInterval(()=>{
     if(tab!=='mtrabajo'){ clearInterval(window.timerInt); return; }
@@ -1081,11 +1086,15 @@ function renderHistorial(){
       ${list.length?list.map(b=>{
         const hechos=(b.acciones||[]).filter(a=>a.hecho>0).length;
         const min=b.tiempoRealMin||0; const htxt=min>=60?`${Math.floor(min/60)} h ${min%60} min`:`${min} min`;
-        return `<div class="row" data-vb="${b.id}"><span class="dot"></span><div><div class="t">${fmtFecha(b.fecha)} · ${htxt}</div><div class="sub">${(b.focos||[]).join(' + ')} · ${hechos} acciones</div></div></div>`;
+        return `<div class="row"><div style="flex:1;" data-vb="${b.id}"><div class="t">${fmtFecha(b.fecha)} · ${htxt}</div><div class="sub">${(b.focos||[]).join(' + ')} · ${hechos} acciones</div></div><span data-delb="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`;
       }).join(''):'<div class="empty">Todavía no guardaste ningún día</div>'}
     </div>`;
   document.getElementById('backHist').addEventListener('click',()=>{tab='mas';render();});
   $main.querySelectorAll('[data-vb]').forEach(el=>el.addEventListener('click',()=>openDetalleBloque(el.dataset.vb)));
+  $main.querySelectorAll('[data-delb]').forEach(el=>el.addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este día del historial? No se puede deshacer.')) return;
+    bloques=bloques.filter(x=>x.id!==el.dataset.delb); saveBloques(); renderHistorial();
+  }));
 }
 
 function openDetalleBloque(id){
@@ -1098,7 +1107,13 @@ function openDetalleBloque(id){
     <div class="section-title">Acciones</div>
     <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho}/${a.objetivo}${a.min?' min':''} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
     ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
+    <button class="cta" id="db_del" style="background:var(--accent);color:var(--brand);margin-top:10px;">Eliminar este día</button>
   `);
+  document.getElementById('db_del').addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este día del historial? No se puede deshacer.')) return;
+    bloques=bloques.filter(x=>x.id!==id); saveBloques(); closeModal();
+    if(tab==='historial') renderHistorial(); else if(tab==='progreso') renderProgreso();
+  });
 }
 
 function sumarDias(fechaStr, n){ const d=new Date(fechaStr+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
