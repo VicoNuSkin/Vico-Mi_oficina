@@ -148,6 +148,7 @@
   </nav>
 </div>
 <div id="modalRoot"></div>
+<div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
 
 <script>
 let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [];
@@ -164,7 +165,6 @@ function madridNow(){
 const fmtFecha = (s) => { if(!s) return ""; const d=new Date(s+"T00:00:00"); return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}); };
 const initials = (n) => (n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 
-// Base de Datos de los 30 Prospectos
 const BASE_PROSPECTOS_30 = [
   {"id":"p1", "nombre":"Sofía Ramírez", "instagram":"@sofia.accesoriosgdl", "pais":"México", "ciudad":"Guadalajara", "profesion":"Emprendedora de accesorios y joyería artesanal", "seguidores":"1250", "afinidad":"Alta", "motivo":"Comparte la pasión por emprender y crear proyectos desde cero en México.", "tema":"Comentar sobre el diseño de su última colección de aretes y cómo selecciona los materiales.", "notas":"Perfil activo en Guadalajara, enfoque muy cercano a sus clientas.", "estado":"Pendiente"},
   {"id":"p2", "nombre":"Mariana Garza", "instagram":"@marianagarza.mty", "pais":"México", "ciudad":"Monterrey", "profesion":"Estética y cuidado personal independiente", "seguidores":"890", "afinidad":"Alta", "motivo":"Coincide en la visión del autocuidado y la belleza consciente.", "tema":"Preguntar por su recomendación para mantener rutinas de skincare sencillas pero efectivas.", "notas":"Muy buena energía en sus publicaciones, enfoque en bienestar.", "estado":"Pendiente"},
@@ -183,7 +183,7 @@ const BASE_PROSPECTOS_30 = [
   {"id":"p15", "nombre":"Catalina Orozco", "instagram":"@cataorozco.cali", "pais":"Colombia", "ciudad":"Cali", "profesion":"Emprendedora de accesorios en tejido artesanal", "seguidores":"920", "afinidad":"Media", "motivo":"Mujer trabajadora con iniciativa y profundo respeto por el trabajo artesanal.", "tema":"Preguntar cuánto tiempo le toma elaborar una de sus piezas principales.", "notas":"Enfoque artesanal muy auténtico.", "estado":"Pendiente"},
   {"id":"p16", "nombre":"Sara Henao", "instagram":"@sarahenao.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Diseñadora de papelería y agendas", "seguidores":"1150", "afinidad":"Media", "motivo":"Interés en la organización, la creatividad y el diseño de proyectos propios.", "tema":"Preguntar qué la inspiró a crear su última colección de libretas.", "notas":"Microemprendimiento activo en Medellín.", "estado":"Pendiente"},
   {"id":"p17", "nombre":"Juliana Pérez", "instagram":"@julianaperez.bog", "pais":"Colombia", "ciudad":"Bogotá", "profesion":"Profesional independiente y amante de la lectura", "seguidores":"850", "afinidad":"Alta", "motivo":"Coincidimos plenamente en el gusto por la lectura y el aprendizaje constante.", "tema":"Comentar sobre la última novela o libro de desarrollo personal que reseñó.", "notas":"Perfil muy intelectual y cercano.", "estado":"Pendiente"},
-  {"id":"p18", "nombre":"Mariana Echeverri", "instagram":"@marianaeche.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Manicurista y propietaria de estudio de belleza", "seguidores":"1900", "afinidad":"Media", "motivo":"Emprendedora constante que ha construido su propio espacio de trabajo.", "tema":"Preguntar por los tonos en tendencia que más le solicitan en su estudio.", "notas":"Negocio real y muy activo.", "estado":"Pendiente"},
+  {"id":"p18", "nombre":"Mariana Echeverri", "instagram":"@marianaeche.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Manicurista y propietaria de estudio de belleza", "seguidores":"1900", "afinidad":"Media", "motivo":"Emprendedora constante que has construido su propio espacio de trabajo.", "tema":"Preguntar por los tonos en tendencia que más le solicitan en su estudio.", "notas":"Negocio real y muy activo.", "estado":"Pendiente"},
   {"id":"p19", "nombre":"Valentina Ríos", "instagram":"@valentnarios.bog", "pais":"Colombia", "ciudad":"Bogotá", "profesion":"Fotógrafa independiente y creadora visual", "seguidores":"1450", "afinidad":"Alta", "motivo":"Mujer creativa, independiente con visión para desarrollar proyectos visuales.", "tema":"Comentar sobre la composición de su última sesión fotográfica publicada.", "notas":"Gran sensibilidad artística y profesional.", "estado":"Pendiente"},
   {"id":"p20", "nombre":"Vanesa Albornoz", "instagram":"@vanesa.alicante", "pais":"España", "ciudad":"Alicante", "profesion":"Emprendedora de cosmética y bienestar en tienda local", "seguidores":"1350", "afinidad":"Alta", "motivo":"Enfoque comercial cercano, afinidad con el sector del bienestar y cuidado personal.", "tema":"Preguntar por la acogida que tienen los productos naturales en su tienda local.", "notas":"Ubicada en Alicante, con posibilidad de conexión presencial.", "estado":"Pendiente"},
   {"id":"p21", "nombre":"Elena Navarro", "instagram":"@elenanavarro.fit", "pais":"España", "ciudad":"Alicante", "profesion":"Entrenadora personal y promotora de hábitos saludables", "seguidores":"2200", "afinidad":"Alta", "motivo":"Comparte la pasión por el movimiento, los hábitos saludables y el bienestar integral.", "tema":"Comentar sobre sus recomendaciones para mantener constancia en las caminatas al aire libre.", "notas":"Muy activa en Alicante y alrededores.", "estado":"Pendiente"},
@@ -228,13 +228,15 @@ async function boot(){
   document.querySelectorAll('nav.bottom button').forEach(b=>{
     b.addEventListener('click', ()=>{ tab=b.dataset.tab; render(); });
   });
-  document.getElementById('fab').addEventListener('click', ()=> openPersonaForm());
+  const fab = document.getElementById('fab');
+  if(fab) fab.addEventListener('click', ()=> openPersonaForm());
   render();
 }
 
 function render(){
   document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(tab==='clientes'?'mas':tab)));
-  document.getElementById('fab').style.display = tab==='personas' ? 'flex' : 'none';
+  const fab = document.getElementById('fab');
+  if(fab) fab.style.display = tab==='personas' ? 'flex' : 'none';
   if(tab==='inicio') renderInicio();
   else if(tab==='prospectos') renderProspectos();
   else if(tab==='personas') renderPersonas();
@@ -292,7 +294,6 @@ function renderInicio(){
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
 
-/* RENDER PROSPECTOS DE 30 EN 30 */
 function renderProspectos(){
   const contactados = prospectos.filter(p=>p.estado==='Contactado').length;
   const descartados = prospectos.filter(p=>p.estado==='Descartado').length;
@@ -472,11 +473,12 @@ function openPersonaDetail(id){
 
 boot();
 </script>
-<div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc,collection,addDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
 const app=initializeApp({apiKey:"AIzaSyCZvCtnddspzVPtCC-FSCLgRwCRhqwrI3I",authDomain:"vico-mi-nuskin.firebaseapp.com",projectId:"vico-mi-nuskin",storageBucket:"vico-mi-nuskin.firebasestorage.app",messagingSenderId:"118400723901",appId:"1:118400723901:web:573520df4370d9a4e2c0d4"});
 const auth=getAuth(app);
 const fs=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
@@ -502,6 +504,7 @@ window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||''}); };
 
 function showLogin(msg){
+  if(!lr) return;
   lr.style.display='flex';
   lr.innerHTML=`<div style="width:100%;max-width:340px;text-align:center;"><svg class="vico-mark-lg" viewBox="0 0 1080 569.95" xmlns="http://www.w3.org/2000/svg"><path d="M181.09,250.79c.24,40.41,9.58,82.79,31.62,117.21,19.04,29.74,55.91,36.68,74.05,2.07,15.54-29.64,16.32-62.52,26.63-93.71,15.11-45.72,48.17-69.51,96.5-65.8,22.76,1.74,22.65-33.73,0-35.46-67.23-5.15-114.66,35.15-132.71,98.42-3.99,13.99-5.92,28.42-9.01,42.61-1.75,8.02-6.42,36.21-13.41,38.85-15.73,5.94-27.46-38.08-30.07-46.74-5.67-18.8-8.03-37.84-8.15-57.44-.13-22.81-35.6-22.86-35.46,0h0Z"/><path d="M866.61,374.25c-28.42,20.88-74.34,28.06-106.84,13.17-17.07-7.8-29.61-22.56-36.66-39.72-15.96,17.25-35.6,30.85-58.16,39.06-34.53,12.5-83.03,11.62-111.67-14.45-12.28-11.17-20.7-26.55-24.83-43.13-16,23.67-34.44,47.79-60.16,59.54-30.99,14.19-61.09-.93-72.84-31.56-12.41-32.32-7.54-68.71-3.28-102.14,2.84-22.39,38.3-22.56,35.46,0-3.46,27.09-13.21,70.8,3.5,95.58,21.99,32.5,66.72-39.5,76.96-54.7,9.75-14.5,22.65-32.36,37.73-46.95,7.85-7.62,16.31-14.36,25.22-19.28.09-.04.13-.09.22-.09,18.97-10.46,40.03-12.59,61.89,2.53,18.53,12.86,1.86,42.65-17.87,30.63-30.68-18.62-56.12,19.2-54.13,46.73,1.82,25.76,16.58,41.94,41.05,47.57,53.29,12.28,99.57-27,120.36-72.57,9.53-20.88,39.59-2.7,30.63,17.91-10.2,23.45,10.86,52.98,34.14,56.26,18.97,2.66,41.85-.93,57.72-12.32,20.48-14.76,23.19-41.23,12.37-63.22-14.45-29.52-46.95-31.25-75.1-22.56-21.9,6.78-31.16-27.44-9.44-34.18,46.24-14.32,97.13-2.53,117.88,44.73,16,36.57,8.64,79.04-24.16,103.2Z"/><path d="M571.05,229.64c-8.91,4.92-17.38,11.66-25.22,19.28,7.09-8.16,15.74-14.76,25.22-19.28Z"/></svg><div style="font-size:11px;color:var(--sub);letter-spacing:1px;margin-bottom:22px;">MI OFICINA · CONCIENCIA EN ACCIÓN</div><input id="lg_mail" type="email" placeholder="Correo" autocomplete="username"><input id="lg_pass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="cta" id="lg_go">Entrar</button><a href="mailto:ezequiel135@hotmail.com?subject=Solicito%20acceso%20a%20VICO%20%C2%B7%20Mi%20Oficina&body=Hola!%20Me%20gustar%C3%ADa%20solicitar%20acceso%20a%20la%20app%20VICO%20%C2%B7%20Mi%20Oficina.%20Mi%20correo%20es%3A%20" class="cta" style="display:block;box-sizing:border-box;text-decoration:none;background:var(--accent);color:var(--brand);margin-top:10px;">Solicitar acceso</a><div id="lg_msg" style="color:#b3423a;font-size:13px;margin-top:10px;min-height:18px;">${msg||''}</div></div>`;
   const go=()=>{ const m=document.getElementById('lg_mail').value.trim(), p=document.getElementById('lg_pass').value; if(!m||!p) return;
@@ -514,7 +517,8 @@ function addOut(){
   const b=document.createElement('button'); b.id='outBtn'; b.textContent='Salir';
   b.style.cssText='background:none;border:none;color:var(--sub);font-size:12px;';
   b.addEventListener('click',async()=>{ if(!confirm('¿Cerrar sesión en este dispositivo?')) return; await signOut(auth); ['personas','eventos','bloques','config'].forEach(k=>{try{localStorage.removeItem('vico_'+k);}catch(e){}}); location.reload(); });
-  document.querySelector('header.top').appendChild(b);
+  const topHeader = document.querySelector('header.top');
+  if(topHeader) topHeader.appendChild(b);
 }
 function listen(){
   const dirKey='vico_dirname_set_'+uid;
@@ -522,7 +526,7 @@ function listen(){
     let nombre=prompt('¿Cómo querés que te vean los demás en los mensajes?', (auth.currentUser&&auth.currentUser.email||'').split('@')[0]);
     nombre=(nombre||'Usuario').trim()||'Usuario';
     window.miNombre=nombre;
-    setDoc(doc(fs,'directorio',uid),{nombre,email:(auth.currentUser&&auth.currentUser.email)||''}).catch(()=>{});
+    setDoc(doc(fs,'directorio',uid),{nombre,email:(auth.currentUser&&auth.currentUser.email||''}).catch(()=>{});
     try{localStorage.setItem(dirKey,nombre);}catch(e){}
   } else {
     window.miNombre=localStorage.getItem(dirKey);
@@ -560,7 +564,7 @@ function listen(){
 }
 onAuthStateChanged(auth,u=>{
   unsubs.forEach(f=>f()); unsubs=[]; first={}; done=0;
-  if(u){ uid=u.uid; lr.style.display='none'; addOut(); listen(); }
+  if(u){ uid=u.uid; if(lr) lr.style.display='none'; addOut(); listen(); }
   else { uid=null; showLogin(); }
 });
 </script>
