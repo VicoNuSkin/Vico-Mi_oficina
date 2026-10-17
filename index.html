@@ -151,7 +151,7 @@
 <div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [], bloques = [];
 let tab = "inicio", filtro = "Todos", prospectoFiltro = "Todos";
 let loteActual = 1;
 
@@ -211,6 +211,7 @@ function loadLocal(){
   try{ campanas = JSON.parse(localStorage.getItem('vico_campanas')||'[]'); }catch(e){ campanas = []; }
   try{ rutinas = JSON.parse(localStorage.getItem('vico_rutinas')||'[]'); }catch(e){ rutinas = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
+  try{ bloques = JSON.parse(localStorage.getItem('vico_bloques')||'[]'); }catch(e){ bloques = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
 function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringify(personas)); }catch(e){} }
@@ -234,9 +235,10 @@ async function boot(){
 }
 
 function render(){
-  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(tab==='clientes'?'mas':tab)));
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(['clientes','metas','biblioteca','equipo','estadisticas','campanas','qr','mensajes','historial','progreso'].includes(tab)?'mas':b.dataset.tab)));
   const fab = document.getElementById('fab');
   if(fab) fab.style.display = tab==='personas' ? 'flex' : 'none';
+
   if(tab==='inicio') renderInicio();
   else if(tab==='prospectos') renderProspectos();
   else if(tab==='personas') renderPersonas();
@@ -419,6 +421,37 @@ function renderPersonas(){
 
 function renderAgenda(){
   $main.innerHTML = `<div class="section-title">Próximos eventos</div><div class="card">${eventos.length?eventos.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora\vert{}\vert{}''} —${e.titulo}</div></div></div>`).join(''):'<div class="empty">Sin eventos próximos</div>'}</div>`;
+}
+
+function renderClientes(){
+  $main.innerHTML = `<div class="section-title">Clientes</div><div class="card"><div class="empty">Módulo de Clientes activo</div></div>`;
+}
+function renderMetas(){
+  $main.innerHTML = `<div class="section-title">Metas y Mi Visión</div><div class="card"><div class="empty">${config.paraQue ? 'Para qué: '+config.paraQue : 'Sin metas definidas'}</div></div>`;
+}
+function renderEquipo(){
+  $main.innerHTML = `<div class="section-title">Equipo</div><div class="card"><div class="empty">Módulo de Equipo activo</div></div>`;
+}
+function renderBiblioteca(){
+  $main.innerHTML = `<div class="section-title">Biblioteca</div><div class="card"><div class="empty">Sin recursos guardados</div></div>`;
+}
+function renderEstadisticas(){
+  $main.innerHTML = `<div class="section-title">Estadísticas</div><div class="card"><div class="empty">Resumen de actividad</div></div>`;
+}
+function renderCampanas(){
+  $main.innerHTML = `<div class="section-title>Campañas</div><div class="card"><div class="empty">Sin campañas activas</div></div>`;
+}
+function renderQR(){
+  $main.innerHTML = `<div class="section-title">Código QR</div><div class="card"><div class="empty">QR Personal</div></div>`;
+}
+function renderMensajes(){
+  $main.innerHTML = `<div class="section-title">Mensajes</div><div class="card"><div class="empty">Bandeja de mensajes</div></div>`;
+}
+function renderHistorial(){
+  $main.innerHTML = `<div class="section-title">Historial</div><div class="card"><div class="empty">Historial general</div></div>`;
+}
+function renderProgreso(){
+  $main.innerHTML = `<div class="section-title">Progreso</div><div class="card"><div class="empty">Tu progreso personal</div></div>`;
 }
 
 function renderMas(){
