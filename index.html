@@ -20,7 +20,7 @@
   :root{
     --bg:#FAEBE8; --card:#fffdfc; --ink:#362859; --sub:#8a7d95;
     --brand:#362859; --brand2:#8968AA; --accent:#EFE1EE; --line:#f0dcdd;
-    --ok:#5c9c7c; --warn:#c98a4a; --err:#c94a4a;
+    --ok:#5c9c7c; --warn:#c98a4a;
     box-sizing:border-box;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
@@ -55,14 +55,14 @@
   .stat3 .box{flex:1; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center;}
   .stat3 .box b{display:block; font-size:20px; color:var(--brand);}
   .stat3 .box small{font-size:11px; color:var(--sub);}
-  .cta{display:block; width:100%; padding:14px; border:none; border-radius:14px; background:var(--brand); color:#fff; font-size:15px; font-weight:600; margin-top:4px; cursor:pointer;}
+  .cta{display:block; width:100%; padding:14px; border:none; border-radius:14px; background:var(--brand); color:#fff; font-size:15px; font-weight:600; margin-top:4px;}
   input,select,textarea{
     width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
     background:var(--bg); color:var(--ink); font-size:14px; margin-bottom:10px;
   }
-  .searchbar{position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:10;}
+  .searchbar{position:sticky; top:0; background:var(--bg); padding:10px 0;}
   .chips{display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:6px;}
-  .chip{flex:none; padding:6px 14px; border-radius:20px; background:var(--card); border:1px solid var(--line); font-size:13px; color:var(--sub); cursor:pointer;}
+  .chip{flex:none; padding:6px 14px; border-radius:20px; background:var(--card); border:1px solid var(--line); font-size:13px; color:var(--sub);}
   .chip.active{background:var(--brand); color:#fff; border-color:var(--brand);}
   .persona{display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);}
   .persona .av{width:38px; height:38px; border-radius:50%; background:var(--brand2); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; flex:none;}
@@ -70,17 +70,15 @@
   .persona .info .n{font-size:14px; font-weight:600;}
   .persona .info .m{font-size:12px; color:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .tag{font-size:10px; padding:2px 8px; border-radius:10px; background:var(--accent); color:var(--brand); display:inline-block; margin-top:2px;}
-  .tag-ok{background:#e2f2e9; color:var(--ok);}
-  .tag-no{background:#fce8e8; color:var(--err);}
-  .fab{position:fixed; right:calc((100vw - 480px)/2 + 20px); bottom:calc(90px + env(safe-area-inset-bottom,0px)); width:52px; height:52px; border-radius:50%; background:var(--brand); color:#fff; border:none; font-size:26px; line-height:1; padding:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(54,40,89,.3); cursor:pointer;}
+  .fab{position:fixed; right:calc((100vw - 480px)/2 + 20px); bottom:calc(90px + env(safe-area-inset-bottom,0px)); width:52px; height:52px; border-radius:50%; background:var(--brand); color:#fff; border:none; font-size:26px; line-height:1; padding:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(54,40,89,.3);}
   @media (max-width:520px){.fab{right:20px;}}
   nav.bottom{
     position:sticky; bottom:0; background:var(--card); border-top:1px solid var(--line);
-    display:flex; padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px)); z-index:20;
+    display:flex; padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));
   }
   nav.bottom button{
     flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center;
-    gap:2px; color:var(--sub); font-size:10px; padding:4px; cursor:pointer;
+    gap:2px; color:var(--sub); font-size:10px; padding:4px;
   }
   nav.bottom button.active{color:var(--brand); font-weight:600;}
   nav.bottom .ic{font-size:18px;}
@@ -89,27 +87,12 @@
   .sheet{position:relative; background:var(--card); width:100%; max-width:480px; margin:0 auto; border-radius:20px 20px 0 0; padding:18px; max-height:85vh; overflow-y:auto; padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));}
   .sheet h3{margin:0 0 12px; color:var(--brand);}
   .sheet .actions{display:flex; gap:10px; margin-top:6px;}
-  .sheet .actions button{flex:1; padding:12px; border-radius:10px; border:none; font-size:14px; cursor:pointer;}
+  .sheet .actions button{flex:1; padding:12px; border-radius:10px; border:none; font-size:14px;}
   .btn-primary{background:var(--brand); color:#fff;}
   .btn-secondary{background:var(--accent); color:var(--brand);}
   .detail-hist{font-size:13px; padding:8px 0; border-bottom:1px solid var(--line);}
   .detail-hist .d{color:var(--sub); font-size:11px;}
-  .close-x{position:absolute; top:10px; right:10px; background:var(--accent); border:none; font-size:18px; color:var(--brand); width:30px; height:30px; border-radius:50%; z-index:5; cursor:pointer;}
-
-  /* Tarjetas de Prospectos */
-  .prospecto-card{
-    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;
-  }
-  .prospecto-card.contactado{ border-left:5px solid var(--ok); opacity:0.85; }
-  .prospecto-card.descartado{ border-left:5px solid var(--err); opacity:0.5; }
-  .prospecto-header{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
-  .prospecto-title{ font-weight:700; font-size:15px; color:var(--brand); }
-  .prospecto-sub{ font-size:12px; color:var(--sub); }
-  .prospecto-body{ font-size:13px; margin:8px 0; line-height:1.4; color:var(--ink); }
-  .prospecto-actions{ display:flex; gap:8px; margin-top:10px; }
-  .btn-check{ flex:1; padding:8px; border-radius:8px; border:1px solid var(--ok); background:#e2f2e9; color:var(--ok); font-weight:600; cursor:pointer; font-size:12px; text-align:center; }
-  .btn-cross{ flex:1; padding:8px; border-radius:8px; border:1px solid var(--err); background:#fce8e8; color:var(--err); font-weight:600; cursor:pointer; font-size:12px; text-align:center; }
-  .btn-reset{ padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--sub); font-size:12px; cursor:pointer; }
+  .close-x{position:absolute; top:10px; right:10px; background:var(--accent); border:none; font-size:18px; color:var(--brand); width:30px; height:30px; border-radius:50%; z-index:5;}
 
   @media (min-width:860px){
     #app{
@@ -129,6 +112,14 @@
     main{ padding:0 40px 60px; max-width:1000px; }
     .cta{ width:auto; min-width:220px; display:inline-block; }
     .list-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+    .list-grid .persona{ border:1px solid var(--line); border-radius:12px; padding:12px; margin:0; flex-direction:column; align-items:flex-start; gap:4px; min-width:0; }
+    .list-grid .row{ border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0; min-width:0; }
+    .list-grid .persona .info{ min-width:0; width:100%; }
+    .list-grid .persona .n, .list-grid .persona .m, .list-grid .row .t, .list-grid .row .sub, .list-grid .row .m{
+      overflow-wrap:anywhere; word-break:break-word; white-space:normal; text-overflow:clip; overflow:visible;
+    }
+    .list-grid .row > div{ min-width:0; }
+    .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
   }
 </style>
 </head>
@@ -141,19 +132,16 @@
   <button class="fab" id="fab" style="display:none">+</button>
   <nav class="bottom">
     <button data-tab="inicio" class="active"><span class="ic">🏠</span>Inicio</button>
-    <button data-tab="prospectos"><span class="ic">🎯</span>Prospectos</button>
     <button data-tab="personas"><span class="ic">👥</span>Personas</button>
     <button data-tab="agenda"><span class="ic">📅</span>Agenda</button>
     <button data-tab="mas"><span class="ic">⋯</span>Más</button>
   </nav>
 </div>
 <div id="modalRoot"></div>
-<div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [], bloques = [];
-let tab = "inicio", filtro = "Todos", prospectoFiltro = "Todos";
-let loteActual = 1;
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [];
+let tab = "inicio", filtro = "Todos";
 
 const $main = document.getElementById('main');
 const todayStr = () => new Date().toISOString().slice(0,10);
@@ -164,59 +152,30 @@ function madridNow(){
 }
 const fmtFecha = (s) => { if(!s) return ""; const d=new Date(s+"T00:00:00"); return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}); };
 const initials = (n) => (n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
-
-const BASE_PROSPECTOS_30 = [
-  {"id":"p1", "nombre":"Sofía Ramírez", "instagram":"@sofia.accesoriosgdl", "pais":"México", "ciudad":"Guadalajara", "profesion":"Emprendedora de accesorios y joyería artesanal", "seguidores":"1250", "afinidad":"Alta", "motivo":"Comparte la pasión por emprender y crear proyectos desde cero en México.", "tema":"Comentar sobre el diseño de su última colección de aretes y cómo selecciona los materiales.", "notas":"Perfil activo en Guadalajara, enfoque muy cercano a sus clientas.", "estado":"Pendiente"},
-  {"id":"p2", "nombre":"Mariana Garza", "instagram":"@marianagarza.mty", "pais":"México", "ciudad":"Monterrey", "profesion":"Estética y cuidado personal independiente", "seguidores":"890", "afinidad":"Alta", "motivo":"Coincide en la visión del autocuidado y la belleza consciente.", "tema":"Preguntar por su recomendación para mantener rutinas de skincare sencillas pero efectivas.", "notas":"Muy buena energía en sus publicaciones, enfoque en bienestar.", "estado":"Pendiente"},
-  {"id":"p3", "nombre":"Valeria Castillo", "instagram":"@valecastillo.qro", "pais":"México", "ciudad":"Querétaro", "profesion":"Diseño y papelería personalizada", "seguidores":"1400", "afinidad":"Alta", "motivo":"Comparte el amor por la organización, la papelería y el desarrollo de ideas propias.", "tema":"Felicitarla por la nueva agenda semanal y preguntarle cómo se organiza para crear sus diseños.", "notas":"Excelente opción en Querétaro con marca propia en crecimiento.", "estado":"Pendiente"},
-  {"id":"p4", "nombre":"Fernanda Solís", "instagram":"@fersolis.pue", "pais":"México", "ciudad":"Puebla", "profesion":"Manicurista independiente y nails art", "seguidores":"2100", "afinidad":"Media", "motivo":"Es una mujer trabajadora con negocio propio enfocado en el detalle y la atención cercana.", "tema":"Consultar sobre las tendencias de colores que más le piden esta temporada.", "notas":"Negocio local consolidado a escala microemprendimiento.", "estado":"Pendiente"},
-  {"id":"p5", "nombre":"Camila Torres", "instagram":"@camilatorres.cdmx", "pais":"México", "ciudad":"Ciudad de México", "profesion":"Emprendedora de decoración y detalles artesanales", "seguidores":"1650", "afinidad":"Alta", "motivo":"Comparte el valor de crear espacios con alma y disfrutar el proceso artesanal.", "tema":"Comentar lo acogedor que se ve su último diseño de velas o piezas de cerámica.", "notas":"Perfil muy cálido en CDMX.", "estado":"Pendiente"},
-  {"id":"p6", "nombre":"Daniela Rojas", "instagram":"@daniela.rojas.gdl", "pais":"México", "ciudad":"Guadalajara", "profesion":"Coach holística en formación y bienestar", "seguidores":"950", "afinidad":"Alta", "motivo":"Altísima afinidad con los temas de coaching, desarrollo personal y bienestar.", "tema":"Comentar el último libro de crecimiento personal que recomendó en sus historias.", "notas":"Conexión directa con el área de desarrollo personal y holístico.", "estado":"Pendiente"},
-  {"id":"p7", "nombre":"Ana Sofía Garza", "instagram":"@anasofi.wellness", "pais":"México", "ciudad":"Monterrey", "profesion":"Espacio de bienestar y yoga", "seguidores":"1800", "afinidad":"Alta", "motivo":"Comparte la pasión por el bienestar, el movimiento y la vida consciente.", "tema":"Preguntar por sus consejos para mantener una práctica constante de yoga o caminatas.", "notas":"Perfil muy alineado con bienestar y hábitos saludables.", "estado":"Pendiente"},
-  {"id":"p8", "nombre":"Regina Morales", "instagram":"@reginamorales.art", "pais":"México", "ciudad":"Puebla", "profesion":"Ilustradora y creadora de papelería", "seguidores":"1100", "afinidad":"Media", "motivo":"Interés común por la creatividad, el diseño y la puesta en marcha de proyectos propios.", "tema":"Preguntar qué técnica utiliza para sus ilustraciones más recientes.", "notas":"Creativa con mucha constancia en su marca.", "estado":"Pendiente"},
-  {"id":"p9", "nombre":"Jimena Vargas", "instagram":"@jimevargas.qro", "pais":"México", "ciudad":"Querétaro", "profesion":"Emprendedora de moda sustentable (tienda online)", "seguidores":"2300", "afinidad":"Alta", "motivo":"Emprendedora con iniciativa, valores claros y enfoque en proyectos a largo plazo.", "tema":"Consultar cómo selecciona las prendas para su curaduría semanal.", "notas":"Muy activa y con comunidad comprometida.", "estado":"Pendiente"},
-  {"id":"p10", "nombre":"Andrea Limón", "instagram":"@andrealimon.cdmx", "pais":"México", "ciudad":"Ciudad de México", "profesion":"Estudiante y creadora de contenido de estilo de vida", "seguidores":"780", "afinidad":"Alta", "motivo":"Coincidimos en el gusto por la lectura, el aprendizaje continuo y la escritura.", "tema":"Preguntar su opinión sobre el último libro que subió a su feed.", "notas":"Perfil muy cercano, ideal para conectar de manera genuina.", "estado":"Pendiente"},
-  {"id":"p11", "nombre":"Paulina Vega", "instagram":"@paulinavega.byl", "pais":"México", "ciudad":"Guadalajara", "profesion":"Emprendedora de accesorios de plata", "seguidores":"1500", "afinidad":"Media", "motivo":"Emprendedora enfocada en el detalle y en construir un negocio propio sostenible.", "tema":"Comentar sobre el diseño minimalista de sus anillos recientes.", "notas":"Comercio local activo.", "estado":"Pendiente"},
-  {"id":"p12", "nombre":"Lucía Méndez", "instagram":"@luciamendez.mty", "pais":"México", "ciudad":"Monterrey", "profesion":"Diseñadora gráfica freelance", "seguidores":"1300", "afinidad":"Alta", "motivo":"Mujer trabajadora, independiente con gran iniciativa profesional.", "tema":"Consultar qué herramientas o hábitos le ayudan a organizarse mejor en sus proyectos freelance.", "notas":"Independiente con mentalidad muy clara de crecimiento.", "estado":"Pendiente"},
-  {"id":"p13", "nombre":"Isabel Gómez", "instagram":"@isabelgomez.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Emprendedora de cosmética natural", "seguidores":"1200", "afinidad":"Alta", "motivo":"Interés compartido por el bienestar, el cuidado de la piel y los proyectos con propósito.", "tema":"Preguntar por los ingredientes naturales que usa en sus bálsamos.", "notas":"Excelente perfil en Medellín, sector cosmética natural.", "estado":"Pendiente"},
-  {"id":"p14", "nombre":"Manuela Restrepo", "instagram":"@manuelarestrepo.bog", "pais":"Colombia", "ciudad":"Bogotá", "profesion":"Instructora de bienestar y hábitos saludables", "seguidores":"1600", "afinidad":"Alta", "motivo":"Comparte valores profundos de bienestar, equilibrio y crecimiento personal.", "tema":"Comentar una de sus publicaciones sobre la importancia de las pausas conscientes.", "notas":"Perfil muy cálido en Bogotá.", "estado":"Pendiente"},
-  {"id":"p15", "nombre":"Catalina Orozco", "instagram":"@cataorozco.cali", "pais":"Colombia", "ciudad":"Cali", "profesion":"Emprendedora de accesorios en tejido artesanal", "seguidores":"920", "afinidad":"Media", "motivo":"Mujer trabajadora con iniciativa y profundo respeto por el trabajo artesanal.", "tema":"Preguntar cuánto tiempo le toma elaborar una de sus piezas principales.", "notas":"Enfoque artesanal muy auténtico.", "estado":"Pendiente"},
-  {"id":"p16", "nombre":"Sara Henao", "instagram":"@sarahenao.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Diseñadora de papelería y agendas", "seguidores":"1150", "afinidad":"Media", "motivo":"Interés en la organización, la creatividad y el diseño de proyectos propios.", "tema":"Preguntar qué la inspiró a crear su última colección de libretas.", "notas":"Microemprendimiento activo en Medellín.", "estado":"Pendiente"},
-  {"id":"p17", "nombre":"Juliana Pérez", "instagram":"@julianaperez.bog", "pais":"Colombia", "ciudad":"Bogotá", "profesion":"Profesional independiente y amante de la lectura", "seguidores":"850", "afinidad":"Alta", "motivo":"Coincidimos plenamente en el gusto por la lectura y el aprendizaje constante.", "tema":"Comentar sobre la última novela o libro de desarrollo personal que reseñó.", "notas":"Perfil muy intelectual y cercano.", "estado":"Pendiente"},
-  {"id":"p18", "nombre":"Mariana Echeverri", "instagram":"@marianaeche.med", "pais":"Colombia", "ciudad":"Medellín", "profesion":"Manicurista y propietaria de estudio de belleza", "seguidores":"1900", "afinidad":"Media", "motivo":"Emprendedora constante que ha construido su propio espacio de trabajo.", "tema":"Preguntar por los tonos en tendencia que más le solicitan en su estudio.", "notas":"Negocio real y muy activo.", "estado":"Pendiente"},
-  {"id":"p19", "nombre":"Valentina Ríos", "instagram":"@valentnarios.bog", "pais":"Colombia", "ciudad":"Bogotá", "profesion":"Fotógrafa independiente y creadora visual", "seguidores":"1450", "afinidad":"Alta", "motivo":"Mujer creativa, independiente con visión para desarrollar proyectos visuales.", "tema":"Comentar sobre la composición de su última sesión fotográfica publicada.", "notas":"Gran sensibilidad artística y profesional.", "estado":"Pendiente"},
-  {"id":"p20", "nombre":"Vanesa Albornoz", "instagram":"@vanesa.alicante", "pais":"España", "ciudad":"Alicante", "profesion":"Emprendedora de cosmética y bienestar en tienda local", "seguidores":"1350", "afinidad":"Alta", "motivo":"Enfoque comercial cercano, afinidad con el sector del bienestar y cuidado personal.", "tema":"Preguntar por la acogida que tienen los productos naturales en su tienda local.", "notas":"Ubicada en Alicante, con posibilidad de conexión presencial.", "estado":"Pendiente"},
-  {"id":"p21", "nombre":"Elena Navarro", "instagram":"@elenanavarro.fit", "pais":"España", "ciudad":"Alicante", "profesion":"Entrenadora personal y promotora de hábitos saludables", "seguidores":"2200", "afinidad":"Alta", "motivo":"Comparte la pasión por el movimiento, los hábitos saludables y el bienestar integral.", "tema":"Comentar sobre sus recomendaciones para mantener constancia en las caminatas al aire libre.", "notas":"Muy activa en Alicante y alrededores.", "estado":"Pendiente"},
-  {"id":"p22", "nombre":"Carmen López", "instagram":"@carmenlopez.eco", "pais":"España", "ciudad":"Murcia", "profesion":"Emprendedora de productos ecológicos y artesanales", "seguidores":"1100", "afinidad":"Media", "motivo":"Valores compartidos de sostenibilidad, consumo consciente y proyectos con propósito.", "tema":"Preguntar cómo seleccionó los materiales ecológicos para su última línea de productos.", "notas":"Cercana a Alicante (Murcia), perfil muy afín.", "estado":"Pendiente"},
-  {"id":"p23", "nombre":"Rocío Martínez", "instagram":"@rociomartinez.val", "pais":"España", "ciudad":"Valencia", "profesion":"Coach y facilitadora de procesos de desarrollo personal", "seguidores":"1700", "afinidad":"Alta", "motivo":"Altísima afinidad con el desarrollo personal, el coaching y el acompañamiento.", "tema":"Comentar sobre su última reflexión acerca de la importancia de la comunicación empática.", "notas":"Valencia está muy cerca para conectar de forma digital o presencial.", "estado":"Pendiente"},
-  {"id":"p24", "nombre":"Nuria Sanchis", "instagram":"@nuriasanchis.creativa", "pais":"España", "ciudad":"Alicante", "profesion":"Diseñadora y artesana de papelería", "seguidores":"980", "afinidad":"Alta", "motivo":"Comparte la creatividad, el amor por el diseño y el emprendimiento local.", "tema":"Preguntar qué tipo de papel utiliza para que las agendas tengan mejor consistencia.", "notas":"Perfil local en Alicante con excelente atención al detalle.", "estado":"Pendiente"},
-  {"id":"p25", "nombre":"Patricia Vidal", "instagram":"@patriciavidal.bienestar", "pais":"España", "ciudad":"Murcia", "profesion":"Terapeuta y promotora de bienestar emocional", "seguidores":"1500", "afinidad":"Alta", "motivo":"Interés común en el bienestar integral, la lectura y el crecimiento interior.", "tema":"Preguntar su opinión sobre el autor del libro de bienestar que mencionó en sus historias.", "notas":"Cercana geográficamente a Alicante.", "estado":"Pendiente"},
-  {"id":"p26", "nombre":"María José Benítez", "instagram":"@mariajose.tuc", "pais":"Argentina", "ciudad":"Tucumán", "profesion":"Emprendedora de repostería artesanal y detalles", "seguidores":"1200", "afinidad":"Alta", "motivo":"Emprendedora trabajadora con iniciativa, raíces argentinas y marca propia.", "tema":"Comentar lo deliciosos que se ven los alfajores artesanales que publicó recientemente.", "notas":"Ubicada en Tucumán, comparte origen argentino.", "estado":"Pendiente"},
-  {"id":"p27", "nombre":"Agustina Sosa", "instagram":"@agustinasosa.tuc", "pais":"Argentina", "ciudad":"Tucumán", "profesion":"Diseñadora de indumentaria independiente", "seguidores":"1600", "afinidad":"Media", "motivo":"Creativa con iniciativa propia, enfoque en el diseño y constancia en su marca.", "tema":"Preguntar cuál fue su mayor reto al lanzar su última colección de temporada.", "notas":"Emprendimiento activo en Tucumán.", "estado":"Pendiente"},
-  {"id":"p28", "nombre":"Solange Figueroa", "instagram":"@solfigueroa.tuc", "pais":"Argentina", "ciudad":"Tucumán", "profesion":"Manicurista y formadora de estética de uñas", "seguidores":"1950", "afinidad":"Media", "motivo":"Mujer con iniciativa, trabajadora y orientada al aprendizaje y la mejora continua.", "tema":"Consultar qué consejos le daría a alguien que está empezando en el mundo de la estética.", "notas":"Buena presencia en Tucumán.", "estado":"Pendiente"},
-  {"id":"p29", "nombre":"Florencia Romero", "instagram":"@florencia.romero.cba", "pais":"Argentina", "ciudad":"Córdoba", "profesion":"Profesional independiente y creadora de contenido de bienestar", "seguidores":"1450", "afinidad":"Alta", "motivo":"Coincidimos en el amor por la naturaleza, los hábitos saludables y el bienestar.", "tema":"Comentar sobre las fotos de sus caminatas y el paisaje cordobés.", "notas":"Conexión muy natural y cercana.", "estado":"Pendiente"},
-  {"id":"p30", "nombre":"Camila Benítez", "instagram":"@camilabenitez.arg", "pais":"Argentina", "ciudad":"Buenos Aires", "profesion":"Emprendedora de accesorios y complementos", "seguidores":"1100", "afinidad":"Media", "motivo":"Emprendedora con iniciativa, dispuesta a aprender y construir un proyecto propio.", "tema":"Preguntar cómo gestiona sus envíos y la atención a clientas por WhatsApp.", "notas":"Emprendedora argentina con marca propia.", "estado":"Pendiente"}
-];
-
+const IMPORT_DATA = [{"nombre": "Agos Mazza", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agus (eeuu)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agus (pequeños y grandes viajeros)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agus Lobo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agus Strigaro", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agus Vildoza", "telefono": "3814682311", "tipo": "Potencial", "ultimaNota": "Ex mejor amiga de la infancia, le gusta cuidarse, mama casada y con buena posicion economica · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno 26-10"}, {"fecha": "", "texto": "Respuesta: que le re interesa probarlo pero que ahora tuvo muchos gastos y que va a esperar un poco."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agustin Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agustin Iriarte", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Agustin Lopez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ale Herandez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandra", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandra Lucena", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandra Moyano", "telefono": "2664325321", "tipo": "Potencial", "ultimaNota": "Tucumana, en grupo de facebook me pidio informacion del negocio · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Le conte sobre negocio queria la informacion para empezar ya y cuando le pase los precios de los productos no respondio mas."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandra Robles Benejam", "telefono": "3814985467", "tipo": "Potencial", "ultimaNota": "Mamá amiga del cole, adulta, ya consumio el colageno antes · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Consulto precio de colageno, me dijo que estaba de viaje al regresar me decia algo."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandra Travels", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alejandro Barros", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Alexia Lombardi", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ana (tejidos Anisha)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ana Dominguez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ana Palacios", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ana Perez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ana Sarmiento", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Andrea Correa Ceballos", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Andrea Fontan", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Anita Farias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Anita Ramirez", "telefono": "3813416669", "tipo": "Potencial", "ultimaNota": "alumna san javier. Muy joven · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Interesada, preg como funciona, como cobra comisiones y cuanto, no responde mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Anto Marchese", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Anto Ricci", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Antonella Mazza", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Antonella Ruiz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Anyelis BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Augusto Araoz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Azul Espasadin", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Bea Coronel", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belen Araoz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belen Blanco", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belen Blanco", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belen Escaño", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belen Salazar", "telefono": "", "tipo": "Potencial", "ultimaNota": "tucumana, emprendedora, mama · País: argentina", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belu Subias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Belu Toledo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Benjamin Ruiz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Berenice Lamarque", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Bety Funes", "telefono": "", "tipo": "Potencial", "ultimaNota": "profe d matematica,amiga de mi mama, adult mayor · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: Ofreci colageno por fc"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Almagro", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Juarez (vecina apunt)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Mariño", "telefono": "", "tipo": "Potencial", "ultimaNota": "CLIENTA", "historial": [{"fecha": "", "texto": "Acción: COMPRO PACK 3 COLAGENO OCTUBRE"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Merlini", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Mont (ig)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cami Velasco", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Camila", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cande Guiraldes", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carla Cervera", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carla Clrecci", "telefono": "3815885905", "tipo": "Potencial", "ultimaNota": "tucumana, mamá, buscando cambiar su forma de vivir · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno, tambien le interesan otros productos"}, {"fecha": "", "texto": "Respuesta: le interesa pero mas adelante ahora tiene muchos gastos"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carla Luque", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carla Sirnio", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carmen Entraigas", "telefono": "", "tipo": "Potencial", "ultimaNota": "afiliada de marca", "historial": [{"fecha": "", "texto": "Acción: NO COMPRO NI VENDIO NADA"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carmen BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "Trabaja en BK conmigo. Mama joven en pareja · País: España", "historial": [{"fecha": "", "texto": "1er contacto: Pegunto por AP, 25/10, el precio"}, {"fecha": "", "texto": "Respuesta: le interesaba probarlo."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Carmen Fontan", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ceci Ruiz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cecilia Aguirre", "telefono": "", "tipo": "Potencial", "ultimaNota": "mejor amiga de mi mama · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cecilia Entraigas", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Celeste Bisso", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Celia Aguirre", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Chane BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Chechu Lozada", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Chechu Peralta", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Chela Graneros", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cinthia Lobos", "telefono": "", "tipo": "Potencial", "ultimaNota": "emigrada argentina · País: españa", "historial": [{"fecha": "", "texto": "1er contacto: consulto sobre colageno"}, {"fecha": "", "texto": "Respuesta: no puede pagarlo por ahora"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Claudia Iriarte", "telefono": "", "tipo": "Potencial", "ultimaNota": "cu;ada, argentina en israel. · País: israel", "historial": [{"fecha": "", "texto": "1er contacto: le pedi referidos."}, {"fecha": "", "texto": "Respuesta: me pidio la pagina para ver precios y me pregunto si llegabamos a israel."}, {"fecha": "", "texto": "Acción: le ofreci que cuando este en otros paises si queria probar algo lo podiamos enviar ahi."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Conti (call center pichi)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Conti Barreras", "telefono": "", "tipo": "Potencial", "ultimaNota": "tucumana, amiga de mi hermana · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: el medico no la deja tomar por el azucar"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Conti Tognoli", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Conty Ramasco", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cony Berarducci", "telefono": "3815862230", "tipo": "Potencial", "ultimaNota": "Esposa mi mejor amigo, mamá, tucumana, buena posicion economica y le gusta cuidarse y las apariencias · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: Octubre ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio despues de pasarle la informacion aun no le pase los precios."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cristina", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cuti Marteau", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Cynthia Perez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Dani Peralta", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Daniel Lopez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Daniel Salinas", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Dardo Entraigas", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Delfi Soria Cano", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Delfina Corvalan", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Diego", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Dora Molina", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Eli Graneros", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Eliana Elias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Emi Delgado", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Emi Delgado", "telefono": "39 3516379701", "tipo": "Potencial", "ultimaNota": "Arg en Italia (proxima a mudarse a Torrevieja, mama soltera, es artista) · País: Italia", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Preg por el negocio mas informacion pero despues cuando le conte como trabajamos no respondio mas"}, {"fecha": "", "texto": "Acción: esta ya en españa y no tiene trabajo ."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Emi Mariño", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Enoa Aguero", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Esteban Sosa", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Exequiel", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Fatima Hasan", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Federico Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Feli Spinelli", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Fernanda Rodriguez", "telefono": "", "tipo": "Potencial", "ultimaNota": "seguidora de ig, creo que es emigrada · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci el negocio, me dijo le cuente mas"}, {"fecha": "", "texto": "Respuesta: y no respondio ya dsp"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Flavia Cambom", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Flavia Caraque", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Flor Barreras", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia", "telefono": "3813535118", "tipo": "Potencial", "ultimaNota": "me contacto porque vio mi info en redes, tucumana · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: pregunto por colageno"}, {"fecha": "", "texto": "Respuesta: mande toda la informacion pero no respondio mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia Cantos", "telefono": "3815678130", "tipo": "Potencial", "ultimaNota": "Amiga, tucumana, mama emprendedora y buscando mejorar y equilibrar su vida · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Ofreci colageno, me dijo le pase la informacion pero cuando le escribi no respondio asiq aun no le pase los precios"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia Escalante", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia Gariboglio", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia Jurado", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Florencia Monfort", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Franco Cambon", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gabriela Lai", "telefono": "", "tipo": "Potencial", "ultimaNota": "tucumana, anses, amiga de pichi, emprendedora · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno por fc"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gaby Contar", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gema (mama carla cuba)", "telefono": "", "tipo": "Potencial", "ultimaNota": "trabajadora aldi · País: España", "historial": [{"fecha": "", "texto": "1er contacto: pregunto por colageno"}, {"fecha": "", "texto": "Respuesta: mande toda la informacion pero no respondio mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Georgina Leiva", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gime Ali", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gimena Facal", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Giselle Robles", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gloria", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gloria Romano Norri", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gringo Cangemi", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Gustavo Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Hernan Nuñez", "telefono": "", "tipo": "Potencial", "ultimaNota": "tucumano, se cuida y sumplementa, amigo · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Iara Lobos", "telefono": "", "tipo": "Potencial", "ultimaNota": "argentina emigrada en torrevieja, mama soltera, sin trabajo · País: españa", "historial": [{"fecha": "", "texto": "1er contacto: ofreci el negocio, me dijo le cuente mas"}, {"fecha": "", "texto": "Respuesta: despues q le conte como trabajamos no contesto mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ignacio Aguirre", "telefono": "", "tipo": "Potencial", "ultimaNota": "amigo, esta quedando pelado, buena situacion economica · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Iso Gonzalez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ivana Caraque", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ivana Salvatierra", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ivonet", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ivonne Tetu", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Jessi Caraque", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga tucumana, ya consumio colageno y tiene lumispa · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no tiene margen en tarjeta ahora en octubre"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Jessi Gay Lopez", "telefono": "3814154804", "tipo": "Potencial", "ultimaNota": "muy amiga, trabaja en el estado, vive quejandose de su situacion actual · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci negocio, mande video no lo vio y tampoco me volvio a decir nada"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Joaquin Monteros", "telefono": "", "tipo": "Potencial", "ultimaNota": "mejor amigo · País: España", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me dijo q no"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Jose Eduardo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Jose Poliche", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Juan Manuel Marteau", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Juli Aparicio", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga tucumana, mama, trabadora en relacion de dependencia pero busca emprender · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Juli Palacios", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga tucumana, le gusta cuidarse · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Juli Powell", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Julio Amoroso", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Karen Uruguaya", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lalo Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lau Castro", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lau Paredes", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Laura (mama sergio)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Laura (olaok barras ig)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lautaro", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Leticia Caceres Parra", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Leticia Esquivel", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Liliana Gordillo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lizy Pediatra", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lore ( bijou)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lorena (ostara terapias)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lorena Romano Boscarino", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lorena Valdeon", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lourdes Arguello", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lu Aguero", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lu Devani", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luchi Gutirrrez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lucia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luciana (amiga ale y carmen)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luciana Aguero", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luciana Gramajo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luciana Sarmiento", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luis Eduardo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lula Galicia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lulu Iriarte", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lulu SobreCasas", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lupe Lopez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz del alma", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz Farias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz Maria Barrenechea", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz Noccelli", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz Rojas Antelo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luz Usandivaras", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mabel Rodriguez Anido", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga d mi mama, adulta mayor", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me dijo q ue no consume"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maca Borges", "telefono": "", "tipo": "Potencial", "ultimaNota": "compañera IES marcheti", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Macarena BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maga Maiztegui ( arg en torrevieja )", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Majo Mir", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Malicha", "telefono": "", "tipo": "Potencial", "ultimaNota": "tia, mejor amiga mi mama, adulta mayot · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me dijo que no, pasando por situacion dificil"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Manuel Poliche", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Manuela Guardia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marcela Ledesma", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marcos Madrid", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mari Santana", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Ana Cornejo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Jose Escalante", "telefono": "", "tipo": "Potencial", "ultimaNota": "tia tucumana, le gusta cuidarse · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno por fc"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Jose Mir", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Jose Rodriguez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Lilia (mamá joaquin)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariana (creaciones)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariana Carrio", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariana Iriarte", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariana Villagarcia", "telefono": "3816870488", "tipo": "Potencial", "ultimaNota": "Tucumana, 41 años, en pareja y con hijo · País: Argentina · IG/mail: marianaluciavillagarcia", "historial": [{"fecha": "", "texto": "1er contacto: Octubre"}, {"fecha": "", "texto": "Respuesta: Muy interesada, le pase info de precios y le conte sobre todo el negocio. Quiere hacerlo, me escribe en unas semanas esta reorganizando su vida"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariano Alzueta", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mariela Poliche", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marielita", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marilin Graneros", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marta Marteau", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Marta Schujman", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Martin Lopez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Martin Olivieri", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mary BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Meli Fernandez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Meli Herrera", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Meli Lozada", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Meli Salem", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Meri Moisa", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mery Figueroa", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Milenka Miller", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mili Santana", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Milu Correa", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Mona Giusta", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Monica", "telefono": "", "tipo": "Potencial", "ultimaNota": "esposa de mi papa, con dolores en sus rodillas, tienen q operarla. Pero es rata · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno."}, {"fecha": "", "texto": "Respuesta: en principio estaba interesada, pero despues lo penso y me dijo que por ahora no."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Nacho Lopez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Nadia Guanco", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me pidio los precios y me dijo que este mes al menos no. Tiene muchos gastos"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Nadia Lozada", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Natt ( joyas vidrio)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Natt (clienta terapias)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Naty Saul", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Nicolas Azaña", "telefono": "", "tipo": "Potencial", "ultimaNota": "amigo · País: España", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me dijo que consumia otra cosa"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Noe Sirnio", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Noemi Pelayo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Nohe Carabajal", "telefono": "", "tipo": "Potencial", "ultimaNota": "seguidora de ig · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci oportunidad de negocio"}, {"fecha": "", "texto": "Respuesta: me dijo q le pase info y dsp no respondio mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pablo Diaz Terezchuk", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pati Yoga", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Patricia Araoz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Patricia Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pau Energia (barras)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pauilina Gramajo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Paula Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Paula Figueredo", "telefono": "", "tipo": "Potencial", "ultimaNota": "emigrada argentina en españa, contacto de facebook", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Paulita Araujo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Paulita Barbieri", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Paulita Moreno Mocchi", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pepa tia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pia Marchessi", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pia Salinas", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiguita del cole rochi, maquillaora y cosmetologa · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: OFRECER NEGOCIO"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pilar Soto", "telefono": "", "tipo": "Potencial", "ultimaNota": "maestra san javier, adulta · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno por fc"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pili Pujol", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Psico Agus", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Ramiro Poliche", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Rocio Araoz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Rocio Ortega", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga de tucuman · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: le ofreci colageno"}, {"fecha": "", "texto": "Respuesta: me pidio le pase la info aun no se la envie"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Romi Herrera (prima lu d)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Romii Ponce (tucumana en españa)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Romina Cena", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Romina Diaz Finoli", "telefono": "", "tipo": "Potencial", "ultimaNota": "ex jefa, tucumana · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Rosario Entraigas", "telefono": "", "tipo": "Potencial", "ultimaNota": "hermana · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci pasta de dientes"}, {"fecha": "", "texto": "Respuesta: da vueltas no quiere gastar"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Rosita Graneros", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga tucumana · País: Argentina", "historial": [{"fecha": "", "texto": "1er contacto: era mi clienta de colageno, ahora no le ofreci aun, pero nunca tiene dinero."}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Salome Salem", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sil Omar", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Silvia Torres(mama sofia)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Silvia Narvaez", "telefono": "662920951", "tipo": "Potencial", "ultimaNota": "Argentina emigrada en torrevieja (le sacamos la cita de pasaporte) · País: españa", "historial": [{"fecha": "", "texto": "1er contacto: le comente del negocio"}, {"fecha": "", "texto": "Respuesta: me pidio tomemos un cafe para que le cuente mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Silvina Diez Ojeda", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofi Amoroso", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofi Astudillo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofi Casalla", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofi Fernandez (carducci)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia Artero", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiguita rochi · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: consulto si funcionaba y precios"}, {"fecha": "", "texto": "Respuesta: no respondio mas"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia Carfi", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia Castellanos", "telefono": "", "tipo": "Potencial", "ultimaNota": "Tucumana, muy buena posicion economica, deportista y se cuida muchi", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: toma otro que es muy bueno"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia Gomez ( mentora)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Sofia Rodriguez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Soledad Iriarte", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Solomia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Stefania Ruiz", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Susana Mauri", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Tere Lomascolo", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Tere Peral", "telefono": "", "tipo": "Potencial", "ultimaNota": "mejor amiga de mi mama · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno por facebook"}, {"fecha": "", "texto": "Respuesta: no me respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Tete (amiga negra)", "telefono": "", "tipo": "Potencial", "ultimaNota": "País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: OFRECER COLAGENO"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Tomas Arguello", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Tomas Sobre Casas", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vale (tu casa esmeralda)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vale Gonzalez", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Valen Caponeto", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga d sof castellanos", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no toma porque le cae muy mal, probo varios"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Valentina Barbieri", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vanesa Asturias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vanesa Bascary", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga pichi · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: da vueltas, no tiene margen, no quiere gastar, etc"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vanina Tarruella", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vero Galicia", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Veronica BK", "telefono": "", "tipo": "Potencial", "ultimaNota": "argentina emigrada, torrevieja, 46 años · País: españa", "historial": [{"fecha": "", "texto": "1er contacto: pregunto por colageno"}, {"fecha": "", "texto": "Respuesta: dice que ella leyo que es mejor el marino q e bovino. No respondio mas dsp de pasarle el video del cientifico,"}, {"fecha": "", "texto": "2do contacto: pregunto por pasta y colageno de nuevo"}, {"fecha": "", "texto": "Respuesta: no tierne dinero ahora"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Victor Reyes", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Vir Lizarraga", "telefono": "", "tipo": "Potencial", "ultimaNota": "amiga tucumana · País: argentina", "historial": [{"fecha": "", "texto": "1er contacto: ofreci colageno"}, {"fecha": "", "texto": "Respuesta: no contesto"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Yami (alquimia creativa)", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Yani Asturias", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Jose Antonio Gonzales (facebook)", "telefono": "", "tipo": "Potencial", "ultimaNota": "de vitoria cercaa de bilbao · País: españa", "historial": [{"fecha": "", "texto": "1er contacto: me pregunto por la pasta de dientes, quiere varias para probar y despues recomendar"}, {"fecha": "", "texto": "Respuesta: quedamos en hacer el pedido aun no respondio"}], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Maria Noelia Ovejero", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Luciana Hurtado", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Pupy Almada", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lulu Arguello", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Melisa Muller", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Leila Roxana Soria", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Lujan Imbert", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}, {"nombre": "Fernanda Zotola", "telefono": "", "tipo": "Potencial", "ultimaNota": "", "historial": [], "proximaAccion": "", "proximaFecha": ""}];
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const waLink=(tel,text)=>{ if(!tel) return null; return 'https://wa.me/'+tel.replace(/\D/g,'')+(text?('?text='+encodeURIComponent(text)):''); };
 
+function repoInfo(p){
+  if(!p.ultimaCompra||!p.ciclo) return null;
+  const d=new Date(p.ultimaCompra+"T00:00:00"); d.setDate(d.getDate()+Number(p.ciclo));
+  const hoy=new Date(todayStr()+"T00:00:00");
+  return {fecha:d.toISOString().slice(0,10), dias:Math.round((d-hoy)/86400000)};
+}
+function repoTxt(p){ const r=repoInfo(p); if(!r) return 'Sin ciclo definido'; return r.dias<0?`Reposición vencida hace ${-r.dias} días`:r.dias===0?'Reposición hoy':`Reposición en ${r.dias} días`; }
+let bloques=[]; try{ bloques=JSON.parse(localStorage.getItem('vico_bloques')||'[]'); }catch(e){}
+function saveBloques(){ try{ localStorage.setItem('vico_bloques', JSON.stringify(bloques)); }catch(e){} }
+// Almacenamiento local (queda guardado en este teléfono/navegador)
 function loadLocal(){
   try{ personas = JSON.parse(localStorage.getItem('vico_personas')||'[]'); }catch(e){ personas = []; }
-  try{ prospectos = JSON.parse(localStorage.getItem('vico_prospectos')||'[]'); }catch(e){ prospectos = []; }
-  if(!prospectos.length){ prospectos = JSON.parse(JSON.stringify(BASE_PROSPECTOS_30)); saveProspectos(); }
-  try{ loteActual = Number(localStorage.getItem('vico_lote_actual')||'1'); }catch(e){ loteActual = 1; }
   try{ metas = JSON.parse(localStorage.getItem('vico_metas')||'[]'); }catch(e){ metas = []; }
   try{ biblioteca = JSON.parse(localStorage.getItem('vico_biblioteca')||'[]'); }catch(e){ biblioteca = []; }
   try{ campanas = JSON.parse(localStorage.getItem('vico_campanas')||'[]'); }catch(e){ campanas = []; }
   try{ rutinas = JSON.parse(localStorage.getItem('vico_rutinas')||'[]'); }catch(e){ rutinas = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
-  try{ bloques = JSON.parse(localStorage.getItem('vico_bloques')||'[]'); }catch(e){ bloques = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
 function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringify(personas)); }catch(e){} }
-function saveProspectos(){ try{ localStorage.setItem('vico_prospectos', JSON.stringify(prospectos)); }catch(e){} }
-function saveLoteActual(){ try{ localStorage.setItem('vico_lote_actual', String(loteActual)); }catch(e){} }
 function saveEventos(){ try{ localStorage.setItem('vico_eventos', JSON.stringify(eventos)); }catch(e){} }
 function saveMetas(){ try{ localStorage.setItem('vico_metas', JSON.stringify(metas)); }catch(e){} }
 function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.stringify(biblioteca)); }catch(e){} }
@@ -229,18 +188,14 @@ async function boot(){
   document.querySelectorAll('nav.bottom button').forEach(b=>{
     b.addEventListener('click', ()=>{ tab=b.dataset.tab; render(); });
   });
-  const fab = document.getElementById('fab');
-  if(fab) fab.addEventListener('click', ()=> openPersonaForm());
+  document.getElementById('fab').addEventListener('click', ()=> openPersonaForm());
   render();
 }
 
 function render(){
-  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(['clientes','metas','biblioteca','equipo','estadisticas','campanas','qr','mensajes','historial','progreso'].includes(tab)?'mas':b.dataset.tab)));
-  const fab = document.getElementById('fab');
-  if(fab) fab.style.display = tab==='personas' ? 'flex' : 'none';
-
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.tab===(tab==='clientes'?'mas':tab)));
+  document.getElementById('fab').style.display = tab==='personas' ? 'flex' : 'none';
   if(tab==='inicio') renderInicio();
-  else if(tab==='prospectos') renderProspectos();
   else if(tab==='personas') renderPersonas();
   else if(tab==='agenda') renderAgenda();
   else if(tab==='clientes') renderClientes();
@@ -249,8 +204,14 @@ function render(){
   else if(tab==='biblioteca') renderBiblioteca();
   else if(tab==='estadisticas') renderEstadisticas();
   else if(tab==='campanas') renderCampanas();
+  else if(tab==='campdet') renderCampanaDetail(window.curCamp);
   else if(tab==='qr') renderQR();
   else if(tab==='mensajes') renderMensajes();
+  else if(tab==='mfoco') renderMFoco();
+  else if(tab==='mrutinas') renderMRutinas();
+  else if(tab==='macciones') renderMAcciones();
+  else if(tab==='mtrabajo') renderMTrabajo();
+  else if(tab==='mresumen') renderMResumen();
   else if(tab==='historial') renderHistorial();
   else if(tab==='progreso') renderProgreso();
   else renderMas();
@@ -261,7 +222,9 @@ function renderInicio(){
   const hoyM = madridNow().fecha;
   const eventosHoy = eventos.filter(e=>e.fecha===hoyM).sort((a,b)=>(a.hora||"").localeCompare(b.hora||""));
   const seguimientos = personas.filter(p=>p.proximaFecha && p.proximaFecha<=hoy);
-  const prospectosPendientes = prospectos.filter(p=>p.estado==='Pendiente').length;
+  const bloquesHoy = bloques.filter(b=>b.fecha===hoyM && b.horaInicio);
+  const minHoy = bloquesHoy.reduce((s,b)=>s+(b.tiempoRealMin||0),0);
+  const accHoy = bloquesHoy.reduce((s,b)=>s+(b.acciones||[]).filter(a=>a.hecho>0).length,0);
   const d = new Date();
   const fechaLarga = d.toLocaleDateString('es-ES',{weekday:'long', day:'numeric', month:'long'});
 
@@ -270,17 +233,26 @@ function renderInicio(){
       <div style="font-size:16px; font-weight:600;">¡Buenos días, Vico! 💜</div>
       <div style="font-size:13px; color:var(--sub); text-transform:capitalize;">${fechaLarga}</div>
     </div>
+    <div class="paraque">
+      <b>MI PARA QUÉ</b>
+      ${window.editPQ || !config.paraQue ? `
+        <div style="margin-top:8px;"><textarea id="paraQueInput" rows="3" placeholder="Escribe tu para qué...">${(config.paraQue||'').replace(/</g,'&lt;')}</textarea></div>
+        <button class="cta" id="savePQ" style="margin-top:4px;">Guardar</button>
+      ` : `
+        <div style="margin-top:6px; white-space:pre-wrap;">${config.paraQue}</div>
+        <span id="editPQ" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--brand2);">EDITAR</span>
+      `}
+    </div>
     <div class="stat3">
-      <div class="box" id="goProsBox" style="cursor:pointer;"><b>${prospectosPendientes}</b><small>Lote Prospectos</small></div>
       <div class="box"><b>${seguimientos.length}</b><small>Seguimientos</small></div>
       <div class="box"><b>${eventosHoy.length}</b><small>Hoy en agenda</small></div>
+      <div class="box"><b>${personas.filter(p=>{const r=repoInfo(p);return r&&r.dias<=7;}).length}</b><small>Reposiciones</small></div>
     </div>
-    <button class="cta" id="moverProsBtn" style="margin-bottom:14px; background:var(--brand2);">🎯 VER MIS 30 PROSPECTOS</button>
     <div class="two-col">
       <div>
         <div class="section-title">Hoy en tu agenda</div>
         <div class="card">
-          ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${e.hora\vert{}\vert{}''} ·${e.titulo}</div><div class="sub">${e.tipo||''}</div></div></div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
+          ${eventosHoy.length ? eventosHoy.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${e.hora||''} · ${e.titulo}</div><div class="sub">${e.tipo||''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;">UNIRME</a>`:''}</div>`).join('') : '<div class="empty">Nada agendado para hoy</div>'}
         </div>
       </div>
       <div>
@@ -290,109 +262,20 @@ function renderInicio(){
         </div>
       </div>
     </div>
+    ${bloquesHoy.length?`<div class="paraque" style="text-align:center;">✨ HOY YA MOVISTE<br><b>${minHoy>=60?Math.floor(minHoy/60)+'h '+(minHoy%60)+'min':minHoy+' min'} · ${accHoy} acciones</b></div>`:''}
+    <button class="cta" id="moverBtn">🔥 MOVER MI OFICINA</button>
   `;
-  document.getElementById('moverProsBtn').addEventListener('click', ()=>{ tab='prospectos'; render(); });
-  document.getElementById('goProsBox').addEventListener('click', ()=>{ tab='prospectos'; render(); });
+  document.getElementById('moverBtn').addEventListener('click', openMover);
+  const pq = document.getElementById('paraQueInput');
+  if(pq) pq.focus();
+  const savePQ = document.getElementById('savePQ');
+  if(savePQ) savePQ.addEventListener('click', ()=>{ config.paraQue = pq.value.trim(); window.editPQ=false; saveConfig(); renderInicio(); });
+  const editPQ = document.getElementById('editPQ');
+  if(editPQ) editPQ.addEventListener('click', ()=>{ window.editPQ=true; renderInicio(); });
   $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
 
-function renderProspectos(){
-  const contactados = prospectos.filter(p=>p.estado==='Contactado').length;
-  const descartados = prospectos.filter(p=>p.estado==='Descartado').length;
-  const pendientes = prospectos.filter(p=>p.estado==='Pendiente').length;
-
-  const list = prospectos.filter(p => {
-    if(prospectoFiltro==='Pendientes') return p.estado==='Pendiente';
-    if(prospectoFiltro==='Contactados') return p.estado==='Contactado';
-    if(prospectoFiltro==='Descartados') return p.estado==='Descartado';
-    return true;
-  });
-
-  $main.innerHTML = `
-    <div class="section-title">Lote de Prospectos #${loteActual}</div>
-    <div class="stat3">
-      <div class="box"><b>${pendientes}</b><small>Pendientes</small></div>
-      <div class="box"><b>${contactados}</b><small>Contactados</small></div>
-      <div class="box"><b>${descartados}</b><small>Descartados</small></div>
-    </div>
-
-    <div class="chips">
-      ${['Todos','Pendientes','Contactados','Descartados'].map(f=>`<div class="chip ${prospectoFiltro===f?'active':''}" data-pf="${f}">${f}</div>`).join('')}
-    </div>
-
-    <div>
-      ${list.length ? list.map(p => `
-        <div class="prospecto-card ${p.estado.toLowerCase()}">
-          <div class="prospecto-header">
-            <div>
-              <div class="prospecto-title">${p.nombre}</div>
-              <div class="prospecto-sub">${p.instagram} · ${p.ciudad},${p.pais}</div>
-            </div>
-            <span class="tag ${p.estado==='Contactado'?'tag-ok':p.estado==='Descartado'?'tag-no':''}">${p.estado}</span>
-          </div>
-          <div class="prospecto-body">
-            <b>Profesión:</b> ${p.profesion}<br>
-            <b>Afinidad:</b> ${p.afinidad} · <b>Aprox:</b>${p.seguidores} seg.<br>
-            <div style="margin-top:4px;"><b>Sugerencia de charla:</b> ${p.tema}</div>
-          </div>
-          <div class="prospecto-actions">
-            <button class="btn-check" data-chk="${p.id}">✓ Contactado</button>
-            <button class="btn-cross" data-crs="${p.id}">✕ Descartar</button>
-            ${p.estado!=='Pendiente'?`<button class="btn-reset" data-rst="${p.id}">↩</button>`:''}
-          </div>
-        </div>
-      `).join('') : '<div class="empty">No hay prospectos en este filtro.</div>'}
-    </div>
-
-    <div style="margin-top:20px; text-align:center;">
-      <button class="cta" id="btnNuevoLote" style="background:var(--brand); display:block; width:100%;">⚡ GENERAR / CARGAR SIGUIENTE LOTE (+30)</button>
-    </div>
-  `;
-
-  $main.querySelectorAll('[data-pf]').forEach(el=>el.addEventListener('click',()=>{ prospectoFiltro=el.dataset.pf; renderProspectos(); }));$main.querySelectorAll('[data-chk]').forEach(el=>el.addEventListener('click',()=>{
-    const item = prospectos.find(x=>x.id===el.dataset.chk);
-    if(item){
-      item.estado = 'Contactado';
-      saveProspectos();
-      if(!personas.find(x=>x.nombre===item.nombre)){
-        personas.push({
-          id: uid(), nombre: item.nombre, instagram: item.instagram, pais: item.pais,
-          telefono: "", tipo: "Potencial", ultimaNota: item.tema, historial: [{fecha: todayStr(), texto: "Primer contacto realizado desde Lote Prospectos"}],
-          proximaAccion: "Seguimiento inicial", proximaFecha: todayStr()
-        });
-        savePersonas();
-      }
-      renderProspectos();
-    }
-  }));
-
-  $main.querySelectorAll('[data-crs]').forEach(el=>el.addEventListener('click',()=>{
-    const item = prospectos.find(x=>x.id===el.dataset.crs);
-    if(item){ item.estado = 'Descartado'; saveProspectos(); renderProspectos(); }
-  }));
-
-  $main.querySelectorAll('[data-rst]').forEach(el=>el.addEventListener('click',()=>{
-    const item = prospectos.find(x=>x.id===el.dataset.rst);
-    if(item){ item.estado = 'Pendiente'; saveProspectos(); renderProspectos(); }
-  }));
-
-  document.getElementById('btnNuevoLote').addEventListener('click',()=>{
-    if(pendientes > 0){
-      if(!confirm(`Aún tienes ${pendientes} prospectos pendientes en este lote. ¿Deseas cargar un nuevo lote de 30 personas?`)) return;
-    }
-    loteActual++;
-    saveLoteActual();
-    prospectos = BASE_PROSPECTOS_30.map((p, i) => ({
-      ...p,
-      id: `lote${loteActual}_p${i+1}`,
-      estado: "Pendiente"
-    }));
-    saveProspectos();
-    alert(`¡Lote #${loteActual} cargado con éxito con 30 nuevos contactos!`);
-    renderProspectos();
-  });
-}
-
+const TIPO_LABEL={'Todos':'Todos','Potencial':'Potenciales','P. Cliente':'P. Clientes','P. Socia':'P. Socias','Cliente':'Clientes','Socia':'Socias'};
 function renderPersonas(){
   const cats = ["Todos","Potencial","P. Cliente","P. Socia","Cliente","Socia"];
   const q=(window.pq||'').toLowerCase();
@@ -401,7 +284,7 @@ function renderPersonas(){
   $main.innerHTML = `
     <div class="searchbar">
       <input id="p_search" placeholder="Buscar por nombre..." value="${(window.pq||'').replace(/"/g,'&quot;')}">
-      <div class="chips">${cats.map(c=>`<div class="chip ${filtro===c?'active':''}" data-f="${c}">${c}</div>`).join('')}</div>
+      <div class="chips">${cats.map(c=>`<div class="chip ${filtro===c?'active':''}" data-f="${c}">${TIPO_LABEL[c]}</div>`).join('')}</div>
     </div>
     <div class="card list-grid" style="padding:10px;">
       ${list.length ? list.map(p=>`
@@ -409,63 +292,887 @@ function renderPersonas(){
           <div class="av">${initials(p.nombre)}</div>
           <div class="info">
             <div class="n">${p.nombre}</div>
-            <div class="m">${p.ultimaNota \vert{}\vert{} p.telefono \vert{}\vert{} p.pais \vert{}\vert{} ''}</div>${p.tipo?`<span class="tag">${p.tipo}</span>`:''}
+            <div class="m">${p.ultimaNota || p.telefono || p.pais || ''}</div>
+            ${p.tipo?`<span class="tag">${p.tipo}</span>`:''}
           </div>
         </div>`).join('') : '<div class="empty">Todavía no hay personas. Tocá + para agregar.</div>'}
     </div>
   `;
   const psEl=document.getElementById('p_search');
   psEl.addEventListener('input', e=>{ window.pq=e.target.value; renderPersonas(); });
-  $main.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('click', ()=>{ filtro=el.dataset.f; renderPersonas(); }));$main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
+  if(window.pq){ psEl.focus(); psEl.selectionStart=psEl.selectionEnd=psEl.value.length; }
+  $main.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('click', ()=>{ filtro=el.dataset.f; renderPersonas(); }));
+  $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>openPersonaDetail(el.dataset.open)));
 }
 
 function renderAgenda(){
-  $main.innerHTML = `<div class="section-title">Próximos eventos</div><div class="card">${eventos.length?eventos.map(e=>`<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora\vert{}\vert{}''} —${e.titulo}</div></div></div>`).join(''):'<div class="empty">Sin eventos próximos</div>'}</div>`;
-}
-
-function renderClientes(){
-  $main.innerHTML = `<div class="section-title">Clientes</div><div class="card"><div class="empty">Módulo de Clientes activo</div></div>`;
-}
-function renderMetas(){
-  $main.innerHTML = `<div class="section-title">Metas y Mi Visión</div><div class="card"><div class="empty">${config.paraQue ? 'Para qué: '+config.paraQue : 'Sin metas definidas'}</div></div>`;
-}
-function renderEquipo(){
-  $main.innerHTML = `<div class="section-title">Equipo</div><div class="card"><div class="empty">Módulo de Equipo activo</div></div>`;
-}
-function renderBiblioteca(){
-  $main.innerHTML = `<div class="section-title">Biblioteca</div><div class="card"><div class="empty">Sin recursos guardados</div></div>`;
-}
-function renderEstadisticas(){
-  $main.innerHTML = `<div class="section-title">Estadísticas</div><div class="card"><div class="empty">Resumen de actividad</div></div>`;
-}
-function renderCampanas(){
-  $main.innerHTML = `<div class="section-title>Campañas</div><div class="card"><div class="empty">Sin campañas activas</div></div>`;
-}
-function renderQR(){
-  $main.innerHTML = `<div class="section-title">Código QR</div><div class="card"><div class="empty">QR Personal</div></div>`;
-}
-function renderMensajes(){
-  $main.innerHTML = `<div class="section-title">Mensajes</div><div class="card"><div class="empty">Bandeja de mensajes</div></div>`;
-}
-function renderHistorial(){
-  $main.innerHTML = `<div class="section-title">Historial</div><div class="card"><div class="empty">Historial general</div></div>`;
-}
-function renderProgreso(){
-  $main.innerHTML = `<div class="section-title">Progreso</div><div class="card"><div class="empty">Tu progreso personal</div></div>`;
+  const {fecha:hoy, hora:horaAhora} = madridNow();
+  const esPasado = e => e.fecha<hoy || (e.fecha===hoy && e.hora && e.hora<horaAhora);
+  const prox = eventos.filter(e=>!esPasado(e)).sort((a,b)=> (a.fecha+(a.hora||'')).localeCompare(b.fecha+(b.hora||'')));
+  const pasados = eventos.filter(esPasado).sort((a,b)=> (b.fecha+(b.hora||'')).localeCompare(a.fecha+(a.hora||'')));
+  const verFin = window.verFinalizados;
+  const evtRow = e => `<div class="row"><span class="dot"></span><div style="flex:1;"><div class="t">${fmtFecha(e.fecha)} · ${e.hora||''} — ${e.titulo}</div><div class="sub">${e.tipo||''}${e.recurrenciaId?' · se repite':''}</div></div>${e.link?`<a href="${e.link}" target="_blank" style="color:var(--brand);font-size:12px;font-weight:600;text-decoration:none;margin-right:6px;">UNIRME</a>`:''}<span data-editevt="${e.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-delevt="${e.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`;
+  $main.innerHTML = `
+    <div class="section-title">Próximos eventos</div>
+    <div class="card">
+      ${prox.length ? prox.map(evtRow).join('') : '<div class="empty">Sin eventos próximos</div>'}
+    </div>
+    <button class="cta" id="addEvt">+ Agendar evento</button>
+    <div class="section-title" style="margin-top:14px;cursor:pointer;" id="toggleFin">Eventos finalizados (${pasados.length}) ${verFin?'▲':'▼'}</div>
+    ${verFin?`<div class="card">${pasados.length?pasados.map(evtRow).join(''):'<div class="empty">Sin eventos finalizados</div>'}</div>`:''}
+  `;
+  document.getElementById('addEvt').addEventListener('click', ()=>openEventoForm(null));
+  document.getElementById('toggleFin').addEventListener('click', ()=>{ window.verFinalizados=!verFin; renderAgenda(); });
+  $main.querySelectorAll('[data-editevt]').forEach(el=>el.addEventListener('click',()=>openEventoForm(el.dataset.editevt)));
+  $main.querySelectorAll('[data-delevt]').forEach(el=>el.addEventListener('click',()=>{
+    const ev=eventos.find(x=>x.id===el.dataset.delevt); if(!ev) return;
+    if(ev.recurrenciaId){
+      if(!confirm('Este evento se repite. Aceptar para borrar ESTE Y LOS SIGUIENTES de la serie, o Cancelar para borrar solo este.')){
+        eventos=eventos.filter(x=>x.id!==ev.id);
+      } else {
+        eventos=eventos.filter(x=>!(x.recurrenciaId===ev.recurrenciaId && x.fecha>=ev.fecha));
+      }
+    } else {
+      if(!confirm('¿Eliminar este evento?')) return;
+      eventos=eventos.filter(x=>x.id!==ev.id);
+    }
+    saveEventos(); renderAgenda();
+  }));
 }
 
 function renderMas(){
+  
   $main.innerHTML = `
     <div class="section-title">Más módulos</div>
     <div class="card">
       <div class="row" id="goCli"><span class="dot"></span><div><div class="t">Clientes</div><div class="sub">Reposiciones y recompras</div></div></div>
+      <div class="row" id="goEq"><span class="dot"></span><div><div class="t">Equipo / Socias</div><div class="sub">Etapa y objetivo de cada socia</div></div></div>
       <div class="row" id="goMet"><span class="dot"></span><div><div class="t">Metas y Mi Visión</div><div class="sub">Corto, mediano y largo plazo</div></div></div>
-      <div class="row" id="goBib"><span class="dot"></span><div><div class="t">Biblioteca</div><div class="sub">Recursos guardados</div></div></div>
+      <div class="row" id="goBib"><span class="dot"></span><div><div class="t">Biblioteca</div><div class="sub">Recursos y materiales guardados</div></div></div>
+      <div class="row" id="goEst"><span class="dot"></span><div><div class="t">Estadísticas</div><div class="sub">Resumen de tu actividad</div></div></div>
+      <div class="row" id="goCam"><span class="dot"></span><div><div class="t">Campañas</div><div class="sub">Promos y acciones sobre tu base de contactos</div></div></div>
+      <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
+      <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
+      <div class="row" id="goHist"><span class="dot"></span><div><div class="t">Historial de Mover mi Oficina</div><div class="sub">Tus días guardados</div></div></div>
+      <div class="row" id="goProg"><span class="dot"></span><div><div class="t">Mi Progreso</div><div class="sub">Estadísticas y calendario de constancia</div></div></div>
     </div>
   `;
   document.getElementById('goCli').addEventListener('click', ()=>{ tab='clientes'; render(); });
+  document.getElementById('goEq').addEventListener('click', ()=>{ tab='equipo'; render(); });
   document.getElementById('goMet').addEventListener('click', ()=>{ tab='metas'; render(); });
   document.getElementById('goBib').addEventListener('click', ()=>{ tab='biblioteca'; render(); });
+  document.getElementById('goEst').addEventListener('click', ()=>{ tab='estadisticas'; render(); });
+  document.getElementById('goCam').addEventListener('click', ()=>{ tab='campanas'; render(); });
+  document.getElementById('goQR').addEventListener('click', ()=>{ tab='qr'; render(); });
+  document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
+  document.getElementById('goHist').addEventListener('click', ()=>{ tab='historial'; render(); });
+  document.getElementById('goProg').addEventListener('click', ()=>{ tab='progreso'; render(); });
+
+}
+
+function renderClientes(){
+  const f=window.cf||'Todos';
+  let list=personas.filter(p=>p.tipo==='Cliente').map(p=>({p,r:repoInfo(p)}));
+  if(f==='Para reponer') list=list.filter(x=>x.r&&x.r.dias<=7);
+  if(f==='Consumiendo') list=list.filter(x=>x.r&&x.r.dias>7);
+  list.sort((a,b)=>(a.r?a.r.dias:9999)-(b.r?b.r.dias:9999));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div>${['Todos','Para reponer','Consumiendo'].map(c=>`<div class="chip ${f===c?'active':''}" data-cf="${c}">${c}</div>`).join('')}</div>
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(({p,r})=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.producto||'Sin producto'} · ${repoTxt(p)}</div>${p.categoria?`<span class="tag">${p.categoria}</span>`:''}</div>${r&&r.dias<=7?'<span class="tag">Reponer</span>':''}</div>`).join(''):'<div class="empty">Sin clientes aquí. Abrí una persona y completá producto, compra y ciclo.</div>'}</div>`;
+  document.getElementById('back').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-cf]').forEach(el=>el.addEventListener('click',()=>{window.cf=el.dataset.cf;renderClientes();}));
+  $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
+}
+
+const FOCOS_CFG = {
+  'Visibilidad': {icon:'📱', acciones:[
+    {id:'vis_historia', nombre:'Publicar historia en Instagram'},
+    {id:'vis_estado', nombre:'Publicar estado en WhatsApp'},
+    {id:'vis_compprod', nombre:'Compartir producto en uso'},
+    {id:'vis_compexp', nombre:'Compartir experiencia personal'},
+    {id:'vis_compneg', nombre:'Compartir oportunidad de negocio'},
+    {id:'vis_content', nombre:'Publicar contenido / reel / post'},
+    {id:'vis_resp', nombre:'Responder interacciones recibidas'},
+    {id:'vis_iniciar', nombre:'Iniciar conversaciones desde story/interacción'}
+  ]},
+  'Clientes': {icon:'🤍', acciones:[
+    {id:'cli_nuevo', nombre:'Contactar personas nuevas'},
+    {id:'cli_retomar', nombre:'Retomar conversaciones'},
+    {id:'cli_seg', nombre:'Hacer seguimiento de producto'},
+    {id:'cli_recom', nombre:'Recomendar producto'},
+    {id:'cli_info', nombre:'Enviar información/precio'},
+    {id:'cli_cerrar', nombre:'Cerrar pedido'},
+    {id:'cli_anterior', nombre:'Contactar cliente anterior'},
+    {id:'cli_react', nombre:'Reactivar cliente'},
+    {id:'cli_repo', nombre:'Consultar por reposición'},
+    {id:'cli_ref', nombre:'Pedir referido/recomendación'}
+  ]},
+  'Equipo': {icon:'🤝', acciones:[
+    {id:'eq_contactar', nombre:'Contactar posible socio/a'},
+    {id:'eq_compneg', nombre:'Compartir oportunidad de negocio'},
+    {id:'eq_seg', nombre:'Hacer seguimiento de oportunidad'},
+    {id:'eq_invitar', nombre:'Invitar a llamada/presentación'},
+    {id:'eq_llamar', nombre:'Realizar llamada/presentación'},
+    {id:'eq_info', nombre:'Enviar información del negocio'},
+    {id:'eq_incorp', nombre:'Incorporar nuevo socio/a'}
+  ]},
+  'Crecimiento': {icon:'🧠', acciones:[
+    {id:'cre_nuskin', nombre:'Formación Nu Skin', min:true},
+    {id:'cre_prod', nombre:'Formación de producto', min:true},
+    {id:'cre_ventas', nombre:'Formación en ventas', min:true},
+    {id:'cre_prosp', nombre:'Formación en prospección', min:true},
+    {id:'cre_lider', nombre:'Formación en liderazgo', min:true},
+    {id:'cre_pract1', nombre:'Practicar presentación del negocio'},
+    {id:'cre_pract2', nombre:'Practicar explicación de producto'},
+    {id:'cre_audio', nombre:'Escuchar audio / podcast / formación', min:true},
+    {id:'cre_mindset', nombre:'Trabajar mindset / creencia / miedo'},
+    {id:'cre_aprend', nombre:'Registrar aprendizaje'}
+  ]}
+};
+const FRASES_VICO = ['Lo que hacés hoy construye lo que querés mañana.','Tomar acción puede dar vuelta todo.','Resultados diferentes requieren acciones diferentes.','Hacer menos, durante más tiempo.'];
+
+function cargarBloqueActivo(){ try{ return JSON.parse(localStorage.getItem('vico_bloque_activo')||'null'); }catch(e){ return null; } }
+function guardarBloqueActivo(b){ window.bloqueActivo=b; try{ b?localStorage.setItem('vico_bloque_activo',JSON.stringify(b)):localStorage.removeItem('vico_bloque_activo'); }catch(e){} }
+
+function openMover(){
+  const activo = cargarBloqueActivo();
+  if(activo){ window.bloqueActivo=activo; tab='mtrabajo'; render(); return; }
+  window.cfgMover = {focos:[], tiempoMin:60, acciones:[]};
+  if(rutinas.length){ tab='mrutinas'; render(); return; }
+  tab='mfoco'; render();
+}
+
+function renderMRutinas(){
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMR">✕</div></div>
+    <h3 style="margin-top:4px;">⚡ ¿Cómo querés empezar?</h3>
+    <div class="card" style="padding:6px 4px;">
+      ${rutinas.map(r=>`<div class="row"><div style="flex:1;" data-userut="${r.id}"><div class="t">${r.nombre}</div><div class="sub">${(r.focos||[]).join(' + ')} · ${r.tiempoMin} min</div></div><span data-delrut="${r.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join('')}
+    </div>
+    <button class="cta" id="mr_foco" style="background:var(--accent);color:var(--brand);">🎯 Elegir mi foco</button>`;
+  document.getElementById('backMR').addEventListener('click',()=>{tab='inicio';render();});
+  document.getElementById('mr_foco').addEventListener('click',()=>{ tab='mfoco'; render(); });
+  document.querySelectorAll('[data-delrut]').forEach(el=>el.addEventListener('click',()=>{ if(!confirm('¿Eliminar esta rutina?')) return; rutinas=rutinas.filter(x=>x.id!==el.dataset.delrut); saveRutinas(); renderMRutinas(); }));
+  document.querySelectorAll('[data-userut]').forEach(el=>el.addEventListener('click',()=>{
+    const r=rutinas.find(x=>x.id===el.dataset.userut); if(!r) return;
+    const bloque={id:uid(), fecha:todayStr(), horaInicio:new Date().toISOString(), focos:r.focos, tiempoPlanMin:r.tiempoMin,
+      acciones:r.acciones.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo,hecho:0})),
+      pausado:false, pausaInicio:null, pausaTotalMs:0, resultados:[], personasAsoc:[]};
+    guardarBloqueActivo(bloque); tab='mtrabajo'; render();
+  }));
+}
+
+function renderMFoco(){
+  const c=window.cfgMover;
+  const nombres=Object.keys(FOCOS_CFG);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMF">✕</div></div>
+    <h3 style="margin-top:4px;">🔥 ¿Qué querés mover hoy?</h3>
+    <p class="sub">Elegí 1 foco principal y, si querés, 1 secundario.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      ${nombres.map(f=>`<div class="card" data-f="${f}" style="cursor:pointer;text-align:center;padding:16px 8px;${c.focos.includes(f)?'border-color:var(--brand);background:var(--accent);':''}">
+        <div style="font-size:22px;">${FOCOS_CFG[f].icon}</div><div style="font-weight:600;font-size:13px;margin-top:4px;">${f.toUpperCase()}</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-title">¿Cuánto tiempo tenés hoy?</div>
+    <div class="chips" style="flex-wrap:wrap;">
+      ${[['30','30 min'],['60','1 h'],['120','2 h']].map(([v,l])=>`<div class="chip ${String(c.tiempoMin)===v?'active':''}" data-t="${v}">${l}</div>`).join('')}
+      <div class="chip ${c.custom?'active':''}" id="tCustom">Personalizado</div>
+    </div>
+    ${c.custom?`<input id="tMin" type="number" min="5" placeholder="Minutos" value="${c.tiempoMin}">`:''}
+    <button class="cta" id="mfContinuar" ${!c.focos.length?'disabled style="opacity:.5;"':''}>Continuar →</button>`;
+  document.getElementById('backMF').addEventListener('click',()=>{tab='inicio';render();});
+  document.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('click',()=>{
+    const f=el.dataset.f;
+    if(c.focos.includes(f)) c.focos=c.focos.filter(x=>x!==f);
+    else if(c.focos.length<2) c.focos.push(f);
+    renderMFoco();
+  }));
+  document.querySelectorAll('[data-t]').forEach(el=>el.addEventListener('click',()=>{ c.tiempoMin=Number(el.dataset.t); c.custom=false; renderMFoco(); }));
+  document.getElementById('tCustom').addEventListener('click',()=>{ c.custom=true; renderMFoco(); });
+  const tMin=document.getElementById('tMin'); if(tMin) tMin.addEventListener('change',e=>{ c.tiempoMin=Number(e.target.value)||30; });
+  const cont=document.getElementById('mfContinuar');
+  if(c.focos.length) cont.addEventListener('click',()=>{ tab='macciones'; render(); });
+}
+
+function renderMAcciones(){
+  const c=window.cfgMover;
+  if(!c.acciones.length){ c.focos.forEach(f=>{ FOCOS_CFG[f].acciones.forEach(a=>{ c.acciones.push({id:a.id,nombre:a.nombre,foco:f,min:!!a.min,activa:false,objetivo:a.min?20:3}); }); }); }
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMA">← Atrás</div></div>
+    <h3 style="margin-top:4px;">🎯 Armá tu foco de hoy</h3>
+    <p class="sub">Elegí qué acciones querés realizar. No necesitás hacerlas todas.</p>
+    ${c.focos.map(f=>`<div class="section-title">${FOCOS_CFG[f].icon} ${f.toUpperCase()}</div>
+    <div class="card">
+      ${c.acciones.filter(a=>a.foco===f).map(a=>`<div class="row">
+        <input type="checkbox" data-act="${a.id}" ${a.activa?'checked':''} style="width:auto;flex:none;margin-right:10px;">
+        <div class="t" style="flex:1;">${a.nombre}</div>
+        <span data-minus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">−</span>
+        <b style="min-width:34px;text-align:center;">${a.objetivo}${a.min?'m':''}</b>
+        <span data-plus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">+</span>
+      </div>`).join('')}
+    </div>`).join('')}
+    <button class="cta" id="mfEmpezar">🔥 Empezar mi oficina</button>
+    <button class="cta" id="mfGuardarRut" style="background:none;color:var(--brand2);">⭐ Guardar como rutina</button>`;
+  document.getElementById('backMA').addEventListener('click',()=>{tab='mfoco';render();});
+  document.getElementById('mfGuardarRut').addEventListener('click',()=>{
+    const elegidas=c.acciones.filter(a=>a.activa);
+    if(!elegidas.length){ alert('Elegí al menos una acción primero.'); return; }
+    const nombre=prompt('¿Cómo querés llamar a esta rutina? (ej: "30 minutos de foco")');
+    if(!nombre) return;
+    rutinas.push({id:uid(), nombre:nombre.trim(), focos:c.focos, tiempoMin:c.tiempoMin, acciones:elegidas.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo}))});
+    saveRutinas();
+    alert('Rutina guardada.');
+  });
+  document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('change',e=>{ const a=c.acciones.find(x=>x.id===el.dataset.act); a.activa=e.target.checked; }));
+  document.querySelectorAll('[data-plus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.plus); a.objetivo+=(a.min?5:1); renderMAcciones(); }));
+  document.querySelectorAll('[data-minus]').forEach(el=>el.addEventListener('click',()=>{ const a=c.acciones.find(x=>x.id===el.dataset.minus); a.objetivo=Math.max(a.min?5:1,a.objetivo-(a.min?5:1)); renderMAcciones(); }));
+  document.getElementById('mfEmpezar').addEventListener('click',()=>{
+    const elegidas=c.acciones.filter(a=>a.activa);
+    if(!elegidas.length){ alert('Elegí al menos una acción.'); return; }
+    const bloque={id:uid(), fecha:todayStr(), horaInicio:new Date().toISOString(), focos:c.focos, tiempoPlanMin:c.tiempoMin,
+      acciones:elegidas.map(a=>({id:a.id,nombre:a.nombre,foco:a.foco,min:a.min,objetivo:a.objetivo,hecho:0})),
+      pausado:false, pausaInicio:null, pausaTotalMs:0, resultados:[], personasAsoc:[]};
+    guardarBloqueActivo(bloque);
+    window.cfgMover=null;
+    tab='mtrabajo'; render();
+  });
+}
+
+function sugeridasParaBloque(){
+  const hoy=todayStr();
+  const a=personas.filter(p=>p.proximaFecha&&p.proximaFecha<=hoy);
+  const b=personas.filter(p=>!a.includes(p)&&(repoInfo(p)&&repoInfo(p).dias<=7));
+  const c=personas.filter(p=>!a.includes(p)&&!b.includes(p)&&p.tipo!=='Socia');
+  return a.concat(b).concat(c).slice(0,3);
+}
+
+function renderMTrabajo(){
+  const b=window.bloqueActivo;
+  if(!b){ tab='inicio'; render(); return; }
+  if(window.timerInt) clearInterval(window.timerInt);
+  const elapsedMs=()=>{ const ini=new Date(b.horaInicio).getTime(); let pausa=b.pausaTotalMs||0; if(b.pausado&&b.pausaInicio) pausa+=(Date.now()-new Date(b.pausaInicio).getTime()); return Date.now()-ini-pausa; };
+  const fmt=ms=>{ const s=Math.max(0,Math.floor(ms/1000)); const h=String(Math.floor(s/3600)).padStart(2,'0'); const m=String(Math.floor((s%3600)/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return h+':'+m+':'+ss; };
+  const sug=sugeridasParaBloque();
+  $main.innerHTML=`<div class="chips"><div class="chip" id="mt_salir">Minimizar</div></div>
+    <h3 style="margin-top:4px;">🔥 Mi foco de hoy</h3>
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+      <div><div class="sub">Tiempo: ${b.tiempoPlanMin} min · ${b.pausado?'⏸ Pausado':'⏱'} <b id="mt_crono">${fmt(elapsedMs())}</b></div><div class="sub">Focos: ${b.focos.join(' + ')}</div></div>
+      <button id="mt_pausa" style="border:none;background:var(--accent);color:var(--brand);border-radius:10px;padding:8px 12px;font-weight:600;">${b.pausado?'Reanudar':'Pausar'}</button>
+    </div>
+    ${b.focos.map(f=>`<div class="section-title">${FOCOS_CFG[f].icon} ${f.toUpperCase()}</div>
+    <div class="card">
+      ${b.acciones.filter(a=>a.foco===f).map(a=>`<div class="row">
+        <div class="t" style="flex:1;">${a.nombre}<div class="sub">${a.hecho}/${a.objetivo}${a.min?' min':''}</div></div>
+        <span data-mminus="${a.id}" style="padding:2px 8px;color:var(--brand);font-weight:700;">−</span>
+        <span data-mplus="${a.id}" style="padding:4px 10px;background:var(--brand);color:#fff;border-radius:8px;font-weight:700;">+1</span>
+        <span data-asoc="${a.id}" style="padding:4px 6px;color:var(--brand2);">👤</span>
+      </div>`).join('')}
+    </div>`).join('')}
+    ${sug.length?`<div class="section-title">⚡ Personas que podrías contactar</div>
+    <div class="card">${sug.map(p=>`<div class="row" data-verp="${p.id}"><span class="dot"></span><div><div class="t">${p.nombre}</div><div class="sub">${p.proximaAccion||repoTxt(p)}</div></div></div>`).join('')}</div>`:''}
+    <button class="cta" id="mt_terminar" style="background:var(--accent);color:var(--brand);">Terminar mi oficina</button>
+    <button class="cta" id="mt_descartar" style="background:none;color:var(--sub);">Descartar este bloque (lo empecé por error)</button>`;
+  document.getElementById('mt_salir').addEventListener('click',()=>{tab='inicio';render();});
+  document.getElementById('mt_pausa').addEventListener('click',()=>{
+    if(b.pausado){ b.pausaTotalMs=(b.pausaTotalMs||0)+(Date.now()-new Date(b.pausaInicio).getTime()); b.pausado=false; b.pausaInicio=null; }
+    else { b.pausado=true; b.pausaInicio=new Date().toISOString(); }
+    guardarBloqueActivo(b); renderMTrabajo();
+  });
+  document.querySelectorAll('[data-mplus]').forEach(el=>el.addEventListener('click',()=>{ const a=b.acciones.find(x=>x.id===el.dataset.mplus); a.hecho++; guardarBloqueActivo(b); renderMTrabajo(); }));
+  document.querySelectorAll('[data-mminus]').forEach(el=>el.addEventListener('click',()=>{ const a=b.acciones.find(x=>x.id===el.dataset.mminus); a.hecho=Math.max(0,a.hecho-1); guardarBloqueActivo(b); renderMTrabajo(); }));
+  document.querySelectorAll('[data-asoc]').forEach(el=>el.addEventListener('click',()=>openAsociarPersona(el.dataset.asoc)));
+  document.querySelectorAll('[data-verp]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.verp)));
+  document.getElementById('mt_terminar').addEventListener('click',()=>{
+    if(!confirm('¿Terminar y guardar el bloque de hoy?')) return;
+    tab='mresumen'; render();
+  });
+  document.getElementById('mt_descartar').addEventListener('click',()=>{
+    if(!confirm('¿Descartar este bloque? No se va a guardar nada de lo hecho acá.')) return;
+    guardarBloqueActivo(null); clearInterval(window.timerInt); tab='inicio'; render();
+  });
+  window.timerInt=setInterval(()=>{
+    if(tab!=='mtrabajo'){ clearInterval(window.timerInt); return; }
+    const el=document.getElementById('mt_crono'); if(!el){ clearInterval(window.timerInt); return; }
+    if(!b.pausado) el.textContent=fmt(elapsedMs());
+  },1000);
+}
+
+const RESULTADOS_OPC=['Información','Interés producto','Interés negocio','Seguimiento','Pedido','Cliente nuevo','Posible socia','Otro'];
+function openAsociarPersona(accionId){
+  const b=window.bloqueActivo; const acc=b.acciones.find(x=>x.id===accionId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${acc.nombre}</h3>
+    <div class="section-title">¿Con quién fue?</div>
+    <select id="as_p"><option value="">Elegí una persona</option><option value="__nueva__">+ Nueva persona</option>${personas.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('')}</select>
+    <div id="as_nueva" style="display:none;">
+      <input id="as_nnombre" placeholder="Nombre">
+      <input id="as_ntel" placeholder="Teléfono / Instagram (opcional)">
+      <select id="as_ntipo"><option value="Potencial">Potencial</option><option value="P. Cliente">Potencial Cliente</option><option value="P. Socia">Potencial Socia</option></select>
+    </div>
+    <div class="section-title">¿Resultado de la conversación?</div>
+    <div class="chips" style="flex-wrap:wrap;">${RESULTADOS_OPC.map(r=>`<div class="chip" data-res="${r}">${r}</div>`).join('')}</div>
+    <div class="section-title">¿Próximo seguimiento?</div>
+    <input id="as_fecha" type="date">
+    <textarea id="as_nota" rows="2" placeholder="Nota (opcional)"></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="as_save">Guardar</button></div>`);
+  let resSel=[];
+  document.getElementById('as_p').addEventListener('change',e=>{ document.getElementById('as_nueva').style.display=e.target.value==='__nueva__'?'block':'none'; });
+  document.querySelectorAll('[data-res]').forEach(el=>el.addEventListener('click',()=>{
+    const r=el.dataset.res;
+    if(resSel.includes(r)){ resSel=resSel.filter(x=>x!==r); el.classList.remove('active'); }
+    else { resSel.push(r); el.classList.add('active'); }
+  }));
+  document.getElementById('as_save').addEventListener('click',()=>{
+    let pid=document.getElementById('as_p').value;
+    const nota=document.getElementById('as_nota').value.trim();
+    const fecha=document.getElementById('as_fecha').value;
+    if(pid==='__nueva__'){
+      const nombreN=document.getElementById('as_nnombre').value.trim();
+      if(!nombreN){ alert('Escribí el nombre de la persona.'); return; }
+      const nueva={id:uid(), nombre:nombreN, telefono:document.getElementById('as_ntel').value.trim(), tipo:document.getElementById('as_ntipo').value, ultimaNota:'', historial:[], proximaAccion:'', proximaFecha:'', creado:todayStr()};
+      personas.push(nueva); pid=nueva.id;
+    }
+    if(pid){
+      const p=personas.find(x=>x.id===pid);
+      p.historial=(p.historial||[]).concat({fecha:todayStr(),texto:acc.nombre+(resSel.length?' — '+resSel.join(', '):'')+(nota?': '+nota:'')});
+      if(nota) p.ultimaNota=nota;
+      if(fecha){ p.proximaFecha=fecha; eventos.push({id:uid(),titulo:'Seguimiento con '+p.nombre,tipo:'Seguimiento',fecha,hora:'',personaId:p.id}); saveEventos(); }
+      savePersonas();
+      b.personasAsoc.push({accionId,personaId:pid,resultado:resSel.join(', '),fecha:todayStr()});
+    }
+    resSel.forEach(r=>b.resultados.push(r));
+    guardarBloqueActivo(b); closeModal(); renderMTrabajo();
+  });
+}
+
+function renderMResumen(){
+  const b=window.bloqueActivo;
+  if(!b){ tab='inicio'; render(); return; }
+  const ini=new Date(b.horaInicio).getTime();
+  const pausa=(b.pausaTotalMs||0)+(b.pausado&&b.pausaInicio?(Date.now()-new Date(b.pausaInicio).getTime()):0);
+  const ms=Date.now()-ini-pausa; const mins=Math.round(ms/60000);
+  const horasTxt = mins>=60?`${Math.floor(mins/60)} h ${mins%60} min`:`${mins} min`;
+  const hechos=b.acciones.filter(a=>a.hecho>0);
+  const resCount={}; (b.resultados||[]).forEach(r=>{ resCount[r]=(resCount[r]||0)+1; });
+  const frase=FRASES_VICO[Math.floor(Math.random()*FRASES_VICO.length)];
+  $main.innerHTML=`<h3 style="margin-top:4px;">✨ Hoy moviste tu negocio</h3>
+    <div class="stat3"><div class="box"><b>${horasTxt}</b><small>Tiempo real</small></div><div class="box"><b>${b.focos.length}</b><small>Focos</small></div></div>
+    <div class="section-title">Lo que hiciste hoy</div>
+    <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
+    ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
+    <div class="paraque" style="text-align:center;margin-top:10px;">${frase}</div>
+    <button class="cta" id="mr_guardar">Guardar día 🤍</button>`;
+  document.getElementById('mr_guardar').addEventListener('click',()=>{
+    bloques.push({id:b.id, fecha:b.fecha, horaInicio:b.horaInicio, horaFin:new Date().toISOString(), tiempoPlanMin:b.tiempoPlanMin, tiempoRealMin:mins,
+      focos:b.focos, acciones:b.acciones, resultados:b.resultados, personasAsoc:b.personasAsoc});
+    saveBloques();
+    guardarBloqueActivo(null);
+    tab='inicio'; render();
+  });
+}
+
+function renderEquipo(){
+  const list = personas.filter(p=>p.tipo==='Socia');
+  $main.innerHTML = `<div class="chips"><div class="chip" id="back2">← Más</div></div>
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(p=>`<div class="persona" data-open="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.etapa||'Sin etapa'} · ${p.objetivo||'Sin objetivo'}</div></div></div>`).join(''):'<div class="empty">Aún no hay socias. Marcá a alguien como Socia desde su ficha.</div>'}</div>`;
+  document.getElementById('back2').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openPersonaDetail(el.dataset.open)));
+}
+
+const PLAZOS=[['corto','Corto plazo (0-3 meses)'],['medio','Mediano plazo (3-6 meses)'],['largo','Largo plazo (+6 meses)']];
+function renderMetas(){
+  $main.innerHTML = `<div class="chips"><div class="chip" id="back3">← Más</div></div>
+    <div class="paraque">
+      <b>MI VISIÓN</b>
+      ${window.editVision || !config.vision ? `
+        <div style="margin-top:8px;"><textarea id="visionTxt" rows="4" placeholder="Describí cómo se ve tu vida cuando logres tus metas...">${(config.vision||'').replace(/</g,'&lt;')}</textarea></div>
+        <button class="cta" id="saveVision" style="margin-top:4px;">Guardar</button>
+      ` : `
+        <div style="margin-top:6px; white-space:pre-wrap;">${config.vision}</div>
+        <span id="editVision" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--brand2);">EDITAR</span>
+      `}
+    </div>
+    ${PLAZOS.map(([k,label])=>{
+      const items=metas.filter(m=>m.plazo===k); const done=items.filter(m=>m.hecha).length;
+      return `<div class="section-title">${label} · ${done}/${items.length||0}</div>
+      <div class="card">
+        ${items.length?items.map(m=>`<div class="row"><input type="checkbox" data-chk="${m.id}" ${m.hecha?'checked':''} style="width:auto;flex:none;margin:0 10px 0 0;padding:0;"><div class="t" style="flex:1;${m.hecha?'text-decoration:line-through;color:var(--sub)':''}">${m.texto}</div><span data-del="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin metas todavía</div>'}
+        <div class="row" style="gap:6px;"><input id="new_${k}" placeholder="Nueva meta..." style="margin:0;flex:1;min-width:0;"><button data-add="${k}" style="flex:none;border:none;background:var(--brand);color:#fff;border-radius:8px;padding:8px 12px;">+</button></div>
+      </div>`;
+    }).join('')}
+  `;
+  document.getElementById('back3').addEventListener('click',()=>{tab='mas';render();});
+  const vt=document.getElementById('visionTxt'); if(vt) vt.focus();
+  const saveVision=document.getElementById('saveVision');
+  if(saveVision) saveVision.addEventListener('click',()=>{ config.vision=vt.value.trim(); window.editVision=false; saveConfig(); renderMetas(); });
+  const editVision=document.getElementById('editVision');
+  if(editVision) editVision.addEventListener('click',()=>{ window.editVision=true; renderMetas(); });
+  $main.querySelectorAll('[data-chk]').forEach(el=>el.addEventListener('change',()=>{ const m=metas.find(x=>x.id===el.dataset.chk); if(m){m.hecha=el.checked; saveMetas(); render();} }));
+  $main.querySelectorAll('[data-del]').forEach(el=>el.addEventListener('click',()=>{ metas=metas.filter(x=>x.id!==el.dataset.del); saveMetas(); render(); }));
+  $main.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>{
+    const k=el.dataset.add; const inp=document.getElementById('new_'+k); const v=inp.value.trim();
+    if(!v) return; metas.push({id:uid(),plazo:k,texto:v,hecha:false}); saveMetas(); render();
+  }));
+}
+
+const BIB_CATS=['Producto','Negocio','Formación'];
+function renderBiblioteca(){
+  const f=window.bf||'Todo';
+  const list=biblioteca.filter(b=>f==='Todo'||b.categoria===f);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back4">← Más</div>${['Todo',...BIB_CATS].map(c=>`<div class="chip ${f===c?'active':''}" data-bf="${c}">${c}</div>`).join('')}</div>
+  <div class="card list-grid" style="padding:10px;">${list.length?list.map(b=>`<div class="row"><span class="dot"></span><div style="flex:1;" data-bopen="${b.id}"><div class="t">${b.titulo}</div><div class="sub">${b.categoria}${b.nota?' · '+b.nota:''}</div></div><span data-bshare="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">COMPARTIR</span><span data-bedit="${b.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 6px;">EDITAR</span><span data-bdel="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin recursos todavía</div>'}</div>
+  <button class="cta" id="addBib">+ Agregar recurso</button>`;
+  document.getElementById('back4').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-bf]').forEach(el=>el.addEventListener('click',()=>{window.bf=el.dataset.bf;renderBiblioteca();}));
+  $main.querySelectorAll('[data-bopen]').forEach(el=>el.addEventListener('click',()=>{
+    const b=biblioteca.find(x=>x.id===el.dataset.bopen);
+    if(b&&b.url){ window.open(b.url,'_blank'); }
+  }));
+  $main.querySelectorAll('[data-bdel]').forEach(el=>el.addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este recurso?')) return;
+    biblioteca=biblioteca.filter(x=>x.id!==el.dataset.bdel); saveBiblioteca(); renderBiblioteca();
+  }));
+  $main.querySelectorAll('[data-bshare]').forEach(el=>el.addEventListener('click',()=>openCompartirRecurso(el.dataset.bshare)));
+  $main.querySelectorAll('[data-bedit]').forEach(el=>el.addEventListener('click',()=>openBibForm(el.dataset.bedit)));
+  document.getElementById('addBib').addEventListener('click',()=>openBibForm(null));
+}
+
+function openCompartirRecurso(bibId){
+  const b=biblioteca.find(x=>x.id===bibId); if(!b) return;
+  const texto=b.titulo+(b.nota?'\n'+b.nota:'')+(b.url?'\n'+b.url:'');
+  const draw=(q)=>{
+    const list=personas.filter(p=>p.telefono&&(!q||p.nombre.toLowerCase().includes(q.toLowerCase())));
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Compartir "${b.titulo}"</h3>
+      <input id="cr_q" placeholder="Buscar por nombre..." value="${q||''}">
+      <div style="max-height:45vh;overflow-y:auto;">${list.length?list.map(p=>`<div class="persona" data-cr="${p.id}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.telefono}</div></div></div>`).join(''):'<div class="empty">Nadie con teléfono cargado por aquí</div>'}</div>`);
+    document.getElementById('cr_q').addEventListener('input',e=>draw(e.target.value));
+    document.querySelectorAll('[data-cr]').forEach(el=>el.addEventListener('click',()=>{
+      const p=personas.find(x=>x.id===el.dataset.cr);
+      const link=waLink(p.telefono, texto); if(link) window.open(link,'_blank');
+      closeModal();
+    }));
+  };
+  draw('');
+}
+
+function openBibForm(editId){
+  const b = editId ? biblioteca.find(x=>x.id===editId) : null;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${b?'Editar recurso':'Nuevo recurso'}</h3>
+    <input id="b_tit" placeholder="Título" value="${b?(b.titulo||'').replace(/"/g,'&quot;'):''}">
+    <select id="b_cat">${BIB_CATS.map(c=>`<option ${b&&b.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
+    <input id="b_url" placeholder="Link (opcional)" value="${b?(b.url||'').replace(/"/g,'&quot;'):''}">
+    <textarea id="b_nota" rows="2" placeholder="Nota (opcional)">${b?(b.nota||''):''}</textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveBib">Guardar</button></div>`);
+  document.getElementById('saveBib').addEventListener('click',()=>{
+    const titulo=document.getElementById('b_tit').value.trim();
+    if(!titulo) return;
+    const data={titulo,categoria:document.getElementById('b_cat').value,url:document.getElementById('b_url').value.trim(),nota:document.getElementById('b_nota').value.trim()};
+    if(b){ Object.assign(b,data); } else { biblioteca.push(Object.assign({id:uid()},data)); }
+    saveBiblioteca(); closeModal(); renderBiblioteca();
+  });
+}
+
+function renderEstadisticas(){
+  const mes=todayStr().slice(0,7);
+  const clientes=personas.filter(p=>p.tipo==='Cliente').length;
+  const socias=personas.filter(p=>p.tipo==='Socia').length;
+  const potenciales=personas.filter(p=>p.tipo==='Potencial').length;
+  const seguimientos=personas.filter(p=>p.proximaFecha&&p.proximaFecha<=todayStr()).length;
+  const nuevos=personas.filter(p=>p.creado&&p.creado.slice(0,7)===mes).length;
+  const bloquesMes=bloques.filter(b=>b.fecha&&b.fecha.slice(0,7)===mes).length;
+  const metasDone=metas.filter(m=>m.hecha).length;
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back5">← Más</div></div>
+    <div class="section-title">Este mes</div>
+    <div class="stat3"><div class="box"><b>${nuevos}</b><small>Contactos nuevos</small></div><div class="box"><b>${bloquesMes}</b><small>Bloques de trabajo</small></div><div class="box"><b>${seguimientos}</b><small>Seguimientos</small></div></div>
+    <div class="section-title">General</div>
+    <div class="card">
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Personas totales</div><b>${personas.length}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Clientes</div><b>${clientes}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Potenciales</div><b>${potenciales}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Socias</div><b>${socias}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Metas logradas</div><b>${metasDone}/${metas.length}</b></div>
+      <div class="row"><span class="dot"></span><div class="t" style="flex:1;">Recursos en biblioteca</div><b>${biblioteca.length}</b></div>
+    </div>`;
+  document.getElementById('back5').addEventListener('click',()=>{tab='mas';render();});
+}
+
+const CAMP_TIPOS=['Venta','Reposición','Reactivación','Nuevo producto','Captación de clientes','Referidos','Oportunidad de negocio','Equipo','Evento / capacitación','Otro'];
+const CAMP_MOTIVOS=['Reposición','Nuevo producto','Reactivación','Interés previo','Referido','Negocio','Seguimiento','Otro'];
+const CAMP_ESTADOS=['Pendiente','Contactada','Respondió','Seguimiento','Venta','Oportunidad de negocio','No interesada'];
+const QUE_PASO=['No respondió','Respondió','Quiere información','Quiere pensarlo','Seguimiento necesario','Compró','Interesada en negocio','No interesada'];
+const QP_ESTADO={'No respondió':'Contactada','Respondió':'Respondió','Quiere información':'Respondió','Quiere pensarlo':'Seguimiento','Seguimiento necesario':'Seguimiento','Compró':'Venta','Interesada en negocio':'Oportunidad de negocio','No interesada':'No interesada'};
+function campMsgFor(c,motivo){ const mo=(motivo||'').toLowerCase(); const m=(c.mensajes||[]).find(x=>x.titulo.toLowerCase().includes(mo)||mo.includes(x.titulo.toLowerCase())); return m?m.texto:''; }
+function campCounts(c){ const o={}; CAMP_ESTADOS.forEach(e=>o[e]=0); (c.personas||[]).forEach(x=>{o[x.estado]=(o[x.estado]||0)+1;}); return o; }
+
+function renderCampanas(){
+  const f=window.camF||'Activas';
+  const list=campanas.filter(c=>(f==='Activas'?c.estado!=='finalizada':c.estado==='finalizada'));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backCM">← Más</div>${['Activas','Finalizadas'].map(x=>`<div class="chip ${f===x?'active':''}" data-camtab="${x}">${x}</div>`).join('')}</div>
+    ${list.length?list.map(c=>{const ct=campCounts(c); return `<div class="card" data-opencamp="${c.id}">
+      <div style="font-weight:600;">${c.nombre}</div>
+      <div class="sub">${c.fechaInicio||''}${c.fechaFin?' → '+c.fechaFin:''} · ${(c.personas||[]).length} personas</div>
+      <div class="sub" style="margin-top:6px;">${ct['Pendiente']} pendientes · ${ct['Contactada']} contactadas · ${ct['Seguimiento']} seguimiento · ${ct['Venta']} ventas</div>
+    </div>`;}).join(''):'<div class="empty">Sin campañas aquí todavía</div>'}
+    ${f==='Activas'?'<button class="cta" id="newCamp">+ Nueva campaña</button>':''}`;
+  document.getElementById('backCM').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-camtab]').forEach(el=>el.addEventListener('click',()=>{window.camF=el.dataset.camtab;renderCampanas();}));
+  $main.querySelectorAll('[data-opencamp]').forEach(el=>el.addEventListener('click',()=>{window.curCamp=el.dataset.opencamp;tab='campdet';render();}));
+  const nb=document.getElementById('newCamp'); if(nb) nb.addEventListener('click', openCampanaForm);
+}
+
+function openCampanaForm(){
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nueva campaña</h3>
+    <input id="c_nom" placeholder="Nombre de la campaña">
+    <select id="c_tipo">${CAMP_TIPOS.map(t=>`<option>${t}</option>`).join('')}</select>
+    <div style="display:flex;gap:8px;"><input id="c_ini" type="date" value="${todayStr()}"><input id="c_fin" type="date" placeholder="Fin (opcional)"></div>
+    <textarea id="c_obj" rows="2" placeholder="Objetivo de la campaña"></textarea>
+    <textarea id="c_notas" rows="2" placeholder="Información importante"></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="saveCamp">Guardar</button></div>`);
+  document.getElementById('saveCamp').addEventListener('click',()=>{
+    const nombre=document.getElementById('c_nom').value.trim(); if(!nombre) return;
+    const camp={id:uid(),nombre,tipo:document.getElementById('c_tipo').value,fechaInicio:document.getElementById('c_ini').value,fechaFin:document.getElementById('c_fin').value,objetivo:document.getElementById('c_obj').value.trim(),notas:document.getElementById('c_notas').value.trim(),estado:'activa',personas:[]};
+    campanas.push(camp); saveCampanas(); closeModal(); window.curCamp=camp.id; tab='campdet'; render();
+  });
+}
+
+function renderCampanaDetail(id){
+  const c=campanas.find(x=>x.id===id);
+  if(!c){ tab='campanas'; render(); return; }
+  const ct=campCounts(c);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backCD">← Campañas</div></div>
+    <div class="card">
+      <div style="font-weight:600;font-size:16px;">${c.nombre}</div>
+      <div class="sub">${c.tipo} · ${c.fechaInicio||''}${c.fechaFin?' → '+c.fechaFin:''}</div>
+      ${c.objetivo?`<div style="font-size:13px;margin-top:8px;">${c.objetivo}</div>`:''}
+    </div>
+    <div class="stat3">${['Pendiente','Contactada','Seguimiento'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
+    <div class="stat3">${['Venta','Oportunidad de negocio','No interesada'].map(k=>`<div class="box"><b>${ct[k]}</b><small>${k}</small></div>`).join('')}</div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="moverCamp">🔥 MOVER ESTA CAMPAÑA</button>':''}
+    <div class="section-title" style="margin-top:14px;">Materiales</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.materiales||[]).length?c.materiales.map(m=>`<div class="row" data-openmat="${m.url||''}"><span class="dot"></span><div class="t" style="flex:1;">${m.titulo}</div><span data-delmat="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin materiales todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addMat" style="background:var(--accent);color:var(--brand);">+ Agregar material</button>':''}
+    <div class="section-title" style="margin-top:14px;">Mensajes preparados</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.mensajes||[]).length?c.mensajes.map(m=>`<div class="row"><div class="t" style="flex:1;">${m.titulo}</div><span data-copymsg="${m.id}" style="color:var(--brand);font-size:12px;font-weight:600;padding:4px 8px;">COPIAR</span><span data-delmsg="${m.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`).join(''):'<div class="empty">Sin mensajes todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addMsg" style="background:var(--accent);color:var(--brand);">+ Agregar mensaje</button>':''}
+    <div class="section-title" style="margin-top:14px;">Personas (${(c.personas||[]).length})</div>
+    <div class="card" style="padding:6px 4px;">
+      ${(c.personas||[]).length?c.personas.map(x=>{const p=personas.find(pp=>pp.id===x.personaId); if(!p) return ''; return `<div class="persona" data-openp="${x.personaId}"><div class="av">${initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${x.motivo}</div></div><span class="tag">${x.estado}</span></div>`;}).join(''):'<div class="empty">Sin personas todavía</div>'}
+    </div>
+    ${c.estado!=='finalizada'?'<button class="cta" id="addPCamp">+ Agregar personas</button><button class="cta" id="finCamp" style="background:var(--accent);color:var(--brand);">Finalizar campaña</button>':''}
+  `;
+  document.getElementById('backCD').addEventListener('click',()=>{tab='campanas';render();});
+  $main.querySelectorAll('[data-openp]').forEach(el=>el.addEventListener('click',()=>openFichaCampana(c.id, el.dataset.openp)));
+  const ap=document.getElementById('addPCamp'); if(ap) ap.addEventListener('click',()=>openAgregarPersonasCampana(c.id));
+  const mv=document.getElementById('moverCamp'); if(mv) mv.addEventListener('click',()=>openMoverCampana(c.id));
+  $main.querySelectorAll('[data-openmat]').forEach(el=>el.addEventListener('click',()=>{ if(el.dataset.openmat) window.open(el.dataset.openmat,'_blank'); }));
+  $main.querySelectorAll('[data-delmat]').forEach(el=>el.addEventListener('click',()=>{ c.materiales=(c.materiales||[]).filter(m=>m.id!==el.dataset.delmat); saveCampanas(); render(); }));
+  $main.querySelectorAll('[data-copymsg]').forEach(el=>el.addEventListener('click',()=>{
+    const m=(c.mensajes||[]).find(x=>x.id===el.dataset.copymsg); if(!m) return;
+    (navigator.clipboard&&navigator.clipboard.writeText ? navigator.clipboard.writeText(m.texto) : Promise.reject()).then(()=>alert('Mensaje copiado')).catch(()=>{ prompt('Copiá el mensaje:', m.texto); });
+  }));
+  $main.querySelectorAll('[data-delmsg]').forEach(el=>el.addEventListener('click',()=>{ c.mensajes=(c.mensajes||[]).filter(m=>m.id!==el.dataset.delmsg); saveCampanas(); render(); }));
+  const am=document.getElementById('addMat'); if(am) am.addEventListener('click',()=>openAgregarMaterial(c.id));
+  const amsg=document.getElementById('addMsg'); if(amsg) amsg.addEventListener('click',()=>openAgregarMensaje(c.id));
+  const fc=document.getElementById('finCamp'); if(fc) fc.addEventListener('click',()=>{
+    const t=ct['Contactada']+ct['Respondió']+ct['Seguimiento']+ct['Venta']+ct['Oportunidad de negocio']+ct['No interesada'];
+    if(!confirm('Resumen: '+(c.personas||[]).length+' personas, '+t+' contactadas, '+ct['Venta']+' ventas, '+ct['Oportunidad de negocio']+' oportunidades. ¿Finalizar y archivar?')) return;
+    c.estado='finalizada'; saveCampanas(); tab='campanas'; window.camF='Finalizadas'; render();
+  });
+}
+
+function openAgregarPersonasCampana(campId){
+  const c=campanas.find(x=>x.id===campId);
+  const yaIds=new Set((c.personas||[]).map(x=>x.personaId));
+  const sel=new Set();
+  const draw=(filtro,q)=>{
+    let list=personas.filter(p=>!yaIds.has(p.id));
+    if(filtro&&filtro!=='Todos') list=list.filter(p=>p.tipo===filtro);
+    if(q) list=list.filter(p=>p.nombre.toLowerCase().includes(q.toLowerCase()));
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Agregar personas</h3>
+      <input id="ap_q" placeholder="Buscar por nombre..." value="${q||''}">
+      <div class="chips">${['Todos','Potencial','Cliente','Socia'].map(f=>`<div class="chip ${(filtro||'Todos')===f?'active':''}" data-apf="${f}">${f}</div>`).join('')}</div>
+      <div style="max-height:40vh;overflow-y:auto;">${list.length?list.map(p=>`<div class="persona" data-ap="${p.id}"><div class="av" style="${sel.has(p.id)?'':'opacity:.4'}">${sel.has(p.id)?'✓':initials(p.nombre)}</div><div class="info"><div class="n">${p.nombre}</div><div class="m">${p.tipo||''}</div></div></div>`).join(''):'<div class="empty">Nada por aquí</div>'}</div>
+      <div class="sub" style="margin:8px 0;">${sel.size} persona${sel.size===1?'':'s'} seleccionada${sel.size===1?'':'s'}</div>
+      <button class="cta" id="doAddP">Agregar a la campaña</button>`);
+    document.getElementById('ap_q').addEventListener('input',e=>draw(filtro,e.target.value));
+    document.querySelectorAll('[data-apf]').forEach(el=>el.addEventListener('click',()=>draw(el.dataset.apf,q)));
+    document.querySelectorAll('[data-ap]').forEach(el=>el.addEventListener('click',()=>{ const i=el.dataset.ap; if(sel.has(i)) sel.delete(i); else sel.add(i); draw(filtro,q); }));
+    document.getElementById('doAddP').addEventListener('click',()=>{
+      if(!sel.size) return;
+      sel.forEach(pid=>c.personas.push({personaId:pid, motivo:'Otro', estado:'Pendiente', nota:'', proximaFecha:''}));
+      saveCampanas(); closeModal(); render();
+    });
+  };
+  draw('Todos','');
+}
+
+function registrarAccionCampana(campId, personaId, onDone){
+  const c=campanas.find(x=>x.id===campId); const entry=c.personas.find(x=>x.personaId===personaId); const p=personas.find(x=>x.id===personaId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">¿Qué pasó?</h3>
+    <select id="qp_res">${QUE_PASO.map(o=>`<option>${o}</option>`).join('')}</select>
+    <textarea id="qp_nota" rows="2" placeholder="Nota (opcional)"></textarea>
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0;"><input type="checkbox" id="qp_seg"> ¿Necesita seguimiento?</label>
+    <div id="qp_segbox" style="display:none;">
+      <div style="display:flex;gap:8px;"><input id="qp_fecha" type="date"><input id="qp_hora" type="time"></div>
+      <input id="qp_motseg" placeholder="Motivo del seguimiento">
+    </div>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="qp_save">Registrar</button></div>`);
+  document.getElementById('qp_seg').addEventListener('change',e=>{ document.getElementById('qp_segbox').style.display=e.target.checked?'block':'none'; });
+  document.getElementById('qp_save').addEventListener('click',()=>{
+    const resultado=document.getElementById('qp_res').value, nota=document.getElementById('qp_nota').value.trim();
+    entry.estado=QP_ESTADO[resultado]||entry.estado; entry.nota=nota;
+    const texto='Campaña "'+c.nombre+'" — '+resultado+(nota?': '+nota:'');
+    p.historial=(p.historial||[]).concat({fecha:todayStr(),texto});
+    p.ultimaNota=texto;
+    if(document.getElementById('qp_seg').checked){
+      const fecha=document.getElementById('qp_fecha').value, hora=document.getElementById('qp_hora').value, mot=document.getElementById('qp_motseg').value.trim();
+      if(fecha){ eventos.push({id:uid(),titulo:'Seguimiento con '+p.nombre+' ('+c.nombre+')',tipo:'Seguimiento',fecha,hora,personaId:p.id}); saveEventos(); p.proximaFecha=fecha; p.proximaAccion=mot||('Seguimiento — '+c.nombre); entry.proximaFecha=fecha; }
+    }
+    savePersonas(); saveCampanas(); closeModal();
+    if(onDone) onDone(); else render();
+  });
+}
+
+function openFichaCampana(campId, personaId){
+  const c=campanas.find(x=>x.id===campId); const entry=c.personas.find(x=>x.personaId===personaId); const p=personas.find(x=>x.id===personaId);
+  if(!p||!entry) return;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${p.nombre}</h3>
+    <div class="sub">${p.tipo||''}${p.producto?' · '+p.producto:''}</div>
+    <div class="section-title">Motivo en esta campaña</div>
+    <select id="fc_mot">${CAMP_MOTIVOS.map(m=>`<option ${entry.motivo===m?'selected':''}>${m}</option>`).join('')}</select>
+    <div class="section-title">Estado</div>
+    <select id="fc_est">${CAMP_ESTADOS.map(e=>`<option ${entry.estado===e?'selected':''}>${e}</option>`).join('')}</select>
+    ${(c.mensajes||[]).length?`<div class="section-title">Mensajes preparados</div>
+    <div class="card" style="padding:6px 4px;margin-bottom:10px;">${c.mensajes.map(m=>`<div class="row"><div class="t" style="flex:1;">${m.titulo}</div><span data-fcmsg="${m.id}" style="color:var(--brand);font-size:12px;font-weight:600;">COPIAR</span></div>`).join('')}</div>`:''}
+    <div class="actions" style="margin:10px 0;">
+      ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;" target="_blank" href="${waLink(p.telefono, campMsgFor(c,entry.motivo) || ('Hola '+p.nombre.split(' ')[0]+'! Te escribo por '+c.nombre+'.'))}">WhatsApp</a>`:''}
+      ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;background:var(--accent);color:var(--brand);" href="tel:${p.telefono}">Llamar</a>`:''}
+    </div>
+    <button class="cta" id="fc_reg">Registrar acción</button>
+    <button class="cta" id="fc_ver" style="background:var(--accent);color:var(--brand);margin-top:8px;">Ver ficha completa</button>`);
+  document.getElementById('fc_mot').addEventListener('change',e=>{ entry.motivo=e.target.value; saveCampanas(); });
+  document.getElementById('fc_est').addEventListener('change',e=>{ entry.estado=e.target.value; saveCampanas(); render(); });
+  document.querySelectorAll('[data-fcmsg]').forEach(el=>el.addEventListener('click',()=>{
+    const m=(c.mensajes||[]).find(x=>x.id===el.dataset.fcmsg); if(!m) return;
+    (navigator.clipboard&&navigator.clipboard.writeText ? navigator.clipboard.writeText(m.texto) : Promise.reject()).then(()=>alert('Mensaje copiado')).catch(()=>{ prompt('Copiá el mensaje:', m.texto); });
+  }));
+  document.getElementById('fc_reg').addEventListener('click',()=>registrarAccionCampana(campId,personaId));
+  document.getElementById('fc_ver').addEventListener('click',()=>openPersonaDetail(personaId));
+}
+
+function openAgregarMaterial(campId){
+  const c=campanas.find(x=>x.id===campId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Agregar material</h3>
+    <input id="m_tit" placeholder="Título (ej: Flyer 3 cuotas)">
+    <input id="m_url" placeholder="Pegar link (imagen, PDF, catálogo...)">
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="m_save">Agregar</button></div>
+    ${biblioteca.length?`<div class="section-title" style="margin-top:14px;">O elegir de Biblioteca</div>
+    <div class="card" style="padding:6px 4px;">${biblioteca.map(b=>`<div class="row" data-frombib="${b.id}"><span class="dot"></span><div class="t" style="flex:1;">${b.titulo}</div></div>`).join('')}</div>`:''}`);
+  document.getElementById('m_save').addEventListener('click',()=>{
+    const titulo=document.getElementById('m_tit').value.trim(); if(!titulo) return;
+    c.materiales=(c.materiales||[]).concat({id:uid(),titulo,url:document.getElementById('m_url').value.trim()});
+    saveCampanas(); closeModal(); render();
+  });
+  document.querySelectorAll('[data-frombib]').forEach(el=>el.addEventListener('click',()=>{
+    const b=biblioteca.find(x=>x.id===el.dataset.frombib); if(!b) return;
+    c.materiales=(c.materiales||[]).concat({id:uid(),titulo:b.titulo,url:b.url||''});
+    saveCampanas(); closeModal(); render();
+  }));
+}
+
+function openAgregarMensaje(campId){
+  const c=campanas.find(x=>x.id===campId);
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Mensaje preparado</h3>
+    <input id="ms_tit" placeholder="Título (ej: Reactivación)">
+    <textarea id="ms_txt" rows="4" placeholder="Escribí el mensaje de referencia..."></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="ms_save">Guardar</button></div>`);
+  document.getElementById('ms_save').addEventListener('click',()=>{
+    const titulo=document.getElementById('ms_tit').value.trim(), texto=document.getElementById('ms_txt').value.trim();
+    if(!titulo||!texto) return;
+    c.mensajes=(c.mensajes||[]).concat({id:uid(),titulo,texto});
+    saveCampanas(); closeModal(); render();
+  });
+}
+
+function openMoverCampana(campId){
+  const c=campanas.find(x=>x.id===campId);
+  const cola=()=>(c.personas||[]).filter(x=>x.estado==='Pendiente'||x.estado==='Seguimiento');
+  const step=()=>{
+    const q=cola();
+    if(!q.length){ closeModal(); alert('No quedan personas pendientes en esta campaña por ahora 🎉'); render(); return; }
+    const entry=q[0]; const p=personas.find(x=>x.id===entry.personaId);
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${p.nombre}</h3>
+      <div class="sub">${p.producto||p.tipo||''}</div>
+      <div class="section-title">Motivo</div><div style="font-size:14px;margin-bottom:8px;">${entry.motivo}</div>
+      ${p.ultimaNota?`<div class="section-title">Última interacción</div><div style="font-size:13px;color:var(--sub);margin-bottom:8px;">${p.ultimaNota}</div>`:''}
+      <div class="actions">
+        ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;" target="_blank" href="${waLink(p.telefono, campMsgFor(c,entry.motivo) || ('Hola '+p.nombre.split(' ')[0]+'! Te escribo por '+c.nombre+'.'))}">WhatsApp</a>`:''}
+        ${p.telefono?`<a class="cta" style="text-align:center;text-decoration:none;flex:1;background:var(--accent);color:var(--brand);" href="tel:${p.telefono}">Llamar</a>`:''}
+      </div>
+      <button class="cta" id="mc_reg">Registrar resultado</button>
+      <button class="cta" id="mc_skip" style="background:none;color:var(--sub);">Omitir por ahora</button>`);
+    document.getElementById('mc_reg').addEventListener('click',()=>{ registrarAccionCampana(campId, entry.personaId, step); });
+    document.getElementById('mc_skip').addEventListener('click',()=>{ const rest=q.slice(1).concat(q[0]); c.personas=c.personas.filter(x=>!q.includes(x)).concat(rest); saveCampanas(); step(); });
+  };
+  step();
+}
+
+function renderQR(){
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backQR">← Más</div></div>
+    <div class="card" style="text-align:center;padding:26px 16px;">
+      <div style="font-weight:600;margin-bottom:4px;">Compartir VICO · Mi Oficina</div>
+      <div class="sub" style="margin-bottom:16px;">Escaneá para abrir la app</div>
+      <div id="qrbox" style="display:flex;justify-content:center;"></div>
+      <div class="sub" style="margin-top:12px;word-break:break-all;">${location.href.split('#')[0]}</div>
+    </div>`;
+  document.getElementById('backQR').addEventListener('click',()=>{tab='mas';render();});
+  const box=document.getElementById('qrbox');
+  if(window.QRCode&&box){ new QRCode(box,{text:location.href.split('#')[0],width:190,height:190,colorDark:'#362859',colorLight:'#ffffff'}); }
+  else if(box){ box.innerHTML='<div class="empty">No se pudo cargar el generador de QR (revisá tu conexión).</div>'; }
+}
+
+function esParaMi(m){ return m.de===window.miUid || m.destinatarios==='todos' || (Array.isArray(m.destinatarios)&&m.destinatarios.includes(window.miUid)); }
+function nombreDe(uidX){ if(uidX===window.miUid) return 'Vos'; const d=(window.directorio||[]).find(x=>x.uid===uidX); return d?d.nombre:'Alguien'; }
+function renderMensajes(){
+  const list=(window.mensajes||[]).filter(esParaMi);
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backMsg">← Más</div></div>
+    <div class="card" style="padding:6px 4px;max-height:60vh;overflow-y:auto;">
+      ${list.length?list.map(m=>`<div class="row" style="align-items:flex-start;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;width:100%;"><b style="font-size:13px;">${nombreDe(m.de)}${m.destinatarios==='todos'?' → Todos':''}</b><span class="sub">${(m.fecha||'').slice(0,16).replace('T',' ')}</span></div>
+        ${m.campanaNombre?`<span class="tag" style="margin-top:4px;">${m.campanaNombre}</span>`:''}
+        ${m.texto?`<div style="font-size:14px;margin-top:4px;">${m.texto}</div>`:''}
+      </div>`).join(''):'<div class="empty">Sin mensajes todavía</div>'}
+    </div>
+    <button class="cta" id="newMsg">+ Nuevo mensaje</button>`;
+  document.getElementById('backMsg').addEventListener('click',()=>{tab='mas';render();});
+  document.getElementById('newMsg').addEventListener('click',openNuevoMensaje);
+}
+
+function openNuevoMensaje(){
+  const otros=(window.directorio||[]).filter(d=>d.uid!==window.miUid);
+  const activas=campanas.filter(c=>c.estado!=='finalizada');
+  let todos=otros.length===0;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Nuevo mensaje</h3>
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" id="nm_todos" style="width:auto;flex:none;" ${todos?'checked':''}> Enviar a todos</label>
+    <div id="nm_dest" style="${todos?'display:none;':''}max-height:22vh;overflow-y:auto;">
+      ${otros.length?otros.map(d=>`<label class="sub" style="display:flex;align-items:center;gap:8px;padding:4px 0;"><input type="checkbox" class="nm_u" value="${d.uid}" style="width:auto;flex:none;"> ${d.nombre}</label>`).join(''):'<div class="empty">Todavía no hay otros usuarios dados de alta</div>'}
+    </div>
+    ${activas.length?`<select id="nm_camp"><option value="">Sin campaña vinculada</option>${activas.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('')}</select>`:''}
+    <textarea id="nm_txt" rows="3" placeholder="Escribí tu mensaje..."></textarea>
+    <div class="actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="nm_send">Enviar</button></div>
+    <div id="nm_msg" class="sub" style="margin-top:6px;"></div>`);
+  document.getElementById('nm_todos').addEventListener('change',e=>{ todos=e.target.checked; document.getElementById('nm_dest').style.display=todos?'none':'block'; });
+  document.getElementById('nm_send').addEventListener('click',async()=>{
+    const texto=document.getElementById('nm_txt').value.trim();
+    const sel=Array.from(document.querySelectorAll('.nm_u:checked')).map(x=>x.value);
+    if(!todos && !sel.length){ alert('Elegí al menos una persona o "Enviar a todos".'); return; }
+    if(!texto){ alert('Escribí un mensaje.'); return; }
+    const btn=document.getElementById('nm_send'); btn.disabled=true;
+    document.getElementById('nm_msg').textContent='Enviando...';
+    try{
+      const campSel=document.getElementById('nm_camp');
+      const campId=campSel?campSel.value:'';
+      const camp=campId?campanas.find(c=>c.id===campId):null;
+      await window.enviarMensaje({destinatarios: todos?'todos':sel, texto, campanaId:campId, campanaNombre:camp?camp.nombre:''});
+      closeModal(); tab='mensajes'; render();
+    }catch(err){ document.getElementById('nm_msg').textContent='No se pudo enviar. Probá de nuevo.'; btn.disabled=false; }
+  });
+}
+
+function renderHistorial(){
+  const list=bloques.slice().filter(b=>b.horaInicio).sort((a,b)=>(b.horaInicio||'').localeCompare(a.horaInicio||''));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backHist">← Más</div></div>
+    <div class="card list-grid" style="padding:10px;">
+      ${list.length?list.map(b=>{
+        const hechos=(b.acciones||[]).filter(a=>a.hecho>0).length;
+        const min=b.tiempoRealMin||0; const htxt=min>=60?`${Math.floor(min/60)} h ${min%60} min`:`${min} min`;
+        return `<div class="row"><div style="flex:1;" data-vb="${b.id}"><div class="t">${fmtFecha(b.fecha)} · ${htxt}</div><div class="sub">${(b.focos||[]).join(' + ')} · ${hechos} acciones</div></div><span data-delb="${b.id}" style="color:var(--sub);padding:0 4px;">✕</span></div>`;
+      }).join(''):'<div class="empty">Todavía no guardaste ningún día</div>'}
+    </div>`;
+  document.getElementById('backHist').addEventListener('click',()=>{tab='mas';render();});
+  $main.querySelectorAll('[data-vb]').forEach(el=>el.addEventListener('click',()=>openDetalleBloque(el.dataset.vb)));
+  $main.querySelectorAll('[data-delb]').forEach(el=>el.addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este día del historial? No se puede deshacer.')) return;
+    bloques=bloques.filter(x=>x.id!==el.dataset.delb); saveBloques(); renderHistorial();
+  }));
+}
+
+function openDetalleBloque(id){
+  const b=bloques.find(x=>x.id===id); if(!b) return;
+  const hechos=(b.acciones||[]).filter(a=>a.hecho>0);
+  const resCount={}; (b.resultados||[]).forEach(r=>{ resCount[r]=(resCount[r]||0)+1; });
+  const min=b.tiempoRealMin||0; const htxt=min>=60?`${Math.floor(min/60)} h ${min%60} min`:`${min} min`;
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${fmtFecha(b.fecha)}</h3>
+    <div class="sub" style="margin-bottom:10px;">${htxt} · ${(b.focos||[]).join(' + ')}</div>
+    <div class="section-title">Acciones</div>
+    <div class="card">${hechos.length?hechos.map(a=>`<div class="row"><span class="dot"></span><div class="t">${a.hecho}/${a.objetivo}${a.min?' min':''} — ${a.nombre}</div></div>`).join(''):'<div class="empty">Sin acciones registradas</div>'}</div>
+    ${Object.keys(resCount).length?`<div class="section-title">Resultados</div><div class="card">${Object.entries(resCount).map(([k,v])=>`<div class="row"><span class="dot"></span><div class="t">${v} — ${k}</div></div>`).join('')}</div>`:''}
+    <button class="cta" id="db_del" style="background:var(--accent);color:var(--brand);margin-top:10px;">Eliminar este día</button>
+  `);
+  document.getElementById('db_del').addEventListener('click',()=>{
+    if(!confirm('¿Eliminar este día del historial? No se puede deshacer.')) return;
+    bloques=bloques.filter(x=>x.id!==id); saveBloques(); closeModal();
+    if(tab==='historial') renderHistorial(); else if(tab==='progreso') renderProgreso();
+  });
+}
+
+function sumarDias(fechaStr, n){ const d=new Date(fechaStr+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function renderProgreso(){
+  const f=window.progFiltro||'Semana';
+  const hoy=madridNow().fecha;
+  const dias={'Semana':6,'Mes':29,'90 días':89,'Año':364}[f];
+  const desde=sumarDias(hoy,-dias);
+  const list=bloques.filter(b=>b.horaInicio && b.fecha>=desde && b.fecha<=hoy);
+  const diasActivos=new Set(list.map(b=>b.fecha)).size;
+  const horasTot=Math.round(list.reduce((s,b)=>s+(b.tiempoRealMin||0),0)/6)/10;
+  const contactosNuevos=personas.filter(p=>p.creado&&p.creado>=desde&&p.creado<=hoy).length;
+  const seguimientos=list.reduce((s,b)=>s+(b.personasAsoc||[]).length,0);
+  const resAll={}; list.forEach(b=>(b.resultados||[]).forEach(r=>resAll[r]=(resAll[r]||0)+1));
+  const focoMin={}; let totalFocoMin=0;
+  list.forEach(b=>{ (b.focos||[]).forEach(fo=>{ focoMin[fo]=(focoMin[fo]||0)+(b.tiempoRealMin||0); totalFocoMin+=(b.tiempoRealMin||0); }); });
+
+  if(!window.calMes){ const hm=madridNow().fecha.split('-'); window.calMes={y:Number(hm[0]),m:Number(hm[1])}; }
+  const {y,m}=window.calMes;
+  const primerDia=new Date(y,m-1,1); const diasMes=new Date(y,m,0).getDate();
+  let offset=primerDia.getDay(); offset=offset===0?6:offset-1;
+  const fechasConBloque=new Set(bloques.filter(b=>b.horaInicio).map(b=>b.fecha));
+  const mesNombre=primerDia.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+  let celdas='';
+  for(let i=0;i<offset;i++) celdas+='<div></div>';
+  for(let d=1;d<=diasMes;d++){
+    const fstr=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const activo=fechasConBloque.has(fstr);
+    celdas+=`<div data-dia="${fstr}" style="text-align:center;padding:6px 0;border-radius:8px;cursor:pointer;${activo?'background:var(--brand);color:#fff;font-weight:600;':''}">${d}</div>`;
+  }
+
+  $main.innerHTML=`<div class="chips"><div class="chip" id="backProg">← Más</div></div>
+    <div class="chips">${['Semana','Mes','90 días','Año'].map(x=>`<div class="chip ${f===x?'active':''}" data-pf="${x}">${x}</div>`).join('')}</div>
+    <div class="stat3"><div class="box"><b>${diasActivos}</b><small>Días activos</small></div><div class="box"><b>${list.length}</b><small>Bloques</small></div><div class="box"><b>${horasTot}</b><small>Horas</small></div></div>
+    <div class="stat3"><div class="box"><b>${contactosNuevos}</b><small>Contactos nuevos</small></div><div class="box"><b>${seguimientos}</b><small>Seguimientos</small></div><div class="box"><b>${resAll['Pedido']||0}</b><small>Pedidos</small></div></div>
+    <div class="section-title">¿Dónde pusiste tu energía?</div>
+    <div class="card">${Object.keys(focoMin).length?Object.entries(focoMin).map(([fo,mins])=>`<div class="row"><div class="t" style="flex:1;">${fo}</div><div class="sub">${Math.round(mins/6)/10} h · ${totalFocoMin?Math.round(mins/totalFocoMin*100):0}%</div></div>`).join(''):'<div class="empty">Sin datos en este período</div>'}</div>
+    <div class="section-title">📅 Mi constancia</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span id="cal_prev" style="padding:4px 10px;color:var(--brand);font-weight:700;">←</span>
+        <b style="text-transform:capitalize;">${mesNombre}</b>
+        <span id="cal_next" style="padding:4px 10px;color:var(--brand);font-weight:700;">→</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px;">${celdas}</div>
+      <div class="sub" style="margin-top:10px;">Este mes moviste tu oficina ${new Set(bloques.filter(b=>b.horaInicio&&b.fecha.slice(0,7)===`${y}-${String(m).padStart(2,'0')}`).map(b=>b.fecha)).size} días. 🤍</div>
+    </div>`;
+  document.getElementById('backProg').addEventListener('click',()=>{tab='mas';render();});
+  document.querySelectorAll('[data-pf]').forEach(el=>el.addEventListener('click',()=>{ window.progFiltro=el.dataset.pf; renderProgreso(); }));
+  document.getElementById('cal_prev').addEventListener('click',()=>{ let {y,m}=window.calMes; m--; if(m<1){m=12;y--;} window.calMes={y,m}; renderProgreso(); });
+  document.getElementById('cal_next').addEventListener('click',()=>{ let {y,m}=window.calMes; m++; if(m>12){m=1;y++;} window.calMes={y,m}; renderProgreso(); });
+  document.querySelectorAll('[data-dia]').forEach(el=>el.addEventListener('click',()=>{
+    const fstr=el.dataset.dia; const delDia=bloques.filter(b=>b.horaInicio&&b.fecha===fstr);
+    if(!delDia.length) return;
+    if(delDia.length===1){ openDetalleBloque(delDia[0].id); return; }
+    openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${fmtFecha(fstr)}</h3>
+      <div class="card">${delDia.map(b=>`<div class="row" data-vb2="${b.id}"><span class="dot"></span><div class="t">${(b.focos||[]).join(' + ')} · ${b.tiempoRealMin||0} min</div></div>`).join('')}</div>`);
+    document.querySelectorAll('[data-vb2]').forEach(x=>x.addEventListener('click',()=>openDetalleBloque(x.dataset.vb2)));
+  }));
 }
 
 function openModal(html){
@@ -480,7 +1187,21 @@ function openPersonaForm(){
     <button class="close-x" onclick="closeModal()">✕</button>
     <h3>Nueva persona</h3>
     <input id="f_nombre" placeholder="Nombre">
-    <input id="f_telefono" placeholder="Teléfono">
+    <input id="f_telefono" placeholder="Teléfono (opcional)">
+    <input id="f_pais" placeholder="País (opcional)">
+    <div style="display:flex;gap:8px;">
+      <input id="f_fb" placeholder="Facebook" style="flex:1;min-width:0;">
+      <input id="f_ig" placeholder="Instagram" style="flex:1;min-width:0;">
+      <input id="f_tt" placeholder="TikTok" style="flex:1;min-width:0;">
+    </div>
+    <select id="f_tipo">
+      <option value="Potencial">Potencial</option>
+      <option value="P. Cliente">Potencial Cliente</option>
+      <option value="P. Socia">Potencial Socia</option>
+      <option value="Cliente">Cliente</option>
+      <option value="Socia">Socia</option>
+    </select>
+    <textarea id="f_nota" placeholder="Nota inicial / cómo la conozco" rows="2"></textarea>
     <div class="actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" id="saveP">Guardar</button>
@@ -489,29 +1210,193 @@ function openPersonaForm(){
   document.getElementById('saveP').addEventListener('click', ()=>{
     const nombre = document.getElementById('f_nombre').value.trim();
     if(!nombre) return;
-    personas.push({ id: uid(), nombre, telefono: document.getElementById('f_telefono').value.trim(), tipo: "Potencial" });
-    savePersonas(); closeModal(); render();
+    const nota = document.getElementById('f_nota').value.trim();
+    const data = {
+      id: uid(), nombre,
+      telefono: document.getElementById('f_telefono').value.trim(),
+      pais: document.getElementById('f_pais').value.trim(),
+      facebook: document.getElementById('f_fb').value.trim(),
+      instagram: document.getElementById('f_ig').value.trim(),
+      tiktok: document.getElementById('f_tt').value.trim(),
+      tipo: document.getElementById('f_tipo').value,
+      ultimaNota: nota,
+      historial: nota ? [{fecha: todayStr(), texto: nota}] : [],
+      proximaAccion:"", proximaFecha:"", creado: todayStr()
+    };
+    personas.push(data);
+    savePersonas();
+    closeModal();
+    render();
   });
 }
 
 function openPersonaDetail(id){
-  const p = personas.find(x=>x.id===id); if(!p) return;
+  const p = personas.find(x=>x.id===id);
+  if(!p) return;
+  const hist = (p.historial||[]).slice().reverse();
   openModal(`
     <button class="close-x" onclick="closeModal()">✕</button>
-    <h3>${p.nombre}</h3>
-    <p>${p.ultimaNota||''}</p>
-    <div class="actions"><button class="btn-primary" onclick="closeModal()">Cerrar</button></div>
+    <h3 style="padding-right:34px;">Editar datos</h3>
+    <input id="d_nombre" placeholder="Nombre" value="${(p.nombre||'').replace(/"/g,'&quot;')}">
+    <input id="d_tel" placeholder="Teléfono" value="${(p.telefono||'').replace(/"/g,'&quot;')}">
+    <input id="d_pais" placeholder="País" value="${(p.pais||'').replace(/"/g,'&quot;')}">
+    <div style="display:flex;gap:8px;">
+      <input id="d_fb" placeholder="Facebook" style="flex:1;min-width:0;" value="${(p.facebook||'').replace(/"/g,'&quot;')}">
+      <input id="d_ig" placeholder="Instagram" style="flex:1;min-width:0;" value="${(p.instagram||'').replace(/"/g,'&quot;')}">
+      <input id="d_tt" placeholder="TikTok" style="flex:1;min-width:0;" value="${(p.tiktok||'').replace(/"/g,'&quot;')}">
+    </div>
+    <select id="d_tipo">
+      <option value="Potencial" ${p.tipo==='Potencial'?'selected':''}>Potencial</option>
+      <option value="P. Cliente" ${p.tipo==='P. Cliente'?'selected':''}>Potencial Cliente</option>
+      <option value="P. Socia" ${p.tipo==='P. Socia'?'selected':''}>Potencial Socia</option>
+      <option value="Cliente" ${p.tipo==='Cliente'?'selected':''}>Cliente</option>
+      <option value="Socia" ${p.tipo==='Socia'?'selected':''}>Socia</option>
+    </select>
+    <div class="section-title">Próxima acción</div>
+    <input id="d_accion" placeholder="Ej: Escribirle para retomar" value="${(p.proximaAccion||'').replace(/"/g,'&quot;')}">
+    <input id="d_fecha" type="date" value="${p.proximaFecha||''}">
+    <button type="button" class="cta" id="d_wa" style="background:var(--accent);color:var(--brand);margin-bottom:10px;">Enviar WhatsApp</button>
+    <div id="blockSocia" style="display:${p.tipo==='Socia'?'block':'none'}">
+      <div class="section-title">Equipo</div>
+      <select id="d_etapa">
+        ${['En inicio','En desarrollo','Activa','Creciendo','En formación'].map(o=>`<option ${p.etapa===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <input id="d_obj" placeholder="Objetivo (ej: su primer rango)" value="${(p.objetivo||'').replace(/"/g,'&quot;')}">
+    </div>
+    <div id="blockOtro" style="display:${p.tipo==='Socia'?'none':'block'}">
+      <div class="section-title">Compra / reposición</div>
+      <select id="d_categ">
+        <option value="">Categoría (Miembro / Minorista)</option>
+        <option value="Miembro" ${p.categoria==='Miembro'?'selected':''}>Miembro</option>
+        <option value="Minorista" ${p.categoria==='Minorista'?'selected':''}>Minorista</option>
+      </select>
+      <input id="d_prod" placeholder="Producto (ej: AP24, ageLOC)" value="${(p.producto||'').replace(/"/g,'&quot;')}">
+      <div style="display:flex;gap:8px;"><input id="d_compra" type="date" value="${p.ultimaCompra||''}"><input id="d_ciclo" type="number" min="1" placeholder="Ciclo (días)" value="${p.ciclo||''}"></div>
+    </div>
+    <div class="section-title">Agregar al historial</div>
+    <textarea id="d_nueva" placeholder="Qué pasó / qué se dijo" rows="2"></textarea>
+    <div class="actions">
+      <button class="btn-secondary" id="delP">Eliminar</button>
+      <button class="btn-primary" id="saveD">Guardar</button>
+    </div>
+    <div class="section-title" style="margin-top:14px;">Historial</div>
+    ${hist.length ? hist.map(h=>`<div class="detail-hist"><div class="d">${fmtFecha(h.fecha)}</div>${h.texto}</div>`).join('') : '<div class="empty">Sin historial aún</div>'}
   `);
+  document.getElementById('d_wa').addEventListener('click', ()=>{
+    const tel=document.getElementById('d_tel').value.trim();
+    const accion=document.getElementById('d_accion').value.trim();
+    const nom=(document.getElementById('d_nombre').value.trim()||'').split(' ')[0];
+    const link=waLink(tel, accion || ('Hola '+nom+'!'));
+    if(link) window.open(link,'_blank'); else alert('Esta persona no tiene teléfono cargado.');
+  });
+  document.getElementById('d_tipo').addEventListener('change', e=>{
+    const soc = e.target.value==='Socia';
+    document.getElementById('blockSocia').style.display = soc?'block':'none';
+    document.getElementById('blockOtro').style.display = soc?'none':'block';
+  });
+  document.getElementById('saveD').addEventListener('click', ()=>{
+    const nuevaTexto = document.getElementById('d_nueva').value.trim();
+    const historial = (p.historial||[]).slice();
+    if(nuevaTexto) historial.push({fecha: todayStr(), texto: nuevaTexto});
+    const nombreNuevo = document.getElementById('d_nombre').value.trim();
+    if(nombreNuevo) p.nombre = nombreNuevo;
+    p.telefono = document.getElementById('d_tel').value.trim();
+    p.pais = document.getElementById('d_pais').value.trim();
+    p.facebook = document.getElementById('d_fb').value.trim();
+    p.instagram = document.getElementById('d_ig').value.trim();
+    p.tiktok = document.getElementById('d_tt').value.trim();
+    p.tipo = document.getElementById('d_tipo').value;
+    p.proximaAccion = document.getElementById('d_accion').value.trim();
+    p.proximaFecha = document.getElementById('d_fecha').value;
+    p.historial = historial;
+    if(p.tipo==='Socia'){
+      p.etapa=document.getElementById('d_etapa').value; p.objetivo=document.getElementById('d_obj').value.trim();
+    } else {
+      p.categoria=document.getElementById('d_categ').value; p.producto=document.getElementById('d_prod').value.trim(); p.ultimaCompra=document.getElementById('d_compra').value; p.ciclo=document.getElementById('d_ciclo').value;
+      if(p.ultimaCompra&&p.tipo==='Potencial') p.tipo='Cliente';
+    }
+    if(nuevaTexto) p.ultimaNota = nuevaTexto;
+    savePersonas();
+    closeModal();
+    render();
+  });
+  document.getElementById('delP').addEventListener('click', ()=>{
+    personas = personas.filter(x=>x.id!==id);
+    savePersonas();
+    closeModal();
+    render();
+  });
+}
+
+function openEventoForm(editId){
+  const ev = editId ? eventos.find(x=>x.id===editId) : null;
+  const opciones = personas.map(p=>`<option value="${p.id}" ${ev&&ev.personaId===p.id?'selected':''}>${p.nombre}</option>`).join('');
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h3 style="padding-right:34px;">${ev?'Editar evento':'Agendar evento'}</h3>
+    <input id="e_titulo" placeholder="Título (ej: Llamada con...)" value="${ev?(ev.titulo||'').replace(/"/g,'&quot;'):''}">
+    <select id="e_tipo">
+      ${['Llamada','Reunión','Seguimiento','Capacitación','Evento','1:1','Tarea'].map(t=>`<option ${ev&&ev.tipo===t?'selected':''}>${t}</option>`).join('')}
+    </select>
+    <input id="e_fecha" type="date" value="${ev?ev.fecha:todayStr()}">
+    <input id="e_hora" type="time" value="${ev?(ev.hora||''):''}">
+    <select id="e_persona"><option value="">— Sin vincular —</option>${opciones}</select>
+    <input id="e_link" placeholder="Link de Zoom / Meet (opcional)" value="${ev?(ev.link||'').replace(/"/g,'&quot;'):''}">
+    <label class="sub" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;"><input type="checkbox" id="e_rep" style="width:auto;flex:none;" ${ev&&ev.recurrenciaId?'checked':''}> Se repite cada semana (mismo día y hora)</label>
+    <div id="e_repbox" style="display:${ev&&ev.recurrenciaId?'block':'none'};">
+      <input id="e_hasta" type="date" placeholder="Repetir hasta (opcional)">
+      <div class="sub" style="margin:-6px 0 8px;">Si no ponés fecha, se agenda por 3 meses.</div>
+    </div>
+    <div class="actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" id="saveE">Guardar</button>
+    </div>
+  `);
+  const erep=document.getElementById('e_rep'); if(erep) erep.addEventListener('change',e=>{ document.getElementById('e_repbox').style.display=e.target.checked?'block':'none'; });
+  document.getElementById('saveE').addEventListener('click', ()=>{
+    const titulo = document.getElementById('e_titulo').value.trim();
+    if(!titulo) return;
+    const tipo=document.getElementById('e_tipo').value, hora=document.getElementById('e_hora').value, personaId=document.getElementById('e_persona').value, link=document.getElementById('e_link').value.trim();
+    const fechaInicial=document.getElementById('e_fecha').value;
+    const repite=document.getElementById('e_rep').checked;
+    if(ev){
+      ev.titulo=titulo; ev.tipo=tipo; ev.hora=hora; ev.personaId=personaId; ev.link=link; ev.fecha=fechaInicial;
+      if(repite && !ev.recurrenciaId){
+        const recId=uid(); ev.recurrenciaId=recId;
+        let hasta=document.getElementById('e_hasta').value;
+        if(!hasta){ const d=new Date(fechaInicial+'T00:00:00'); d.setMonth(d.getMonth()+3); hasta=d.toISOString().slice(0,10); }
+        let fecha=fechaInicial;
+        while(true){
+          const d=new Date(fecha+'T00:00:00'); d.setDate(d.getDate()+7); fecha=d.toISOString().slice(0,10);
+          if(fecha>hasta) break;
+          eventos.push({id:uid(), titulo, tipo, fecha, hora, personaId, link, recurrenciaId:recId});
+        }
+      }
+      saveEventos(); closeModal(); render(); return;
+    }
+    const recId = repite ? uid() : null;
+    let hasta = repite ? document.getElementById('e_hasta').value : '';
+    if(repite && !hasta){ const d=new Date(fechaInicial+'T00:00:00'); d.setMonth(d.getMonth()+3); hasta=d.toISOString().slice(0,10); }
+    let fecha = fechaInicial;
+    while(true){
+      eventos.push({id:uid(), titulo, tipo, fecha, hora, personaId, link, recurrenciaId:recId});
+      if(!repite) break;
+      const d=new Date(fecha+'T00:00:00'); d.setDate(d.getDate()+7); fecha=d.toISOString().slice(0,10);
+      if(fecha>hasta) break;
+    }
+    saveEventos();
+    closeModal();
+    render();
+  });
 }
 
 boot();
 </script>
-
+<div id="loginRoot" style="display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:24px;"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc,collection,addDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
 const app=initializeApp({apiKey:"AIzaSyCZvCtnddspzVPtCC-FSCLgRwCRhqwrI3I",authDomain:"vico-mi-nuskin.firebaseapp.com",projectId:"vico-mi-nuskin",storageBucket:"vico-mi-nuskin.firebasestorage.app",messagingSenderId:"118400723901",appId:"1:118400723901:web:573520df4370d9a4e2c0d4"});
 const auth=getAuth(app);
 const fs=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
@@ -537,7 +1422,6 @@ window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||''}); };
 
 function showLogin(msg){
-  if(!lr) return;
   lr.style.display='flex';
   lr.innerHTML=`<div style="width:100%;max-width:340px;text-align:center;"><svg class="vico-mark-lg" viewBox="0 0 1080 569.95" xmlns="http://www.w3.org/2000/svg"><path d="M181.09,250.79c.24,40.41,9.58,82.79,31.62,117.21,19.04,29.74,55.91,36.68,74.05,2.07,15.54-29.64,16.32-62.52,26.63-93.71,15.11-45.72,48.17-69.51,96.5-65.8,22.76,1.74,22.65-33.73,0-35.46-67.23-5.15-114.66,35.15-132.71,98.42-3.99,13.99-5.92,28.42-9.01,42.61-1.75,8.02-6.42,36.21-13.41,38.85-15.73,5.94-27.46-38.08-30.07-46.74-5.67-18.8-8.03-37.84-8.15-57.44-.13-22.81-35.6-22.86-35.46,0h0Z"/><path d="M866.61,374.25c-28.42,20.88-74.34,28.06-106.84,13.17-17.07-7.8-29.61-22.56-36.66-39.72-15.96,17.25-35.6,30.85-58.16,39.06-34.53,12.5-83.03,11.62-111.67-14.45-12.28-11.17-20.7-26.55-24.83-43.13-16,23.67-34.44,47.79-60.16,59.54-30.99,14.19-61.09-.93-72.84-31.56-12.41-32.32-7.54-68.71-3.28-102.14,2.84-22.39,38.3-22.56,35.46,0-3.46,27.09-13.21,70.8,3.5,95.58,21.99,32.5,66.72-39.5,76.96-54.7,9.75-14.5,22.65-32.36,37.73-46.95,7.85-7.62,16.31-14.36,25.22-19.28.09-.04.13-.09.22-.09,18.97-10.46,40.03-12.59,61.89,2.53,18.53,12.86,1.86,42.65-17.87,30.63-30.68-18.62-56.12,19.2-54.13,46.73,1.82,25.76,16.58,41.94,41.05,47.57,53.29,12.28,99.57-27,120.36-72.57,9.53-20.88,39.59-2.7,30.63,17.91-10.2,23.45,10.86,52.98,34.14,56.26,18.97,2.66,41.85-.93,57.72-12.32,20.48-14.76,23.19-41.23,12.37-63.22-14.45-29.52-46.95-31.25-75.1-22.56-21.9,6.78-31.16-27.44-9.44-34.18,46.24-14.32,97.13-2.53,117.88,44.73,16,36.57,8.64,79.04-24.16,103.2Z"/><path d="M571.05,229.64c-8.91,4.92-17.38,11.66-25.22,19.28,7.09-8.16,15.74-14.76,25.22-19.28Z"/></svg><div style="font-size:11px;color:var(--sub);letter-spacing:1px;margin-bottom:22px;">MI OFICINA · CONCIENCIA EN ACCIÓN</div><input id="lg_mail" type="email" placeholder="Correo" autocomplete="username"><input id="lg_pass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="cta" id="lg_go">Entrar</button><a href="mailto:ezequiel135@hotmail.com?subject=Solicito%20acceso%20a%20VICO%20%C2%B7%20Mi%20Oficina&body=Hola!%20Me%20gustar%C3%ADa%20solicitar%20acceso%20a%20la%20app%20VICO%20%C2%B7%20Mi%20Oficina.%20Mi%20correo%20es%3A%20" class="cta" style="display:block;box-sizing:border-box;text-decoration:none;background:var(--accent);color:var(--brand);margin-top:10px;">Solicitar acceso</a><div id="lg_msg" style="color:#b3423a;font-size:13px;margin-top:10px;min-height:18px;">${msg||''}</div></div>`;
   const go=()=>{ const m=document.getElementById('lg_mail').value.trim(), p=document.getElementById('lg_pass').value; if(!m||!p) return;
@@ -550,8 +1434,7 @@ function addOut(){
   const b=document.createElement('button'); b.id='outBtn'; b.textContent='Salir';
   b.style.cssText='background:none;border:none;color:var(--sub);font-size:12px;';
   b.addEventListener('click',async()=>{ if(!confirm('¿Cerrar sesión en este dispositivo?')) return; await signOut(auth); ['personas','eventos','bloques','config'].forEach(k=>{try{localStorage.removeItem('vico_'+k);}catch(e){}}); location.reload(); });
-  const topHeader = document.querySelector('header.top');
-  if(topHeader) topHeader.appendChild(b);
+  document.querySelector('header.top').appendChild(b);
 }
 function listen(){
   const dirKey='vico_dirname_set_'+uid;
@@ -559,7 +1442,7 @@ function listen(){
     let nombre=prompt('¿Cómo querés que te vean los demás en los mensajes?', (auth.currentUser&&auth.currentUser.email||'').split('@')[0]);
     nombre=(nombre||'Usuario').trim()||'Usuario';
     window.miNombre=nombre;
-    setDoc(doc(fs,'directorio',uid),{nombre,email:(auth.currentUser&&auth.currentUser.email||'')}).catch(()=>{});
+    setDoc(doc(fs,'directorio',uid),{nombre,email:(auth.currentUser&&auth.currentUser.email)||''}).catch(()=>{});
     try{localStorage.setItem(dirKey,nombre);}catch(e){}
   } else {
     window.miNombre=localStorage.getItem(dirKey);
@@ -597,7 +1480,7 @@ function listen(){
 }
 onAuthStateChanged(auth,u=>{
   unsubs.forEach(f=>f()); unsubs=[]; first={}; done=0;
-  if(u){ uid=u.uid; if(lr) lr.style.display='none'; addOut(); listen(); }
+  if(u){ uid=u.uid; lr.style.display='none'; addOut(); listen(); }
   else { uid=null; showLogin(); }
 });
 </script>
