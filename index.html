@@ -203,6 +203,7 @@ function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(c
 
 async function boot(){
   loadLocal();
+  limpiarProspectosEjemplo(false);
   document.querySelectorAll('nav.bottom button').forEach(b=>{
     b.addEventListener('click', ()=>{ tab=b.dataset.tab; render(); });
   });
@@ -232,7 +233,7 @@ function render(){
   else if(tab==='mresumen') renderMResumen();
   else if(tab==='historial') renderHistorial();
   else if(tab==='progreso') renderProgreso();
-  else if(tab==='prospectos') renderProspectos();
+  else if(tab==='prospectos'){ renderProspectos(); autoSincronizarSheets(); }
   else renderMas();
 }
 
@@ -368,6 +369,15 @@ function renderProspectos(){
   const cfgB=document.getElementById('btnSheetsCfg'); if(cfgB) cfgB.addEventListener('click',openConfigSheets);
 }
 
+// Quita una sola vez los 30 prospectos de ejemplo (ids p1..p30 / lote*_p*). Los agregados a mano o desde Sheets no se tocan.
+function limpiarProspectosEjemplo(desdeNube){
+  if(localStorage.getItem('vico_prosp_limpio_v1')) return;
+  const antes=prospectos.length;
+  prospectos=prospectos.filter(p=>!/^(p\d+|lote\d+_p\d+)$/.test(String(p.id)));
+  if(prospectos.length!==antes){ saveProspectos(); }
+  if(desdeNube){ try{ localStorage.setItem('vico_prosp_limpio_v1','1'); }catch(e){} }
+}
+
 // ===== Lectura de prospectos desde Google Sheets (CSV) =====
 function parseCSV(text){
   text=String(text||'').replace(/^\uFEFF/,'');
@@ -411,7 +421,7 @@ function importarProspectosCSV(text,opts){
       intereses:get(r,'intereses'), evidencia:get(r,'evidencia'), motivo:get(r,'motivo'), tema:get(r,'tema'), afinidad:get(r,'afinidad'), notas:get(r,'notas')};
     const k=keyProspecto(datos); if(vistos.has(k)) return; vistos.add(k); total++;
     const ex=prospectos.find(x=>keyProspecto(x)===k);
-    if(ex){ Object.entries(datos).forEach(([f,v])=>{ if(v) ex[f]=v; }); actualizados++; }
+    if(ex){ let ch=false; Object.entries(datos).forEach(([f,v])=>{ if(v && ex[f]!==v){ ex[f]=v; ch=true; } }); if(ch) actualizados++; }
     else { prospectos.push({id:'sh_'+k.replace(/[^a-z0-9]+/g,'_'), ...datos, estado:mapEstado(get(r,'estado'))}); nuevos++; }
   });
   if(opts&&opts.quitar){
@@ -419,7 +429,7 @@ function importarProspectosCSV(text,opts){
     prospectos=prospectos.filter(p=>p.estado!=='Pendiente'||vistos.has(keyProspecto(p)));
     quitados=antes-prospectos.length;
   }
-  saveProspectos();
+  if(nuevos||actualizados||quitados) saveProspectos();
   return {nuevos,actualizados,quitados,total};
 }
 function toCsvUrl(input){
@@ -433,18 +443,29 @@ function toCsvUrl(input){
   return 'https://docs.google.com/spreadsheets/d/'+m[1]+'/gviz/tq?tqx=out:csv&gid='+gid;
 }
 async function sincronizarSheets(opts){
-  const btn=document.getElementById('btnSheets'); if(btn){ btn.disabled=true; btn.textContent='Leyendo…'; }
+  const silent=!!(opts&&opts.silent);
+  const btn=document.getElementById('btnSheets'); if(btn&&!silent){ btn.disabled=true; btn.textContent='Leyendo…'; }
   try{
     const res=await fetch(toCsvUrl(config.sheetsUrl),{cache:'no-store'});
     if(!res.ok) throw new Error('Google respondió '+res.status+'.');
     const txt=await res.text();
     if(/^\s*<(!doctype|html)/i.test(txt)) throw new Error('La hoja no es pública, así que no puedo leerla. Publicala en la web (Archivo → Compartir → Publicar en la web → CSV) o importá un archivo CSV.');
     const r=importarProspectosCSV(txt,opts);
-    alert('Listo: '+r.nuevos+' nuevos, '+r.actualizados+' actualizados'+(r.quitados?', '+r.quitados+' pendientes quitados':'')+' ('+r.total+' filas leídas).');
+    window.lastSheetsSync=Date.now();
+    if(silent){ if(r.nuevos&&tab==='prospectos') renderProspectos(); return r; }
+    alert('Listo: '+(r.nuevos?r.nuevos+' nuevos':'sin prospectos nuevos')+(r.actualizados?', '+r.actualizados+' actualizados':'')+(r.quitados?', '+r.quitados+' pendientes quitados':'')+' ('+r.total+' filas leídas).');
   }catch(e){
+    if(silent) return null;
     alert('No pude leer la hoja: '+(e&&e.message?e.message:e)+(/Failed to fetch|NetworkError|Load failed/i.test(String(e))?'\nPuede que la hoja no esté publicada o que falte conexión.':''));
   }
   renderProspectos();
+}
+// Al entrar a Prospectos, si ya hay hoja conectada, la lee sola (como mucho cada 5 minutos).
+function autoSincronizarSheets(){
+  if(!config.sheetsUrl) return;
+  if(window.lastSheetsSync && Date.now()-window.lastSheetsSync<5*60000) return;
+  window.lastSheetsSync=Date.now();
+  sincronizarSheets({quitar:false,silent:true});
 }
 function openConfigSheets(){
   openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">Conectar con Google Sheets</h3>
@@ -463,7 +484,7 @@ function openConfigSheets(){
   document.getElementById('sh_file').addEventListener('change',e=>{
     const f=e.target.files[0]; if(!f) return; const quitar=document.getElementById('sh_quitar').checked;
     const fr=new FileReader();
-    fr.onload=()=>{ try{ const r=importarProspectosCSV(fr.result,{quitar}); closeModal(); alert('Listo: '+r.nuevos+' nuevos, '+r.actualizados+' actualizados'+(r.quitados?', '+r.quitados+' pendientes quitados':'')+'.'); }catch(err){ alert('No pude leer el archivo: '+err.message); } renderProspectos(); };
+    fr.onload=()=>{ try{ const r=importarProspectosCSV(fr.result,{quitar}); closeModal(); alert('Listo: '+(r.nuevos?r.nuevos+' nuevos':'sin prospectos nuevos')+(r.actualizados?', '+r.actualizados+' actualizados':'')+(r.quitados?', '+r.quitados+' pendientes quitados':'')+'.'); }catch(err){ alert('No pude leer el archivo: '+err.message); } renderProspectos(); };
     fr.readAsText(f,'utf-8');
   });
 }
@@ -1674,7 +1695,7 @@ function listen(){
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
         if(done===8) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
-        setCur(n,cloud); render(); return;
+        setCur(n,cloud); if(n==='prospectos'&&typeof limpiarProspectosEjemplo==='function') limpiarProspectosEjemplo(true); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
     },()=>{}));
