@@ -1365,6 +1365,17 @@ function pubAvanzar(p,render_){
   p.hechos=[]; p.comp=false; p.fecha='';
   savePubli(); if(render_) renderPublicidad();
 }
+const PUB_FILES = {};
+function pubPrefetch(id){
+  if(PUB_FILES[id]!==undefined) return;
+  PUB_FILES[id]=null;
+  fetch('https://drive.google.com/thumbnail?id='+id+'&sz=w2000').then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{
+    if(!b.type||b.type.indexOf('image/')!==0||b.size<500) throw 0;
+    const ext=b.type.indexOf('png')>-1?'png':'jpg';
+    PUB_FILES[id]=new File([b],'vico-'+id.slice(0,8)+'.'+ext,{type:b.type});
+    const el=document.querySelector('[data-pshare="'+id+'"]'); if(el) el.textContent='Compartir imagen';
+  }).catch(()=>{ PUB_FILES[id]=false; });
+}
 function renderPublicidad(){
   const p=pubEstado(), items=PUB_DATA[p.dia]||[], hechos=new Set(p.hechos||[]);
   const nHechos=items.filter(it=>hechos.has(it[1])).length;
@@ -1382,7 +1393,7 @@ function renderPublicidad(){
         <div style="flex:1;min-width:0;">
           <div style="font-weight:600;font-size:14px;color:var(--brand);">${vid?'Video':'Imagen'} ${i+1} ${ok?'✓':''}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-            <button class="cta" data-pshare="${id}" style="padding:8px 12px;font-size:13px;margin:0;width:auto;">Compartir en WhatsApp</button>
+            <button class="cta" data-pshare="${id}" data-ptipo="${tipo}" style="padding:8px 12px;font-size:13px;margin:0;width:auto;">${PUB_FILES[id]?'Compartir imagen':'Compartir en WhatsApp'}</button>
             <a href="${link(id)}" target="_blank" rel="noopener" class="chip" style="text-decoration:none;">Ver</a>
             <div class="chip ${ok?'active':''}" data-ptog="${id}">${ok?'Hecho ✓':'Marcar hecho'}</div>
           </div>
@@ -1404,10 +1415,15 @@ function renderPublicidad(){
   document.getElementById('back').addEventListener('click',()=>{ tab='mas'; render(); });
   const toggle=(id,force)=>{ const h=new Set(p.hechos||[]); if(force===true) h.add(id); else if(h.has(id)) h.delete(id); else h.add(id); p.hechos=[...h]; savePubli(); renderPublicidad(); };
   document.querySelectorAll('[data-pshare]').forEach(b=>b.addEventListener('click',()=>{
-    const id=b.dataset.pshare, txt='Mira esto 💜 '+link(id);
-    window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+    const id=b.dataset.pshare, f=PUB_FILES[id];
+    if(f && navigator.canShare && navigator.canShare({files:[f]})){
+      navigator.share({files:[f]}).then(()=>toggle(id,true)).catch(()=>{});
+      return;
+    }
+    window.open('https://wa.me/?text='+encodeURIComponent('Mira esto 💜 '+link(id)),'_blank');
     toggle(id,true);
   }));
+  items.forEach(it=>{ if(it[0]==='I') pubPrefetch(it[1]); });
   document.querySelectorAll('[data-ptog]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.ptog)));
   const d=document.getElementById('pubDone'); if(d&&todos) d.addEventListener('click',()=>{ p.comp=true; p.fecha=hoy; savePubli(); renderPublicidad(); });
   const n=document.getElementById('pubNext'); if(n) n.addEventListener('click',()=>pubAvanzar(p,true));
