@@ -1366,15 +1366,31 @@ function pubAvanzar(p,render_){
   savePubli(); if(render_) renderPublicidad();
 }
 const PUB_FILES = {};
-function pubPrefetch(id){
+const PUB_API_KEY = 'AIzaSyCORSwyWLaIzO300aAlWB2VIKkK_uIoltA'; // clave de Google Drive API (restringida a Drive API y a este sitio)
+let pubQueue = Promise.resolve();
+function pubUrl(id,tipo){
+  return PUB_API_KEY ? 'https://www.googleapis.com/drive/v3/files/'+id+'?alt=media&key='+PUB_API_KEY
+                     : (tipo==='I' ? 'https://drive.google.com/thumbnail?id='+id+'&sz=w2000' : null);
+}
+function pubLabel(id,tipo){
+  const f=PUB_FILES[id];
+  if(f) return tipo==='V'?'Compartir video':'Compartir imagen';
+  if(f===false || (!PUB_API_KEY && tipo==='V')) return 'Compartir enlace';
+  return PUB_API_KEY ? 'Preparando…' : 'Compartir en WhatsApp';
+}
+function pubPrefetch(id,tipo){
   if(PUB_FILES[id]!==undefined) return;
+  const url=pubUrl(id,tipo);
+  if(!url){ PUB_FILES[id]=false; return; }
   PUB_FILES[id]=null;
-  fetch('https://drive.google.com/thumbnail?id='+id+'&sz=w2000').then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{
-    if(!b.type||b.type.indexOf('image/')!==0||b.size<500) throw 0;
-    const ext=b.type.indexOf('png')>-1?'png':'jpg';
-    PUB_FILES[id]=new File([b],'vico-'+id.slice(0,8)+'.'+ext,{type:b.type});
-    const el=document.querySelector('[data-pshare="'+id+'"]'); if(el) el.textContent='Compartir imagen';
-  }).catch(()=>{ PUB_FILES[id]=false; });
+  pubQueue=pubQueue.then(()=>fetch(url).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{
+    const t=b.type||'';
+    if(!(t.indexOf('image/')===0||t.indexOf('video/')===0)||b.size<500) throw 0;
+    const ext=t.indexOf('png')>-1?'png':t.indexOf('video/')===0?(t.indexOf('quicktime')>-1?'mov':'mp4'):'jpg';
+    PUB_FILES[id]=new File([b],'vico-'+id.slice(0,8)+'.'+ext,{type:t});
+  }).catch(()=>{ PUB_FILES[id]=false; }).then(()=>{
+    const el=document.querySelector('[data-pshare="'+id+'"]'); if(el) el.textContent=pubLabel(id,tipo);
+  }));
 }
 function renderPublicidad(){
   const p=pubEstado(), items=PUB_DATA[p.dia]||[], hechos=new Set(p.hechos||[]);
@@ -1393,7 +1409,7 @@ function renderPublicidad(){
         <div style="flex:1;min-width:0;">
           <div style="font-weight:600;font-size:14px;color:var(--brand);">${vid?'Video':'Imagen'} ${i+1} ${ok?'✓':''}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-            <button class="cta" data-pshare="${id}" data-ptipo="${tipo}" style="padding:8px 12px;font-size:13px;margin:0;width:auto;">${PUB_FILES[id]?'Compartir imagen':'Compartir en WhatsApp'}</button>
+            <button class="cta" data-pshare="${id}" data-ptipo="${tipo}" style="padding:8px 12px;font-size:13px;margin:0;width:auto;">${pubLabel(id,tipo)}</button>
             <a href="${link(id)}" target="_blank" rel="noopener" class="chip" style="text-decoration:none;">Ver</a>
             <div class="chip ${ok?'active':''}" data-ptog="${id}">${ok?'Hecho ✓':'Marcar hecho'}</div>
           </div>
@@ -1416,6 +1432,7 @@ function renderPublicidad(){
   const toggle=(id,force)=>{ const h=new Set(p.hechos||[]); if(force===true) h.add(id); else if(h.has(id)) h.delete(id); else h.add(id); p.hechos=[...h]; savePubli(); renderPublicidad(); };
   document.querySelectorAll('[data-pshare]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.pshare, f=PUB_FILES[id];
+    if(f===null && PUB_API_KEY){ return; }
     if(f && navigator.canShare && navigator.canShare({files:[f]})){
       navigator.share({files:[f]}).then(()=>toggle(id,true)).catch(()=>{});
       return;
@@ -1423,7 +1440,7 @@ function renderPublicidad(){
     window.open('https://wa.me/?text='+encodeURIComponent('Mira esto 💜 '+link(id)),'_blank');
     toggle(id,true);
   }));
-  items.forEach(it=>{ if(it[0]==='I') pubPrefetch(it[1]); });
+  items.forEach(it=>pubPrefetch(it[1],it[0]));
   document.querySelectorAll('[data-ptog]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.ptog)));
   const d=document.getElementById('pubDone'); if(d&&todos) d.addEventListener('click',()=>{ p.comp=true; p.fecha=hoy; savePubli(); renderPublicidad(); });
   const n=document.getElementById('pubNext'); if(n) n.addEventListener('click',()=>pubAvanzar(p,true));
