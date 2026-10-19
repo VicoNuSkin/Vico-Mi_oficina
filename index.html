@@ -1368,6 +1368,8 @@ function pubAvanzar(p,render_){
 const PUB_FILES = {};
 const PUB_API_KEY = 'AIzaSyCORSwyWLaIzO300aAlWB2VIKkK_uIoltA'; // clave de Google Drive API (restringida a Drive API y a este sitio)
 let pubQueue = Promise.resolve();
+const PUB_ERR = {};
+function pubDiagHtml(){ const e=Object.values(PUB_ERR); return e.length?'<div class="card" style="font-size:12px;color:#b3423a;">No se pudo preparar el archivo para compartir directo.<br><b>Motivo:</b> '+e[0]+'<br><span style="color:var(--sub)">Mientras tanto se compartirá el enlace.</span></div>':''; }
 function pubUrl(id,tipo){
   return PUB_API_KEY ? 'https://www.googleapis.com/drive/v3/files/'+id+'?alt=media&key='+PUB_API_KEY
                      : (tipo==='I' ? 'https://drive.google.com/thumbnail?id='+id+'&sz=w2000' : null);
@@ -1383,12 +1385,13 @@ function pubPrefetch(id,tipo){
   const url=pubUrl(id,tipo);
   if(!url){ PUB_FILES[id]=false; return; }
   PUB_FILES[id]=null;
-  pubQueue=pubQueue.then(()=>fetch(url).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{
+  pubQueue=pubQueue.then(()=>fetch(url).then(r=>{ if(!r.ok) return r.text().then(t=>{ let m=''; try{ m=JSON.parse(t).error.message; }catch(e){} throw ('Error '+r.status+(m?': '+m:'')); }); return r.blob(); }).then(b=>{
     const t=b.type||'';
-    if(!(t.indexOf('image/')===0||t.indexOf('video/')===0)||b.size<500) throw 0;
+    if(!(t.indexOf('image/')===0||t.indexOf('video/')===0)||b.size<500) throw ('Tipo de archivo inesperado ('+(t||'vacío')+', '+b.size+' bytes): Drive no entregó el archivo (¿carpeta sin compartir?)');
     const ext=t.indexOf('png')>-1?'png':t.indexOf('video/')===0?(t.indexOf('quicktime')>-1?'mov':'mp4'):'jpg';
     PUB_FILES[id]=new File([b],'vico-'+id.slice(0,8)+'.'+ext,{type:t});
-  }).catch(()=>{ PUB_FILES[id]=false; }).then(()=>{
+  }).catch(er=>{ PUB_FILES[id]=false; PUB_ERR[id]=(typeof er==='string')?er:('No se pudo descargar: '+(er&&er.message?er.message:'red o permisos (CORS)')); }).then(()=>{
+    const dg=document.getElementById('pubDiag'); if(dg) dg.innerHTML=pubDiagHtml();
     const el=document.querySelector('[data-pshare="'+id+'"]'); if(el) el.textContent=pubLabel(id,tipo);
   }));
 }
@@ -1427,7 +1430,7 @@ function renderPublicidad(){
   $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div></div>
     <div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:18px;font-weight:700;color:var(--brand);">Día ${p.dia} de 30</div><div style="font-size:12px;color:var(--sub);">${p.ciclos?('Ciclo '+(p.ciclos+1)+' · '):''}${nHechos}/${items.length} hechos</div></div>
     <div style="height:8px;background:var(--accent);border-radius:6px;margin-top:10px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--brand);"></div></div></div>
-    <div class="list-grid">${cards}</div>${pie}`;
+    <div id="pubDiag">${pubDiagHtml()}</div><div class="list-grid">${cards}</div>${pie}`;
   document.getElementById('back').addEventListener('click',()=>{ tab='mas'; render(); });
   const toggle=(id,force)=>{ const h=new Set(p.hechos||[]); if(force===true) h.add(id); else if(h.has(id)) h.delete(id); else h.add(id); p.hechos=[...h]; savePubli(); renderPublicidad(); };
   document.querySelectorAll('[data-pshare]').forEach(b=>b.addEventListener('click',()=>{
