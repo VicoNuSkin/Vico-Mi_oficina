@@ -155,7 +155,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [], publi = [];
 let tab = "inicio", filtro = "Todos", prospectoFiltro = "Todos";
 
 const $main = document.getElementById('main');
@@ -190,6 +190,7 @@ function loadLocal(){
   try{ rutinas = JSON.parse(localStorage.getItem('vico_rutinas')||'[]'); }catch(e){ rutinas = []; }
   try{ prospectos = JSON.parse(localStorage.getItem('vico_prospectos')||'[]'); }catch(e){ prospectos = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
+  try{ publi = JSON.parse(localStorage.getItem('vico_publi')||'[]'); }catch(e){ publi = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
 function savePersonas(){ try{ localStorage.setItem('vico_personas', JSON.stringify(personas)); }catch(e){} }
@@ -199,6 +200,7 @@ function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.str
 function saveCampanas(){ try{ localStorage.setItem('vico_campanas', JSON.stringify(campanas)); }catch(e){} }
 function saveProspectos(){ try{ localStorage.setItem('vico_prospectos', JSON.stringify(prospectos)); }catch(e){} }
 function saveRutinas(){ try{ localStorage.setItem('vico_rutinas', JSON.stringify(rutinas)); }catch(e){} }
+function savePubli(){ try{ localStorage.setItem('vico_publi', JSON.stringify(publi)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
 async function boot(){
@@ -233,6 +235,7 @@ function render(){
   else if(tab==='mresumen') renderMResumen();
   else if(tab==='historial') renderHistorial();
   else if(tab==='progreso') renderProgreso();
+  else if(tab==='publicidad') renderPublicidad();
   else if(tab==='prospectos'){ renderProspectos(); autoSincronizarSheets(); }
   else renderMas();
 }
@@ -582,6 +585,7 @@ function renderMas(){
       <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
       <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
       <div class="row" id="goHist"><span class="dot"></span><div><div class="t">Historial de Mover mi Oficina</div><div class="sub">Tus días guardados</div></div></div>
+      <div class="row" id="goPub"><span class="dot"></span><div><div class="t">Publicidad</div><div class="sub">Contenido diario de 30 días para compartir</div></div></div>
       <div class="row" id="goProg"><span class="dot"></span><div><div class="t">Mi Progreso</div><div class="sub">Estadísticas y calendario de constancia</div></div></div>
     </div>
   `;
@@ -595,6 +599,7 @@ function renderMas(){
   document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
   document.getElementById('goHist').addEventListener('click', ()=>{ tab='historial'; render(); });
   document.getElementById('goProg').addEventListener('click', ()=>{ tab='progreso'; render(); });
+  document.getElementById('goPub').addEventListener('click', ()=>{ tab='publicidad'; render(); });
 
 }
 
@@ -1345,6 +1350,70 @@ function openDetalleBloque(id){
 }
 
 function sumarDias(fechaStr, n){ const d=new Date(fechaStr+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+
+// ===== PUBLICIDAD (30 días) =====
+const PUB_DATA = {"1":[["I","1kIfjDjvfZLf_-3vmQX6pbw1Gp5HI-APy"],["I","1KquKe_IgI6QGBsX2nblHCpguBhZcyg7R"],["I","1DavvTNFtwJVoYGLlySiXGUplOtIxFoCg"],["V","1hMSB1DtH_19q0QNnE3xh37ii07XI9Hpx"]],"2":[["I","1OG99GReAretim0w07G-42zi_gB7yUo17"],["I","1JMp3_iki-bHCIaUjzD4duDCTGYonyl1b"],["I","1eSDdOxC3nj8bGc5UkxDwa257Y2sTBcn2"],["I","1k_fMZwHr3HEqBv2PmIJaW1cX2o85X0ua"],["I","1Go73SPbPDmf5n04Bua3_8lq2H_tzZ5Sv"],["I","1UIsTV9BZAqJ2oajvkJLbavRiKS9QeGlG"],["I","1fis2yXyq5Xt0U70tB5GISim7Bv1HDqNK"]],"3":[["I","1ztOAdy9rdcETjLimPf7blFBx6zgJW13F"],["I","1N8HpnmomGDSAjLVF0kki2nCX67KnTPoc"],["I","13MGV5Q9fueu4T-AZZaJP2w0EIpu2-k1m"],["I","1hFCwonIE1gBB6ArJ4tzq-PSkC1KgdjpJ"],["I","1--q0Rh24jf_fpW76e5YOoS9URjKkwAhx"],["I","11t2br_5PEt3UsKOpMBavA7L3bmcJTXJf"]],"4":[["I","1hXTftvEKoZY4MUJ7Wnf2EFQU2SmjfwHO"],["I","1bO5ANwRoU8JkLoXQPZnAGyybUretK2nD"],["I","1SCGdNOZ6rxdKxtOUtBFwWOOBfl36MpNk"],["I","1QOlymmBuVT-3ZAdWmuqKaRpUsiI0hM5i"],["I","1_4hx94kMsrl3IkYEczzNIVLgRx3KKEEy"],["I","1Wps7M7LLA36GAYBAADkVypJB4fa1hyzN"]],"5":[["I","1_E2doLiQSyjAO5P5pqcXAwTRVv2727wz"],["I","1lY0D57cgHDzkNiuoLOvySkk8JvD7k5Zn"],["I","1LemjV3wK9ypUxsVDGiScx7Sn4N4mzbA_"],["I","1BYXrk5UHb1lZr6JwlImuLoXr0E83p3Y_"],["I","1JhKHnBVrj63Em_exzBrN19fT7FfNDqJN"],["V","1YeO9xrR_vEfNUFBXp4Pr3Saah99mVVEV"]],"6":[["I","1MOBUvtwGdzO1mTpBsW23sCgRDnhsmCC7"],["I","1acU-lbnnXp1GLqly85r_GXiidJRL7fA9"],["I","1xtpf_AO-axQEJOIMC1qsnTAHbuxT_9W2"],["V","1-9D8eHKrfoa1V6sedtkZrI6WrmhAErMJ"]],"7":[["I","1-wYkLmj_q8lCLdagfrRAk1yxlKFUPpGG"],["I","1QSn1ASsap6XPFF9IM0ahU7vgTNn5WQGQ"],["I","1Su3OeJCZucqV9LAOuROO_v5Z-KUzbkE5"],["I","11RJ9Bwf9qwRqUvRisK71PAA_d3lKUB-R"],["I","163Qxon8eR1oZVguZj0hR4ttfQ1LcRbyp"],["V","1tCE6LSF5bOg9I5FhRCK-Osu-TmMVaAU8"]],"8":[["V","1_2w_cO2KbOi61Zt3Jou4EsD9BNhG9I-p"],["V","10jTgLrMk-E8BsnJm7NqUdAujXeIPOtcM"],["V","1lf0316ZMM3qAJ8vtF8k5sHN5dFAdBhIg"],["I","1liExbqScsNR3FhOD40swcYAFUiyN1SjQ"],["I","1Cbj1Bi6UAIxTcKUuQyj69RHbuLfnAQkq"],["I","1fdY866rUM9lbvnaF_IVrdWLP7p1BhZxh"]],"9":[["I","1maJD66yKtq9crc-DcNpK9emiX2jIx-Co"],["I","1zshATpK7ar4GTVHPKI-JE3F0s4pqbIuT"],["I","1kwWTuu_x9hzfQH_UO-STgrU55-DPd0jF"],["V","1-2Mg2eiqe3zu5WrmsqeasjhOkUbQ17Tb"],["I","1gaUSeSqxYA7LNgltijpgB5tOGNTTfvzm"]],"10":[["I","1vGLeC5HON7I0NXIPeC3vjeOTwecuJItw"],["I","1y0VW_u4c6xh1XKjhDUqehb0hTNsRRi3w"],["I","11Xd7AYDvl-eZJD6N1KcHnAwX23aDg7-G"],["I","1RY3NYzijQ32Clb1_5BWFlEmdBlr9AzsE"],["I","1JgNzz5UReYCsu8TUq_oPO5IqSmppveIX"],["I","1wQQMkK-eIsWa77aqkHzrdnNcDhPRgh17"]],"11":[["V","1KwTngIQydWevTo7XVz-WN_zy5fnjY-zD"],["I","1_kCTkWFFbsjQHr67ew7jyTF_Yx3w-gP5"],["I","1sFyGLsqxmPg04Tz2nj1q0P-krPip1gMr"],["I","1F6gt6-LF6eCsL8JUGXkHPqGOufTkHU1p"],["I","1K75BwPJCnm8kweYasJHMZV0x2Dz7_IEx"],["I","11ak0WDi6Fu3GS32hbjNWEPe4SKIIYxjY"],["I","1AG3CeRzmvSZkmuteaA6ac__4lU352mFX"]],"12":[["V","1Groim4F8_q60sKvu-iO2b3VGb-YyhezG"],["V","1cm1wQPmg33iH0b3HKtsQ-L237Gg0ZUTp"],["V","1ITA7MxAlmkGaCHQdX5nvj3P4wovIpOHL"],["V","1d2v2wg7HaFRWkNECCDdz-HyKHhxe_A9n"],["V","1mSUCuplGvy69MfhN136rOqEmfXaqwe07"],["V","1ZvcYpPFIeeVQI6HfruUWI9o6HfvbE0gk"],["V","1MSNsDVe2Gyj4e5OOcdT7PWhoUaiU-mW9"],["V","1Q5-sPCy7D302xnOkWrIJtXqGOTFm6JFQ"]],"13":[["V","100pCL_HQH1i5XB8OpPPzXr5UprPTpQPe"],["I","1uF3-ox8g4RsoBwf5zz0lj1vGaXM1XNXJ"],["V","1ca8nKrW9ic0m4VrRrKOGhEfyWclAn-sc"],["I","124U7LUE3Ml4fNj3zQHsCDK0_X3Dg1s5k"],["I","1BCPwhY7EEypzUuue-R_wGEe4G1rzvTvm"],["I","13QqZ4u1FRoYAnfZLWq3HlARm5QM19tZy"],["I","1KAIFmb35D9AYwlLQt8vfh6LG0M_VDg78"]],"14":[["I","15W0od4ErnU7w1zwOfDclsr8BHN93o_PM"],["V","1Ub1PD9ckbVjk8eW836gNJWIEsTOOqMdp"],["V","1nwab1Mf9USIaxrouA_UpZMbWLi1eV9xS"],["I","1miH_HMcouivdzPad0RdLDb_QfrTD_tRj"],["I","1y8cvx-PP-oLlGrTE2E16XoRdwjIMjyia"],["I","1_nKMVybOU2edzcezUZaOtfN6HA9KzLLj"]],"15":[["V","1BOmJqpL-aeu8mtkFEiqVQ-YQ04WsN_NF"],["V","1Woqxgl0HSy_Nk06yGQ-nX6Z0yrxCxONC"],["V","14Cjt7Zx2-ZmYQ4qGpjU96QKhCs5L0Gjc"],["V","1H-INtuJh6g1h5q8S5wpPxOp-PQArVOWB"],["I","16n6PQGaK75K3_XTKakRLTukuWNHO6jgw"],["V","1dhDLnDSQ2qNTUDGGRrirW_EvJ0iuxcoP"]],"16":[["V","1dJwr0sy2ssc25kK-45BwtuUeVrcBPAFG"],["V","1I-USIIPlGmWfcJymAe_pfveo5U731C2U"],["I","1BQUByoDDFZmZ_ekVdH2QjbKqko8OJMPF"],["I","1QUIwVYrs8W27hStxgVhplM5mm_osSkUp"],["V","163LQIO2Tma8Kk6U27822Tlh_v4cQCI2L"]],"17":[["I","1xxXAJbwY8o2NeaUMtQGqsSj4kavij97n"],["I","1qiFdXZhQIAGqpZuTuYZ_H_AynlvCR-wW"],["I","1wRtaWwKbOJ7l5RiEnzrzzGVejgQzHTf5"],["V","1Pj8dJFRvitnDgt8JtIHUqT1aIsxQM42q"],["V","1CJA_QLvLoOZh4kBcYxKtCkYqasxLUcZ7"],["I","15JK8FTKO_XjR5PyUAtj8Tow20gRSau9c"]],"18":[["I","1D2Ny-QEIrpqrfcvehYNL1WuajnjNr_Ot"],["V","1Pz_iDH95IUxG_Xa5KavO4QcBhX4PgEuO"],["V","1b94zwnxLgpyvcvinmRwg-KF2J2Kmh50m"],["V","1hgrxsxbJpEfWE1h3zxMq3sUMOm5eQria"],["V","12sx3VTVqFhMmac0xjaq3qbqX8HbBHSnL"]],"19":[["I","1M3kwaoWQkv8nHVBrnz6pQWdrrsGUHUjJ"],["I","1EOjw7KfAYvpFXhiFgkmUZ40FijaCfj6G"],["V","1hGE3M3qqJvE0baARc1d_cngWDnfUwZ53"],["I","18qnU9Y38p2P7jLv6LAYLkHr1VBLGkseg"],["I","1LRSS8YikQKUiMcKpr8QIJD2WniNzovj2"],["I","1ZcNSh7mVj_ExlOnHbIeL3xAHNdYtnXJQ"]],"20":[["V","1gCXG0QULotyYK9Z8dX81JDphu3BJ66_d"],["I","1uYQ3gpbZUMlXUS0ah06cF81oPOJ1QJoh"],["V","1-vRXCQ1YE431I56nyFo-JvPbO4VAS8gZ"],["I","173rWrdU47XJU6MYUWc9JM6t9KZuNf-Fx"],["V","1NzOXheIzEP08Nnw46igqnFG_q48g1bwD"],["V","1h5Ca1--xQgAaBLFdhVUwSwOV3HF3I4mI"],["I","1aCewwfUUO44u5DJwdBpwe_fZlUEsaaAv"],["I","1qvdgFvWX9x58BgRck7Bjmqr6fOlrnW4b"]],"21":[["V","1TbP5GuhoVuqwZ3ESxCHUzq0EW8J69oqf"],["I","1XlmUz2_0Fx6z7kOWhOMTYwQmiRQ9Tb0g"],["I","1K7Qtf2wJ73AtStI9Ksd_nZtSkV6WvNE6"],["I","1aYHgcYn_T_WzUx51Qo1FqhwP5y-PEQpj"],["I","12zQ2IPUWG1uhEw49EIJd50DITJlg4838"],["V","1ktva_VD_XhyT_ksnvb8d27hgmeiLITUA"]],"22":[["I","1ZB9zFkYCwg-Z-i7TGt2l8FmfNeffmatI"],["I","1RiK1qr9r9vxiiel3AFbjKHsR8IocYVmc"],["I","10VAlPJlUOml7oMx1aWipGh3K7m7bTiX3"],["I","1BX6HoUWqmBFpDRwzPxIJEf4ejyww2IM3"],["V","1vxFMxg45XRCfVRsMA_SgTicMVaHGUwh-"],["I","1Kd48feaBFrzpZhd0Wrnkxo4SZgabd83W"]],"23":[["V","1pDC-ISicmyzNA4Lp8Qg1L8-lUof9badR"],["I","1MGzxQZkBbemFcNcN7vl5BZjwIqfVbdv5"],["I","1VE5tJgfAUPro59GSeTiEV8xt4Y4oWQBu"],["I","1mhDU6uHPb_jHZUYfqeKtTbK_pSs3GtyD"],["I","1tWLefEEgOfT9oiX4EaLJM8H5eL2fQ7g9"],["V","1kv_o67e-N9Y1sXVhaMnksQ5tNyN9iX0u"]],"24":[["I","14Skc1vNa1pTL8DZNQlOOfFZDAZhPMd7g"],["I","19AkgUqKptwjCIExEugNgAhXWT9hhcVBe"],["I","1kAY6ESXNK6ipvBNNd2X8QLrF5_hr_Fw1"],["V","1pBofD7pBQB-7GuWnxQ5yN-mP_ycJ-62R"],["I","1E-DklPfBjmfTwo3lI0zI1QD5JZPuVxzj"],["I","1YpzjEJUBOXdrZNMXuHc43mk2ssDUZOt6"]],"25":[["V","1POfivegmGZIBOEI5Cy_y_FZxAX1zjmj_"],["I","1W_oPoQVzxoXyks_r_tzKXVsws4QnI1VG"],["I","1o3rxcU0Zg7cOoDcUt5Hckd7LxQzrFG_H"],["I","1jePBFt79pS3Lt5G5pz0Bv1SCocZ2eQWk"],["I","1stRR9f2ra4_g9wbBxTKW88hPhV7HB-RI"],["I","1iJ_Ch6jwvR_x3X0klYkurW2YVRzTOORi"]],"26":[["V","1SdYqrf1pqMkyzumE3fmqPCVLmGbusZQr"],["I","1avI3aRGCZSj-h25bOuSkxq369gROHzwd"],["I","1GZezGA835h-u3KCBNp1ohY79l9OBS1qM"],["I","1CD3NcAO-wQJ1WHkLWEXxCrBOJEoLOckP"],["I","1c4ddOQVymbf9wpJctjRUV0nwhcoedLUN"],["I","18uhPF_ATUEUQMoTCWsOoVOlWxNuMCKOj"]],"27":[["I","1eKSnu8IrGNeisiZakbocguPMfwXIiAvG"],["I","1niDjyMSPMnDUWXPcUo64AfzY9WOP2ACg"],["I","1iJzsS5I6Sp-7AVmlZ2LMySnzcGwMowhU"],["I","1WHqjI2C7rfq0_yR6apvqMWnNm0Rlf6Ab"],["I","1RFZaXd6Iyu3EaeN1axG7AW3QRMhRr8Ek"],["I","1ybOd_0UehA7KOxqwzCf7DHfQBx5IM7hb"]],"28":[["I","1wpt73g9eQNrhKP8mYkRJyaNjnSORw8JV"],["I","1c8vKIJ2aIYxWjSWiDJjMK_Gz95K__T3r"],["V","1hcrup7Qezy0dFI6muyUwMuMnVuD3FnGN"],["V","1IynFZah-pmbx_Um2Wyq3i0C-EGsE1p27"],["V","1ArUG0PuNzmD9TwGf7cRdYSvV3Gypthxw"],["I","1baPUsqaFgU-VS1a2NAnH3j0SwMwrPAq4"]],"29":[["I","14xWGG2tdNypDNRPVsEvX6MInMbNlxqeH"],["I","1KwaboBGSSd8SBy3Jgm07_9K8iagQ3t5x"],["I","1Oqo0Mpj8hqLZT7IQXbbJGsh3QediqluP"],["I","1d50XEcqnTRpFvfpZ-dpnGy7Gei5k5dix"],["I","1LKHd8ioef8vWI9VR2o9P-VeTez81_NMG"]],"30":[["I","1dzWhrVocUabAwVelO_EsGx0pwvrnBd3c"],["I","1AqcaH83VBehoIwOzW7Bu4drSShw7yPcY"],["I","1Jg6UuBZYaJKxqSPCB1k5Un_yel0Mlt7a"],["V","1F84GSBChfJesHy9uxyQja2j0fJTmSbD3"],["I","123yEICHuGzqEotHyDOuycpy2aNd-idPX"],["I","1DO0We9CqdlZFOkp3Il4N2t0IZe3HF3Ho"]]};
+function pubEstado(){
+  if(!publi.length) publi=[{id:'pub',dia:1,hechos:[],comp:false,fecha:'',ciclos:0}];
+  const p=publi[0], hoy=madridNow().fecha;
+  if(p.comp && p.fecha && hoy>p.fecha){ pubAvanzar(p,false); }
+  return p;
+}
+function pubAvanzar(p,render_){
+  p.dia = p.dia>=30 ? 1 : p.dia+1;
+  if(p.dia===1) p.ciclos=(p.ciclos||0)+1;
+  p.hechos=[]; p.comp=false; p.fecha='';
+  savePubli(); if(render_) renderPublicidad();
+}
+function renderPublicidad(){
+  const p=pubEstado(), items=PUB_DATA[p.dia]||[], hechos=new Set(p.hechos||[]);
+  const nHechos=items.filter(it=>hechos.has(it[1])).length;
+  const todos=items.length>0 && nHechos===items.length;
+  const pct=Math.round(((p.dia-1)+(p.comp?1:nHechos/Math.max(1,items.length)))/30*100);
+  const link=id=>'https://drive.google.com/file/d/'+id+'/view?usp=sharing';
+  const cards=items.map((it,i)=>{
+    const [tipo,id]=it, ok=hechos.has(id), vid=tipo==='V';
+    return `<div class="card" style="padding:10px;${ok?'opacity:.7;':''}">
+      <div style="display:flex;gap:12px;align-items:center;">
+        <a href="${link(id)}" target="_blank" rel="noopener" style="flex:0 0 84px;height:84px;border-radius:10px;overflow:hidden;background:var(--accent);display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;">
+          <img src="https://drive.google.com/thumbnail?id=${id}&sz=w300" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+          ${vid?'<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);">▶</span>':''}
+        </a>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:14px;color:var(--brand);">${vid?'Video':'Imagen'} ${i+1} ${ok?'✓':''}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            <button class="cta" data-pshare="${id}" style="padding:8px 12px;font-size:13px;margin:0;width:auto;">Compartir en WhatsApp</button>
+            <a href="${link(id)}" target="_blank" rel="noopener" class="chip" style="text-decoration:none;">Ver</a>
+            <div class="chip ${ok?'active':''}" data-ptog="${id}">${ok?'Hecho ✓':'Marcar hecho'}</div>
+          </div>
+        </div>
+      </div></div>`;
+  }).join('');
+  const hoy=madridNow().fecha;
+  let pie='';
+  if(p.comp){
+    const sig=p.dia>=30?1:p.dia+1;
+    pie=`<div class="card" style="text-align:center;"><div style="font-size:30px;">🎉</div><div style="font-weight:700;color:var(--brand);">¡Día ${p.dia} completado!</div><div style="font-size:13px;color:var(--sub);margin:6px 0 12px;">Mañana se desbloquea el Día ${sig}${p.dia>=30?' (empieza un nuevo ciclo)':''}.</div><button class="cta" id="pubNext" style="margin:0;">Pasar al Día ${sig} ahora</button><div class="chip" id="pubUndo" style="display:inline-block;margin-top:10px;">Deshacer</div></div>`;
+  } else {
+    pie=`<button class="cta" id="pubDone" ${todos?'':'disabled style="opacity:.45;"'}>${todos?'✓ Marcar día completado':`Faltan ${items.length-nHechos} por compartir`}</button>`;
+  }
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:18px;font-weight:700;color:var(--brand);">Día ${p.dia} de 30</div><div style="font-size:12px;color:var(--sub);">${p.ciclos?('Ciclo '+(p.ciclos+1)+' · '):''}${nHechos}/${items.length} hechos</div></div>
+    <div style="height:8px;background:var(--accent);border-radius:6px;margin-top:10px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--brand);"></div></div></div>
+    <div class="list-grid">${cards}</div>${pie}`;
+  document.getElementById('back').addEventListener('click',()=>{ tab='mas'; render(); });
+  const toggle=(id,force)=>{ const h=new Set(p.hechos||[]); if(force===true) h.add(id); else if(h.has(id)) h.delete(id); else h.add(id); p.hechos=[...h]; savePubli(); renderPublicidad(); };
+  document.querySelectorAll('[data-pshare]').forEach(b=>b.addEventListener('click',()=>{
+    const id=b.dataset.pshare, txt='Mira esto 💜 '+link(id);
+    window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+    toggle(id,true);
+  }));
+  document.querySelectorAll('[data-ptog]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.ptog)));
+  const d=document.getElementById('pubDone'); if(d&&todos) d.addEventListener('click',()=>{ p.comp=true; p.fecha=hoy; savePubli(); renderPublicidad(); });
+  const n=document.getElementById('pubNext'); if(n) n.addEventListener('click',()=>pubAvanzar(p,true));
+  const u=document.getElementById('pubUndo'); if(u) u.addEventListener('click',()=>{ p.comp=false; p.fecha=''; savePubli(); renderPublicidad(); });
+}
+
 function renderProgreso(){
   const f=window.progFiltro||'Semana';
   const hoy=madridNow().fecha;
@@ -1638,8 +1707,8 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='rutinas'?rutinas:n==='prospectos'?prospectos:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='rutinas'){rutinas=a;} else if(n==='prospectos'){prospectos=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='rutinas'?rutinas:n==='prospectos'?prospectos:n==='publi'?publi:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='rutinas'){rutinas=a;} else if(n==='prospectos'){prospectos=a;} else if(n==='publi'){publi=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
@@ -1647,6 +1716,7 @@ window.saveBiblioteca=()=>{ try{localStorage.setItem('vico_biblioteca',JSON.stri
 window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringify(campanas));}catch(e){} push('campanas',{items:clone(campanas)}); };
 window.saveProspectos=()=>{ try{localStorage.setItem('vico_prospectos',JSON.stringify(prospectos));}catch(e){} push('prospectos',{items:clone(prospectos)}); };
 window.saveRutinas=()=>{ try{localStorage.setItem('vico_rutinas',JSON.stringify(rutinas));}catch(e){} push('rutinas',{items:clone(rutinas)}); };
+window.savePubli=()=>{ try{localStorage.setItem('vico_publi',JSON.stringify(publi));}catch(e){} push('publi',{items:clone(publi)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||'', lote:config.lote||1, sheetsUrl:config.sheetsUrl||''}); };
 
@@ -1686,7 +1756,7 @@ function listen(){
     if(tab==='mensajes') render();
   },()=>{}));
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas','biblioteca','campanas','rutinas','prospectos'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca','campanas','rutinas','prospectos','publi'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -1694,7 +1764,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===8) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===9) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); if(n==='prospectos'&&typeof limpiarProspectosEjemplo==='function') limpiarProspectosEjemplo(true); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
