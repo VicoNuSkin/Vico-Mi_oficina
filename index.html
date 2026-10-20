@@ -155,7 +155,7 @@
 <div id="modalRoot"></div>
 
 <script>
-let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [], publi = [];
+let personas = [], eventos = [], config = {paraQue:""}, metas = [], biblioteca = [], campanas = [], rutinas = [], prospectos = [], publi = [], objeciones = [];
 let tab = "inicio", filtro = "Todos", prospectoFiltro = "Todos";
 
 const $main = document.getElementById('main');
@@ -190,6 +190,7 @@ function loadLocal(){
   try{ rutinas = JSON.parse(localStorage.getItem('vico_rutinas')||'[]'); }catch(e){ rutinas = []; }
   try{ prospectos = JSON.parse(localStorage.getItem('vico_prospectos')||'[]'); }catch(e){ prospectos = []; }
   try{ eventos = JSON.parse(localStorage.getItem('vico_eventos')||'[]'); }catch(e){ eventos = []; }
+  try{ objeciones = JSON.parse(localStorage.getItem('vico_objeciones')||'[]'); }catch(e){ objeciones = []; }
   try{ publi = JSON.parse(localStorage.getItem('vico_publi')||'[]'); }catch(e){ publi = []; }
   try{ config = JSON.parse(localStorage.getItem('vico_config')||'{"paraQue":""}'); }catch(e){ config = {paraQue:""}; }
 }
@@ -200,6 +201,7 @@ function saveBiblioteca(){ try{ localStorage.setItem('vico_biblioteca', JSON.str
 function saveCampanas(){ try{ localStorage.setItem('vico_campanas', JSON.stringify(campanas)); }catch(e){} }
 function saveProspectos(){ try{ localStorage.setItem('vico_prospectos', JSON.stringify(prospectos)); }catch(e){} }
 function saveRutinas(){ try{ localStorage.setItem('vico_rutinas', JSON.stringify(rutinas)); }catch(e){} }
+function saveObjeciones(){ try{ localStorage.setItem('vico_objeciones', JSON.stringify(objeciones)); }catch(e){} }
 function savePubli(){ try{ localStorage.setItem('vico_publi', JSON.stringify(publi)); }catch(e){} }
 function saveConfig(){ try{ localStorage.setItem('vico_config', JSON.stringify(config)); }catch(e){} }
 
@@ -236,6 +238,7 @@ function render(){
   else if(tab==='historial') renderHistorial();
   else if(tab==='progreso') renderProgreso();
   else if(tab==='publicidad') renderPublicidad();
+  else if(tab==='objeciones') renderObjeciones();
   else if(tab==='prospectos'){ renderProspectos(); autoSincronizarSheets(); }
   else renderMas();
 }
@@ -585,6 +588,7 @@ function renderMas(){
       <div class="row" id="goQR"><span class="dot"></span><div><div class="t">Mi código QR</div><div class="sub">Para compartir la app</div></div></div>
       <div class="row" id="goMsg"><span class="dot"></span><div><div class="t">Mensajería</div><div class="sub">Mensajes entre usuarios de la app</div></div></div>
       <div class="row" id="goHist"><span class="dot"></span><div><div class="t">Historial de Mover mi Oficina</div><div class="sub">Tus días guardados</div></div></div>
+      <div class="row" id="goObj"><span class="dot"></span><div><div class="t">Objeciones</div><div class="sub">Cómo responder + preguntar a Claude</div></div></div>
       <div class="row" id="goPub"><span class="dot"></span><div><div class="t">Publicidad</div><div class="sub">Contenido diario de 30 días para compartir</div></div></div>
       <div class="row" id="goProg"><span class="dot"></span><div><div class="t">Mi Progreso</div><div class="sub">Estadísticas y calendario de constancia</div></div></div>
     </div>
@@ -599,6 +603,7 @@ function renderMas(){
   document.getElementById('goMsg').addEventListener('click', ()=>{ tab='mensajes'; render(); });
   document.getElementById('goHist').addEventListener('click', ()=>{ tab='historial'; render(); });
   document.getElementById('goProg').addEventListener('click', ()=>{ tab='progreso'; render(); });
+  document.getElementById('goObj').addEventListener('click', ()=>{ tab='objeciones'; render(); });
   document.getElementById('goPub').addEventListener('click', ()=>{ tab='publicidad'; render(); });
 
 }
@@ -1351,6 +1356,90 @@ function openDetalleBloque(id){
 
 function sumarDias(fechaStr, n){ const d=new Date(fechaStr+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
 
+// ===== OBJECIONES =====
+const OBJ_SEED = [
+ {id:'s1',titulo:'"Está caro"',respuesta:'Te entiendo, es importante cuidar lo que se invierte. Mirá: no lo veo como un gasto, sino como lo que te cuesta por día. Dividido en el tiempo que dura, sale a ______ al día. ¿Querés que veamos juntas cuál es la opción que mejor se adapta a tu presupuesto? Tenemos packs y pago en cuotas.'},
+ {id:'s2',titulo:'"No tengo tiempo"',respuesta:'Justo por eso te lo cuento: es una rutina de 2 minutos, mañana y noche. No te quita tiempo, es un ratito para vos. Si querés, te mando un paso a paso cortito y lo probás esta semana.'},
+ {id:'s3',titulo:'"Lo tengo que pensar"',respuesta:'Por supuesto, tomate tu tiempo. Para ayudarte a decidir: ¿qué es lo que más te gustaría pensar? ¿El precio, si es para vos, o los resultados? Así te paso justo esa información y lo ves con tranquilidad.'},
+ {id:'s4',titulo:'"No sé si funciona"',respuesta:'Es normal dudar, hay muchísimo en el mercado. Te cuento mi experiencia y te muestro resultados reales de otras personas (siempre cada piel y cada cuerpo es distinto). Y si querés, empezamos con algo chico para que lo pruebes vos misma.'},
+ {id:'s5',titulo:'"Ya uso otra marca / ya tengo mi rutina"',respuesta:'¡Qué bien que ya te cuidás! No te pido que cambies todo. Muchas de mis clientas empezaron sumando un solo producto a lo que ya usaban. ¿Qué es lo que más te gustaría mejorar de lo que usás hoy?'},
+ {id:'s6',titulo:'"No me interesa"',respuesta:'Gracias por decírmelo con sinceridad, te lo agradezco. Si algún día querés cuidarte la piel o conocer otra forma de generar un ingreso extra, acá estoy. ¡Un abrazo grande!'},
+ {id:'s7',titulo:'"¿Es una pirámide?"',respuesta:'Buena pregunta, y hacés bien en preguntar. Es venta directa: se gana vendiendo productos reales que la gente consume y recompra, no por sumar gente. Es un modelo legal y regulado. Si querés, te cuento cómo funciona y vos decidís.'},
+ {id:'s8',titulo:'"No tengo plata ahora"',respuesta:'Gracias por tu sinceridad. No hay apuro. ¿Querés que te avise cuando haya alguna promo o pack especial? Y si algún día querés generar un ingreso extra para tus gastos, también te cuento cómo.'},
+ {id:'s9',titulo:'"Lo voy a comparar / lo veo en otro lado"',respuesta:'Hacés bien en comparar. Lo que me gusta de esto es el acompañamiento: yo te guío con tu rutina y estoy para tus dudas. Contame qué estás comparando y te ayudo a ver las diferencias.'},
+ {id:'s10',titulo:'"Tengo la piel sensible / me da miedo probar"',respuesta:'Lo entiendo, tu piel es lo primero. Podemos empezar con un solo producto, probarlo en una zona chica y ver cómo responde. Contame qué te pasó antes y te recomiendo lo más suave para vos.'},
+ {id:'s11',titulo:'"No quiero vender / no sirvo para vender" (equipo)',respuesta:'Yo tampoco pensaba que sirviera para esto. No es "vender" al estilo tradicional: es recomendar lo que ya te gusta y acompañar a la gente. Se aprende paso a paso y no estás sola, tenés un equipo que te guía. ¿Te cuento cómo arrancaría?'},
+ {id:'s12',titulo:'"Déjame consultarlo con mi pareja / familia"',respuesta:'¡Claro! Es una decisión importante. Si querés, te preparo un resumen cortito y claro para que se lo muestres. ¿Cuándo te parece bien que retomemos la charla?'}
+];
+function objLista(){
+  const ov={}; objeciones.forEach(o=>{ ov[o.id]=o; });
+  const base=OBJ_SEED.map(sd=>ov[sd.id]?ov[sd.id]:sd);
+  const extra=objeciones.filter(o=>!OBJ_SEED.some(sd=>sd.id===o.id));
+  return base.concat(extra).filter(o=>!o.borrado);
+}
+function objPrompt(situacion){
+  const ej=objLista().filter(o=>o.respuesta).slice(0,25).map(o=>'- Objeción: '+o.titulo+(o.usos?' (me funcionó '+o.usos+' veces)':'')+'\n  Mi respuesta: '+o.respuesta).join('\n');
+  return 'Soy Vico, vendo productos de cuidado de la piel y bienestar por venta directa (Nu Skin) y construyo equipo. Quiero responder con empatía, sin presionar ni prometer resultados de salud. Hablo en tono cercano, cálido y breve, para WhatsApp.\n\n'+
+  'Situación / lo que me dijo la persona:\n'+(situacion||'(describir aquí)')+'\n\n'+
+  'Dame 3 opciones de respuesta cortas (una más suave, una con pregunta que abra la conversación, una con un pequeño cierre). Usá el estilo de mis respuestas guardadas:\n'+ej;
+}
+function objPreguntarClaude(situacion){
+  const p=objPrompt(situacion);
+  try{ navigator.clipboard && navigator.clipboard.writeText(p); }catch(e){}
+  window.open('https://claude.ai/new?q='+encodeURIComponent(p),'_blank');
+}
+function renderObjeciones(){
+  const q=(window.objQ||'').toLowerCase();
+  const list=objLista().filter(o=>!q||(o.titulo+' '+o.respuesta).toLowerCase().includes(q));
+  $main.innerHTML=`<div class="chips"><div class="chip" id="back">← Más</div></div>
+    <div class="card"><div style="font-weight:700;color:var(--brand);margin-bottom:6px;">Pregúntale a Claude</div>
+      <textarea id="obj_sit" rows="3" placeholder="¿Qué te dijo la persona? Ej: 'Me dijo que lo tiene que pensar porque está caro'"></textarea>
+      <button class="cta" id="obj_ask" style="margin-top:8px;">Preguntar a Claude</button>
+      <div style="font-size:11px;color:var(--sub);margin-top:6px;">Se abre Claude con tu pregunta y tus respuestas guardadas ya escritas. Si no se ve el texto, pégalo (ya está copiado).</div></div>
+    <input id="obj_q" placeholder="Buscar objeción..." value="${(window.objQ||'').replace(/"/g,'&quot;')}">
+    <div class="list-grid">${list.map(o=>`<div class="card" style="padding:12px;">
+      <div style="font-weight:700;color:var(--brand);">${o.titulo}${o.usos?` <span style="font-weight:400;font-size:12px;color:var(--sub);">· ⭐ ${o.usos}</span>`:''}</div>
+      <div style="font-size:14px;margin:6px 0 10px;white-space:pre-wrap;overflow-wrap:anywhere;">${o.respuesta||'<i>Sin respuesta todavía</i>'}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="chip" data-ocopy="${o.id}">Copiar</div>
+        <div class="chip" data-owa="${o.id}">WhatsApp</div>
+        <div class="chip" data-ostar="${o.id}">⭐ Me funcionó</div>
+        <div class="chip" data-oai="${o.id}">Preguntar a Claude</div>
+        <div class="chip" data-oedit="${o.id}">Editar</div>
+      </div></div>`).join('')||'<div class="card" style="color:var(--sub);">Sin resultados.</div>'}</div>
+    <button class="cta" id="obj_add">+ Nueva objeción</button>`;
+  const get=id=>objLista().find(o=>o.id===id);
+  document.getElementById('back').addEventListener('click',()=>{ tab='mas'; render(); });
+  document.getElementById('obj_q').addEventListener('input',e=>{ window.objQ=e.target.value; const pos=e.target.selectionStart; renderObjeciones(); const i=document.getElementById('obj_q'); i.focus(); i.setSelectionRange(pos,pos); });
+  document.getElementById('obj_ask').addEventListener('click',()=>objPreguntarClaude(document.getElementById('obj_sit').value.trim()));
+  document.getElementById('obj_add').addEventListener('click',()=>openObjForm(null));
+  $main.querySelectorAll('[data-ocopy]').forEach(el=>el.addEventListener('click',()=>{ const o=get(el.dataset.ocopy); try{ navigator.clipboard.writeText(o.respuesta); el.textContent='Copiado ✓'; }catch(e){ prompt('Copia este texto:',o.respuesta); } }));
+  $main.querySelectorAll('[data-owa]').forEach(el=>el.addEventListener('click',()=>{ const o=get(el.dataset.owa); window.open('https://wa.me/?text='+encodeURIComponent(o.respuesta),'_blank'); }));
+  $main.querySelectorAll('[data-oai]').forEach(el=>el.addEventListener('click',()=>{ const o=get(el.dataset.oai); objPreguntarClaude('Me dijeron: '+o.titulo+'. Quiero mejorar mi respuesta actual: '+(o.respuesta||'')); }));
+  $main.querySelectorAll('[data-ostar]').forEach(el=>el.addEventListener('click',()=>{ const o=get(el.dataset.ostar); objGuardar(Object.assign({},o,{usos:(o.usos||0)+1})); renderObjeciones(); }));
+  $main.querySelectorAll('[data-oedit]').forEach(el=>el.addEventListener('click',()=>openObjForm(el.dataset.oedit)));
+}
+function objGuardar(o){
+  const i=objeciones.findIndex(x=>x.id===o.id);
+  if(i>=0) objeciones[i]=o; else objeciones.push(o);
+  saveObjeciones();
+}
+function openObjForm(id){
+  const o=id?objLista().find(x=>x.id===id):null;
+  const esc=t=>(t||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  openModal(`<button class="close-x" onclick="closeModal()">✕</button><h3 style="padding-right:34px;">${o?'Editar objeción':'Nueva objeción'}</h3>
+    <input id="of_t" placeholder="Qué dice la persona" value="${esc(o&&o.titulo)}">
+    <textarea id="of_r" rows="6" placeholder="Cómo le respondo">${esc(o&&o.respuesta)}</textarea>
+    <div class="actions">${o?'<button class="btn-secondary" id="of_del" style="color:#b3423a;">Eliminar</button>':''}<button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" id="of_ok">Guardar</button></div>`);
+  document.getElementById('of_ok').addEventListener('click',()=>{
+    const titulo=document.getElementById('of_t').value.trim(), respuesta=document.getElementById('of_r').value.trim();
+    if(!titulo) return;
+    objGuardar(Object.assign({usos:0},o||{},{id:o?o.id:uid(),titulo,respuesta,borrado:false})); closeModal(); renderObjeciones();
+  });
+  const d=document.getElementById('of_del');
+  if(d) d.addEventListener('click',()=>{ if(!confirm('¿Eliminar esta objeción?')) return; objGuardar({id:o.id,borrado:true}); closeModal(); renderObjeciones(); });
+}
+
 // ===== PUBLICIDAD (30 días) =====
 const PUB_DATA = {"1":[["I","1kIfjDjvfZLf_-3vmQX6pbw1Gp5HI-APy"],["I","1KquKe_IgI6QGBsX2nblHCpguBhZcyg7R"],["I","1DavvTNFtwJVoYGLlySiXGUplOtIxFoCg"],["V","1hMSB1DtH_19q0QNnE3xh37ii07XI9Hpx"]],"2":[["I","1OG99GReAretim0w07G-42zi_gB7yUo17"],["I","1JMp3_iki-bHCIaUjzD4duDCTGYonyl1b"],["I","1eSDdOxC3nj8bGc5UkxDwa257Y2sTBcn2"],["I","1k_fMZwHr3HEqBv2PmIJaW1cX2o85X0ua"],["I","1Go73SPbPDmf5n04Bua3_8lq2H_tzZ5Sv"],["I","1UIsTV9BZAqJ2oajvkJLbavRiKS9QeGlG"],["I","1fis2yXyq5Xt0U70tB5GISim7Bv1HDqNK"]],"3":[["I","1ztOAdy9rdcETjLimPf7blFBx6zgJW13F"],["I","1N8HpnmomGDSAjLVF0kki2nCX67KnTPoc"],["I","13MGV5Q9fueu4T-AZZaJP2w0EIpu2-k1m"],["I","1hFCwonIE1gBB6ArJ4tzq-PSkC1KgdjpJ"],["I","1--q0Rh24jf_fpW76e5YOoS9URjKkwAhx"],["I","11t2br_5PEt3UsKOpMBavA7L3bmcJTXJf"]],"4":[["I","1hXTftvEKoZY4MUJ7Wnf2EFQU2SmjfwHO"],["I","1bO5ANwRoU8JkLoXQPZnAGyybUretK2nD"],["I","1SCGdNOZ6rxdKxtOUtBFwWOOBfl36MpNk"],["I","1QOlymmBuVT-3ZAdWmuqKaRpUsiI0hM5i"],["I","1_4hx94kMsrl3IkYEczzNIVLgRx3KKEEy"],["I","1Wps7M7LLA36GAYBAADkVypJB4fa1hyzN"]],"5":[["I","1_E2doLiQSyjAO5P5pqcXAwTRVv2727wz"],["I","1lY0D57cgHDzkNiuoLOvySkk8JvD7k5Zn"],["I","1LemjV3wK9ypUxsVDGiScx7Sn4N4mzbA_"],["I","1BYXrk5UHb1lZr6JwlImuLoXr0E83p3Y_"],["I","1JhKHnBVrj63Em_exzBrN19fT7FfNDqJN"],["V","1YeO9xrR_vEfNUFBXp4Pr3Saah99mVVEV"]],"6":[["I","1MOBUvtwGdzO1mTpBsW23sCgRDnhsmCC7"],["I","1acU-lbnnXp1GLqly85r_GXiidJRL7fA9"],["I","1xtpf_AO-axQEJOIMC1qsnTAHbuxT_9W2"],["V","1-9D8eHKrfoa1V6sedtkZrI6WrmhAErMJ"]],"7":[["I","1-wYkLmj_q8lCLdagfrRAk1yxlKFUPpGG"],["I","1QSn1ASsap6XPFF9IM0ahU7vgTNn5WQGQ"],["I","1Su3OeJCZucqV9LAOuROO_v5Z-KUzbkE5"],["I","11RJ9Bwf9qwRqUvRisK71PAA_d3lKUB-R"],["I","163Qxon8eR1oZVguZj0hR4ttfQ1LcRbyp"],["V","1tCE6LSF5bOg9I5FhRCK-Osu-TmMVaAU8"]],"8":[["V","1_2w_cO2KbOi61Zt3Jou4EsD9BNhG9I-p"],["V","10jTgLrMk-E8BsnJm7NqUdAujXeIPOtcM"],["V","1lf0316ZMM3qAJ8vtF8k5sHN5dFAdBhIg"],["I","1liExbqScsNR3FhOD40swcYAFUiyN1SjQ"],["I","1Cbj1Bi6UAIxTcKUuQyj69RHbuLfnAQkq"],["I","1fdY866rUM9lbvnaF_IVrdWLP7p1BhZxh"]],"9":[["I","1maJD66yKtq9crc-DcNpK9emiX2jIx-Co"],["I","1zshATpK7ar4GTVHPKI-JE3F0s4pqbIuT"],["I","1kwWTuu_x9hzfQH_UO-STgrU55-DPd0jF"],["V","1-2Mg2eiqe3zu5WrmsqeasjhOkUbQ17Tb"],["I","1gaUSeSqxYA7LNgltijpgB5tOGNTTfvzm"]],"10":[["I","1vGLeC5HON7I0NXIPeC3vjeOTwecuJItw"],["I","1y0VW_u4c6xh1XKjhDUqehb0hTNsRRi3w"],["I","11Xd7AYDvl-eZJD6N1KcHnAwX23aDg7-G"],["I","1RY3NYzijQ32Clb1_5BWFlEmdBlr9AzsE"],["I","1JgNzz5UReYCsu8TUq_oPO5IqSmppveIX"],["I","1wQQMkK-eIsWa77aqkHzrdnNcDhPRgh17"]],"11":[["V","1KwTngIQydWevTo7XVz-WN_zy5fnjY-zD"],["I","1_kCTkWFFbsjQHr67ew7jyTF_Yx3w-gP5"],["I","1sFyGLsqxmPg04Tz2nj1q0P-krPip1gMr"],["I","1F6gt6-LF6eCsL8JUGXkHPqGOufTkHU1p"],["I","1K75BwPJCnm8kweYasJHMZV0x2Dz7_IEx"],["I","11ak0WDi6Fu3GS32hbjNWEPe4SKIIYxjY"],["I","1AG3CeRzmvSZkmuteaA6ac__4lU352mFX"]],"12":[["V","1Groim4F8_q60sKvu-iO2b3VGb-YyhezG"],["V","1cm1wQPmg33iH0b3HKtsQ-L237Gg0ZUTp"],["V","1ITA7MxAlmkGaCHQdX5nvj3P4wovIpOHL"],["V","1d2v2wg7HaFRWkNECCDdz-HyKHhxe_A9n"],["V","1mSUCuplGvy69MfhN136rOqEmfXaqwe07"],["V","1ZvcYpPFIeeVQI6HfruUWI9o6HfvbE0gk"],["V","1MSNsDVe2Gyj4e5OOcdT7PWhoUaiU-mW9"],["V","1Q5-sPCy7D302xnOkWrIJtXqGOTFm6JFQ"]],"13":[["V","100pCL_HQH1i5XB8OpPPzXr5UprPTpQPe"],["I","1uF3-ox8g4RsoBwf5zz0lj1vGaXM1XNXJ"],["V","1ca8nKrW9ic0m4VrRrKOGhEfyWclAn-sc"],["I","124U7LUE3Ml4fNj3zQHsCDK0_X3Dg1s5k"],["I","1BCPwhY7EEypzUuue-R_wGEe4G1rzvTvm"],["I","13QqZ4u1FRoYAnfZLWq3HlARm5QM19tZy"],["I","1KAIFmb35D9AYwlLQt8vfh6LG0M_VDg78"]],"14":[["I","15W0od4ErnU7w1zwOfDclsr8BHN93o_PM"],["V","1Ub1PD9ckbVjk8eW836gNJWIEsTOOqMdp"],["V","1nwab1Mf9USIaxrouA_UpZMbWLi1eV9xS"],["I","1miH_HMcouivdzPad0RdLDb_QfrTD_tRj"],["I","1y8cvx-PP-oLlGrTE2E16XoRdwjIMjyia"],["I","1_nKMVybOU2edzcezUZaOtfN6HA9KzLLj"]],"15":[["V","1BOmJqpL-aeu8mtkFEiqVQ-YQ04WsN_NF"],["V","1Woqxgl0HSy_Nk06yGQ-nX6Z0yrxCxONC"],["V","14Cjt7Zx2-ZmYQ4qGpjU96QKhCs5L0Gjc"],["V","1H-INtuJh6g1h5q8S5wpPxOp-PQArVOWB"],["I","16n6PQGaK75K3_XTKakRLTukuWNHO6jgw"],["V","1dhDLnDSQ2qNTUDGGRrirW_EvJ0iuxcoP"]],"16":[["V","1dJwr0sy2ssc25kK-45BwtuUeVrcBPAFG"],["V","1I-USIIPlGmWfcJymAe_pfveo5U731C2U"],["I","1BQUByoDDFZmZ_ekVdH2QjbKqko8OJMPF"],["I","1QUIwVYrs8W27hStxgVhplM5mm_osSkUp"],["V","163LQIO2Tma8Kk6U27822Tlh_v4cQCI2L"]],"17":[["I","1xxXAJbwY8o2NeaUMtQGqsSj4kavij97n"],["I","1qiFdXZhQIAGqpZuTuYZ_H_AynlvCR-wW"],["I","1wRtaWwKbOJ7l5RiEnzrzzGVejgQzHTf5"],["V","1Pj8dJFRvitnDgt8JtIHUqT1aIsxQM42q"],["V","1CJA_QLvLoOZh4kBcYxKtCkYqasxLUcZ7"],["I","15JK8FTKO_XjR5PyUAtj8Tow20gRSau9c"]],"18":[["I","1D2Ny-QEIrpqrfcvehYNL1WuajnjNr_Ot"],["V","1Pz_iDH95IUxG_Xa5KavO4QcBhX4PgEuO"],["V","1b94zwnxLgpyvcvinmRwg-KF2J2Kmh50m"],["V","1hgrxsxbJpEfWE1h3zxMq3sUMOm5eQria"],["V","12sx3VTVqFhMmac0xjaq3qbqX8HbBHSnL"]],"19":[["I","1M3kwaoWQkv8nHVBrnz6pQWdrrsGUHUjJ"],["I","1EOjw7KfAYvpFXhiFgkmUZ40FijaCfj6G"],["V","1hGE3M3qqJvE0baARc1d_cngWDnfUwZ53"],["I","18qnU9Y38p2P7jLv6LAYLkHr1VBLGkseg"],["I","1LRSS8YikQKUiMcKpr8QIJD2WniNzovj2"],["I","1ZcNSh7mVj_ExlOnHbIeL3xAHNdYtnXJQ"]],"20":[["V","1gCXG0QULotyYK9Z8dX81JDphu3BJ66_d"],["I","1uYQ3gpbZUMlXUS0ah06cF81oPOJ1QJoh"],["V","1-vRXCQ1YE431I56nyFo-JvPbO4VAS8gZ"],["I","173rWrdU47XJU6MYUWc9JM6t9KZuNf-Fx"],["V","1NzOXheIzEP08Nnw46igqnFG_q48g1bwD"],["V","1h5Ca1--xQgAaBLFdhVUwSwOV3HF3I4mI"],["I","1aCewwfUUO44u5DJwdBpwe_fZlUEsaaAv"],["I","1qvdgFvWX9x58BgRck7Bjmqr6fOlrnW4b"]],"21":[["V","1TbP5GuhoVuqwZ3ESxCHUzq0EW8J69oqf"],["I","1XlmUz2_0Fx6z7kOWhOMTYwQmiRQ9Tb0g"],["I","1K7Qtf2wJ73AtStI9Ksd_nZtSkV6WvNE6"],["I","1aYHgcYn_T_WzUx51Qo1FqhwP5y-PEQpj"],["I","12zQ2IPUWG1uhEw49EIJd50DITJlg4838"],["V","1ktva_VD_XhyT_ksnvb8d27hgmeiLITUA"]],"22":[["I","1ZB9zFkYCwg-Z-i7TGt2l8FmfNeffmatI"],["I","1RiK1qr9r9vxiiel3AFbjKHsR8IocYVmc"],["I","10VAlPJlUOml7oMx1aWipGh3K7m7bTiX3"],["I","1BX6HoUWqmBFpDRwzPxIJEf4ejyww2IM3"],["V","1vxFMxg45XRCfVRsMA_SgTicMVaHGUwh-"],["I","1Kd48feaBFrzpZhd0Wrnkxo4SZgabd83W"]],"23":[["V","1pDC-ISicmyzNA4Lp8Qg1L8-lUof9badR"],["I","1MGzxQZkBbemFcNcN7vl5BZjwIqfVbdv5"],["I","1VE5tJgfAUPro59GSeTiEV8xt4Y4oWQBu"],["I","1mhDU6uHPb_jHZUYfqeKtTbK_pSs3GtyD"],["I","1tWLefEEgOfT9oiX4EaLJM8H5eL2fQ7g9"],["V","1kv_o67e-N9Y1sXVhaMnksQ5tNyN9iX0u"]],"24":[["I","14Skc1vNa1pTL8DZNQlOOfFZDAZhPMd7g"],["I","19AkgUqKptwjCIExEugNgAhXWT9hhcVBe"],["I","1kAY6ESXNK6ipvBNNd2X8QLrF5_hr_Fw1"],["V","1pBofD7pBQB-7GuWnxQ5yN-mP_ycJ-62R"],["I","1E-DklPfBjmfTwo3lI0zI1QD5JZPuVxzj"],["I","1YpzjEJUBOXdrZNMXuHc43mk2ssDUZOt6"]],"25":[["V","1POfivegmGZIBOEI5Cy_y_FZxAX1zjmj_"],["I","1W_oPoQVzxoXyks_r_tzKXVsws4QnI1VG"],["I","1o3rxcU0Zg7cOoDcUt5Hckd7LxQzrFG_H"],["I","1jePBFt79pS3Lt5G5pz0Bv1SCocZ2eQWk"],["I","1stRR9f2ra4_g9wbBxTKW88hPhV7HB-RI"],["I","1iJ_Ch6jwvR_x3X0klYkurW2YVRzTOORi"]],"26":[["V","1SdYqrf1pqMkyzumE3fmqPCVLmGbusZQr"],["I","1avI3aRGCZSj-h25bOuSkxq369gROHzwd"],["I","1GZezGA835h-u3KCBNp1ohY79l9OBS1qM"],["I","1CD3NcAO-wQJ1WHkLWEXxCrBOJEoLOckP"],["I","1c4ddOQVymbf9wpJctjRUV0nwhcoedLUN"],["I","18uhPF_ATUEUQMoTCWsOoVOlWxNuMCKOj"]],"27":[["I","1eKSnu8IrGNeisiZakbocguPMfwXIiAvG"],["I","1niDjyMSPMnDUWXPcUo64AfzY9WOP2ACg"],["I","1iJzsS5I6Sp-7AVmlZ2LMySnzcGwMowhU"],["I","1WHqjI2C7rfq0_yR6apvqMWnNm0Rlf6Ab"],["I","1RFZaXd6Iyu3EaeN1axG7AW3QRMhRr8Ek"],["I","1ybOd_0UehA7KOxqwzCf7DHfQBx5IM7hb"]],"28":[["I","1wpt73g9eQNrhKP8mYkRJyaNjnSORw8JV"],["I","1c8vKIJ2aIYxWjSWiDJjMK_Gz95K__T3r"],["V","1hcrup7Qezy0dFI6muyUwMuMnVuD3FnGN"],["V","1IynFZah-pmbx_Um2Wyq3i0C-EGsE1p27"],["V","1ArUG0PuNzmD9TwGf7cRdYSvV3Gypthxw"],["I","1baPUsqaFgU-VS1a2NAnH3j0SwMwrPAq4"]],"29":[["I","14xWGG2tdNypDNRPVsEvX6MInMbNlxqeH"],["I","1KwaboBGSSd8SBy3Jgm07_9K8iagQ3t5x"],["I","1Oqo0Mpj8hqLZT7IQXbbJGsh3QediqluP"],["I","1d50XEcqnTRpFvfpZ-dpnGy7Gei5k5dix"],["I","1LKHd8ioef8vWI9VR2o9P-VeTez81_NMG"]],"30":[["I","1dzWhrVocUabAwVelO_EsGx0pwvrnBd3c"],["I","1AqcaH83VBehoIwOzW7Bu4drSShw7yPcY"],["I","1Jg6UuBZYaJKxqSPCB1k5Un_yel0Mlt7a"],["V","1F84GSBChfJesHy9uxyQja2j0fJTmSbD3"],["I","123yEICHuGzqEotHyDOuycpy2aNd-idPX"],["I","1DO0We9CqdlZFOkp3Il4N2t0IZe3HF3Ho"]]};
 // Numeración real de cada archivo (la del nombre D##_NNN); por defecto 1,2,3… en orden
@@ -1749,8 +1838,8 @@ const ref=n=>doc(fs,'usuarios',uid,'datos',n);
 const lr=document.getElementById('loginRoot');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const push=(n,data)=>{ if(uid) setDoc(ref(n),data).catch(()=>{}); };
-const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='rutinas'?rutinas:n==='prospectos'?prospectos:n==='publi'?publi:bloques;
-const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='rutinas'){rutinas=a;} else if(n==='prospectos'){prospectos=a;} else if(n==='publi'){publi=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
+const cur=n=>n==='personas'?personas:n==='eventos'?eventos:n==='metas'?metas:n==='biblioteca'?biblioteca:n==='campanas'?campanas:n==='rutinas'?rutinas:n==='prospectos'?prospectos:n==='publi'?publi:n==='objeciones'?objeciones:bloques;
+const setCur=(n,a)=>{ if(n==='personas'){personas=a;} else if(n==='eventos'){eventos=a;} else if(n==='metas'){metas=a;} else if(n==='biblioteca'){biblioteca=a;} else if(n==='campanas'){campanas=a;} else if(n==='rutinas'){rutinas=a;} else if(n==='prospectos'){prospectos=a;} else if(n==='publi'){publi=a;} else if(n==='objeciones'){objeciones=a;} else {bloques=a;} try{localStorage.setItem('vico_'+n,JSON.stringify(a));}catch(e){} };
 window.savePersonas=()=>{ try{localStorage.setItem('vico_personas',JSON.stringify(personas));}catch(e){} push('personas',{items:clone(personas)}); };
 window.saveEventos=()=>{ try{localStorage.setItem('vico_eventos',JSON.stringify(eventos));}catch(e){} push('eventos',{items:clone(eventos)}); };
 window.saveMetas=()=>{ try{localStorage.setItem('vico_metas',JSON.stringify(metas));}catch(e){} push('metas',{items:clone(metas)}); };
@@ -1759,6 +1848,7 @@ window.saveCampanas=()=>{ try{localStorage.setItem('vico_campanas',JSON.stringif
 window.saveProspectos=()=>{ try{localStorage.setItem('vico_prospectos',JSON.stringify(prospectos));}catch(e){} push('prospectos',{items:clone(prospectos)}); };
 window.saveRutinas=()=>{ try{localStorage.setItem('vico_rutinas',JSON.stringify(rutinas));}catch(e){} push('rutinas',{items:clone(rutinas)}); };
 window.savePubli=()=>{ try{localStorage.setItem('vico_publi',JSON.stringify(publi));}catch(e){} push('publi',{items:clone(publi)}); };
+window.saveObjeciones=()=>{ try{localStorage.setItem('vico_objeciones',JSON.stringify(objeciones));}catch(e){} push('objeciones',{items:clone(objeciones)}); };
 window.saveBloques=()=>{ try{localStorage.setItem('vico_bloques',JSON.stringify(bloques));}catch(e){} push('bloques',{items:clone(bloques)}); };
 window.saveConfig=()=>{ try{localStorage.setItem('vico_config',JSON.stringify(config));}catch(e){} push('config',{paraQue:config.paraQue||'', vision:config.vision||'', lote:config.lote||1, sheetsUrl:config.sheetsUrl||''}); };
 
@@ -1798,7 +1888,7 @@ function listen(){
     if(tab==='mensajes') render();
   },()=>{}));
   const merged=localStorage.getItem('vico_merged_'+uid);
-  ['personas','eventos','bloques','metas','biblioteca','campanas','rutinas','prospectos','publi'].forEach(n=>{
+  ['personas','eventos','bloques','metas','biblioteca','campanas','rutinas','prospectos','publi','objeciones'].forEach(n=>{
     unsubs.push(onSnapshot(ref(n),snap=>{
       if(snap.metadata.hasPendingWrites) return;
       if(!first[n]){
@@ -1806,7 +1896,7 @@ function listen(){
         first[n]=true; done++;
         let cloud=snap.exists()?(snap.data().items||[]):[];
         if(!merged){ const ids=new Set(cloud.map(x=>x.id)); const extra=cur(n).filter(x=>!ids.has(x.id)); if(extra.length){ cloud=cloud.concat(extra); push(n,{items:clone(cloud)}); } }
-        if(done===9) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
+        if(done===10) try{localStorage.setItem('vico_merged_'+uid,'1');}catch(e){}
         setCur(n,cloud); if(n==='prospectos'&&typeof limpiarProspectosEjemplo==='function') limpiarProspectosEjemplo(true); render(); return;
       }
       setCur(n,snap.exists()?(snap.data().items||[]):[]); render();
